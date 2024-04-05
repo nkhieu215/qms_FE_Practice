@@ -1,0 +1,78 @@
+<!-- Basic Form Inputs card start -->
+<div class="row">
+  <h2>Danh sách loại lỗi</h2>
+  <form name="form" (ngSubmit)="f.form.valid && refreshExamination()" #f="ngForm" novalidate style="margin-top: 20px;">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Tên lỗi</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+            placeholder="Tên lỗi" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Mã lỗi</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.type" #name="ngModel"
+            placeholder="Mã lỗi" />
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <button class="btn btn-primary m-2" type="submit">
+          <i class="fa fa-search"></i> Tìm kiếm
+        </button>
+        <button class="btn btn-success" routerLink="/setting/error-add-edit/0">
+          <i class="fa fa-plus"></i> Thêm mới thông tin lỗi
+        </button>
+        <div class="form-group">
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- <span>Add class of <code>.form-control</code> with <code>&lt;input&gt;</code> tag</span> -->
+
+</div>
+
+<div class="card-body">
+
+  <div class="row col-md-12">
+    <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
+      [nzData]="auditCriteria" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+      (nzPageIndexChange)="refreshExamination()" (nzPageSizeChange)="refreshExamination()">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Tên lỗi</th>
+          <th scope="col">Mã lỗi</th>
+          <th scope="col">Loại</th>
+          <th scope="col">Mô tả</th>
+          <th scope="col">Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let examination of auditCriteria ;let i = index;">
+          <td scope="row">{{ i+1 }}</td>
+          <td>
+            {{ examination.name }}
+          </td>
+          <td>{{ examination.errorCode}}</td>
+          <td>
+            <p *ngIf="examination.type ==1"> Hoạt động </p>
+            <p *ngIf="examination.type ==0"> Tạm dừng </p>
+          </td>
+          <td>
+            {{ examination.description}}
+          <td class="text-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" routerLink="/setting/error-add-edit/{{examination.id}}">Sửa</button>
+            </div>
+
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>

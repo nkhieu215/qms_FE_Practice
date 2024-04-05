@@ -1,0 +1,34 @@
+import { AuditCriteriaParam } from './auditCriteriaParam.model';
+import { AuditCriteriaLKDT2 } from './auditCriteriaLkdt2.model';
+import { ErrorElectronicComponent } from './errorElectronicComponent.model';
+import { ErrorList } from './errorList.model';
+export class PqcPhotoelectricProduct {
+  public id = null;
+  public lotNumber = null;
+  public checkPerson = null;
+  public coefficientWattageMax = null;
+  public coefficientWattageMin = null;
+  public colorMax = null;
+  public colorMin = null;
+  public colorTempMax = null;
+  public colorTempMin = null;
+  public conclude = null;
+  public ectricMax = null;
+  public ectricMin = null;
+  public note = null;
+  public performanceMax = null;
+  public performanceMin = null;
+  public powSupplyMax = null;
+  public powSupplyMin = null;
+  public powMax = null;
+  public powMin = null;
+  public quatity = null;
+  public ratio = null;
+  public tbn = null;
+  public temp = null;
+  public wattageMax = null;
+  public wattageMin = null;
+  public sdcmMin = null;
+  public sdcmMax = null;
+  public workOrderId = null;
+}

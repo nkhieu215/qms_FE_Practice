@@ -1,0 +1,126 @@
+<!-- Basic Form Inputs card start -->
+<div class="row">
+  <h2>Chỉnh sửa thông tin</h2>
+  <div class="float-right">
+    <button class="btn  btn-success" (click)="openError()"><i class="fa fa-plus"></i> Thêm lỗi</button>
+  </div>
+</div>
+<div class="card-body">
+  <div class="row">
+    <div class="col-xs-12 col-sm-12">
+      <div *ngIf="error" class={{classError}} role="alert">
+        {{error}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="col-xs-12 col-sm-12 col-md-4">
+      <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+
+        <div class="form-group">
+          <label>Tên nhóm lỗi</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="form.name" required #name="ngModel"
+            placeholder="Tên lỗi" />
+          <div class="alert-danger" *ngIf="name.errors && f.submitted">
+            <div *ngIf="name.errors['required']">Tên biên bản không được để trống</div>
+            <div *ngIf="name.errors['minlength']">
+              Username must be at least 3 characters
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mã nhóm lỗi</label>
+          <input type="text" class="form-control" name="errorCode" [(ngModel)]="form.errorCode" #code="ngModel"
+            placeholder="Mã lỗi" />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả</label>
+          <textarea class="form-control" name="description" [(ngModel)]="form.description"
+            #description="ngModel"></textarea>
+        </div>
+
+        <div class="form-group">
+
+
+          <button class="btn btn-primary" type="submit">
+            <i class="fa fa-save"></i>
+            Thêm mới
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- thong tin kiem tra nvl -->
+    <div class="col-xs-12 col-sm-12 col-md-8">
+      <div class="col-md-12" *ngIf="check">
+
+        <div class="form-group">
+          <label>Tên lỗi</label>
+          <input type="text" class="form-control" [(ngModel)]="selectExamination" value="{{ strSelect }}"
+            [matAutocomplete]="auto" class="form-control" [formControl]="searchExaminationCtrl" placeholder="Tên lỗi" />
+          <mat-autocomplete [panelWidth]="400" #auto="matAutocomplete" (optionSelected)="onSelected()"
+            [displayWith]="displayWith">
+            <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
+            <ng-container *ngIf="!isLoading">
+              <mat-option *ngFor="let error of filterError.lstError" [value]="error">
+                <span><b>{{ error.name }}</b> ({{ error.label}})</span>
+              </mat-option>
+            </ng-container>
+          </mat-autocomplete>
+        </div>
+
+        <div class="form-group">
+          <label>Mã lỗi</label>
+          <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formErrorChild.errorCode" required
+            #level="ngModel" placeholder="Mã lỗi" />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả</label>
+          <textarea class="form-control" name="description" [(ngModel)]="formErrorChild.description" required
+            #note="ngModel"></textarea>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-default m2" routerLink="/error"><i class="fa fa-list"></i> Danh sách</button>
+
+          <button class="btn btn-success" type="submit" (click)="onAddErrorChild()"> Thêm mới</button>
+        </div>
+
+      </div>
+
+      <nz-table #borderedTable nzBordered nzFooter="Footer" nzTitle="Danh sách lỗi ứng với nhóm lỗi"
+        [nzData]="arrErrChild" pagination="false">
+        <thead>
+          <tr>
+            <th>Tên lỗi</th>
+            <th>Mã lỗi</th>
+            <th>Mô tả</th>
+            <th>Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let audit of arrErrChild">
+            <td>{{ audit.name }}</td>
+            <td>{{ audit.errorCode }}</td>
+            <td>{{ audit.description }}</td>
+            <td class="text-center">
+              <div class="btn-group">
+                <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- thong tin kiem tra nvl -->

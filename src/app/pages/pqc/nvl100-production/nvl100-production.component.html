@@ -1,0 +1,160 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Kiểm tra rút nghiệm NVL 100%</h2>
+  <div class="card-body">
+    <div class="row">
+
+      <div class="col-xs-12 col-sm-12">
+        <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+          <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order"
+            item_id="{{idWorkOrder}}"></pqc-show-work-order>
+
+          <div class="form-group row" *ngIf="show_work_order">
+            <div class="col-sm-3">
+              <label style="color: blue;"><strong>Thực hiện quét mã linh kiện đầu vào . . .</strong></label>
+            </div>
+          </div>
+
+          <div class="form-group row" *ngIf="show_work_order">
+            <div class="col-sm-4">
+              <label>Thông tin scan máy </label>
+              <input type="text" class="form-control" placeholder="Thông tin mã máy" name="machineCode"
+                [(ngModel)]="form.machineCode">
+            </div>
+
+            <!-- <div class="col-sm-3">
+              <label>Chọn mặt trước sau (L/F/R) </label>
+              <select [(ngModel)]="form.side" class="form-control" name="conclude">
+                <option value="L">Mặt trái</option>
+                <option value="R">Mặt phải</option>
+                <option value="F">Mặt trước</option>
+                <option value="RE">Mặt sau</option>
+              </select>
+            </div> -->
+
+            <div class="col-sm-4">
+              <label>Thông tin Feeder </label>
+              <input type="text" class="form-control" placeholder="Thông tin Feeder" name="feeder" readonly
+                [(ngModel)]="form.feeder">
+            </div>
+
+            <div class="col-sm-4">
+              <label>Thông tin Material </label>
+              <input type="text" class="form-control" placeholder="Thông tin Material" name="material" readonly
+                [(ngModel)]="form.material">
+            </div>
+          </div>
+
+
+
+          <div class="form-group row">
+            <div class="col-sm-12 table-responsive">
+
+              <nz-table #borderedTable nzBordered nzTitle="Danh sách kiểm soát nguyên vật liệu theo lệnh sản xuất"  [nzData]="['']"
+                [nzFrontPagination]="false" >
+                <thead>
+                  <tr>
+                    <th>Mã máy</th>
+                    <!-- <th>Vị trí</th> -->
+                    <th>Mã Feeder</th>
+                    <th>Material</th>
+                    <th>Thông tin chi tiết mã QR </th>
+                    <th>Thời gian thực hiện Scan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let scan of lstScan let i=index;">
+                    <td>{{scan.machine}}</td>
+                    <!-- <td>{{scan.side}}</td> -->
+                    <td>{{scan.feeder}}</td>
+                    <td>{{scan.material}}</td>
+                    <td>{{scan.qr}}</td>
+                    <td>{{scan.date}}</td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+          </div>
+
+
+          <div class="form-group row">
+            <div class="col-sm-12 table-responsive">
+              <nz-table #borderedTable nzBordered
+                nzTitle="Danh sách nguyên vật liệu không thuộc khuyến nghị theo lệnh sản xuất" [nzData]="['']"
+                [nzFrontPagination]="false">
+                <thead>
+                  <tr>
+                    <th>Mã máy</th>
+                    <!-- <th>Vị trí mặt SX</th> -->
+                    <th>Mã Feeder </th>
+                    <th>Material</th>
+                    <th>Thông tin chi tiết mã QR </th>
+                    <th>Thời gian thực hiện Scan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let scan of lstScanFail">
+                    <td>{{scan.machine}}</td>
+                    <!-- <td>{{scan.side}}</td> -->
+                    <td>{{scan.feeder}}</td>
+                    <td>{{scan.material}}</td>
+                    <td>{{scan.qr}}</td>
+                    <td>{{scan.date}}</td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+          </div>
+
+
+          <app-button-success item_type="CHECK_NVL" show_work_order="{{show_work_order}}"
+            *ngIf="show_work_order"></app-button-success>
+
+          <div class="col-xs-12 col-sm-12">
+            <div *ngIf="error" class="alert alert-danger" role="alert">
+              {{error}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+
+  <ng-template #myModalScan let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Thông tin scan nguyên vật liệu đầu vào</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <nz-table #borderedTable nzBordered nzTitle="Thông tin scan nguyên vật liệu đầu vào" [nzData]="lstScanView"
+        [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th>Reel ID</th>
+            <th>Partnumber</th>
+            <th>Rank áp</th>
+            <th>Rank quang</th>
+            <th>Rank màu</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let scan of lstScanView">
+            <td>{{scan.reelID}}</td>
+            <td>{{scan.partNumber}}</td>
+            <td>{{scan.rankAp}}</td>
+            <td>{{scan.rankQuang}}</td>
+            <td>{{scan.rankMau}}</td>
+            <td>{{scan.date}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </ng-template>

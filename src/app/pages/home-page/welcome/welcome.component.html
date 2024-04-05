@@ -1,0 +1,313 @@
+<!-- <img src="../assets/img/logo_home.jpg" alt="logo" style="width: 100%;"> -->
+
+<div class="search-inputs">
+  <div class="row mb-3">
+    <label class="form-label" for="start-time">Thời gian bắt đầu</label>
+    <input class="form-control form-search" type="date"  [(ngModel)]="startDate"
+    [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
+  </div>
+
+  <div class="row mb-3">
+    <label class="form-label">Thời gian kết thúc</label>
+    <input class="form-control form-search" type="date"  [(ngModel)]="endDate"
+    [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
+  </div>
+
+  <div class="row mb-3">
+    <label class="form-label" for="">Đơn vị sản xuất</label>
+    <input class="form-control form-search" type="search">
+  </div>
+
+  <div class="row mb-3">
+    <label class="form-label" for="">Tổ</label>
+    <input class="form-control form-search" type="search">
+  </div>
+
+  <div class="row mb-3">
+    <label class="form-label" for="">Mã sản phẩm</label>
+    <input class="form-control form-search" type="search">
+  </div>
+
+  <div class="row mb-3">
+    <label class="form-label" for="">Tên sản phẩm</label>
+    <input class="form-control form-search" type="search">
+  </div>
+  <div>
+    <button class="button-header" (click)="getAllDataDashBoard()">Find</button>
+  </div>
+  <div>
+    <button class="button-header" (click)="openPopupConfig()">Config</button>
+  </div>
+  <div>
+    <button class="button-header" (click)="openPopupReport()">Report</button>
+  </div>
+</div>
+
+<!-- popup config -->
+<div class="table-responsive popup-background" role="dialog" *ngIf="popupConfig===true">
+  <div class="popup-container">
+    <div class="popup-header">
+      <h2>Khai báo</h2>
+      <span class="close-btn" (click)="closePopupConfig()">&times;</span>
+    </div>
+    <div class="popup-content">
+      <form action="" class="form-popup-declare">
+        <div>
+          <h2>Tỉ lệ lỗi mục tiêu các bộ phận</h2>
+          <table class=" table table-striped">
+            <thead>
+              <tr style="background-color: #006699">
+                <th class="custom-column">Tên ngành</th>
+                <th class="custom-column">Tỉ lệ % mục tiêu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of listOfNganh">
+                <td><input type="text" name="tenNganh" class="form-control inp-colum-declare" value="{{data.tenNganh}}">
+                </td>
+                <td><input type="text" name="target" class="form-control inp-colum-declare" value="{{data.target}}">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h2>Mức độ cảnh báo tỉ lệ lỗi mua hàng vật tư</h2>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="custom-column">Mục tiêu</th>
+                <th class="custom-column">Tỉ lệ % lỗi MIN</th>
+                <th class="custom-column">Tỉ lệ % lỗi MAX</th>
+                <th class="custom-column">Chọn màu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of listOfTarget">
+                <td><input type="text" name="nameTarget" class="form-control inp-colum-declare"
+                    value="{{data.nameTarget}}"></td>
+                <td><input type="text" name="targetMin" class="form-control inp-colum-declare"
+                    value="{{data.targetMin}}"></td>
+                <td><input type="text" name="targetMax" class="form-control inp-colum-declare"
+                    value="{{data.targetMax}}"></td>
+                <td>
+                  <select value="" class="form-control inp-colum-declare">
+                    <option name="" id="">Xanh</option>
+                    <option name="" id="">Vàng</option>
+                    <option name="" id="">Đỏ</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+      <button class="btn-save">Lưu</button>
+      <button class="btn-cancel">Huỷ</button>
+    </div>
+  </div>
+</div>
+
+<!-- popup Report -->
+<div class="table-responsive popup-background" role="dialog" *ngIf="popupReport === true">
+  <div class="popup-container">
+    <div class="popup-header">
+      <h2>View List Report</h2>
+      <span class="close-btn" (click)="closePopupReport()">&times;</span>
+    </div>
+    <div class="popup-content">
+      <form action="">
+        <table class=" table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span>STT</span>
+              </th>
+              <th scope="col">
+                <span>Thời gian chạy báo cáo</span>
+              </th>
+              <th scope="col">
+                <span>Người chạy</span>
+              </th>
+              <th scope="col">
+                <span>Nhận xét</span>
+              </th>
+              <th scope="col">
+                <span>Trạng thái</span>
+              </th>
+              <th scope="col">
+                <span>Option</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i = index; let data of listOfReport">
+              <td>{{i+1}}</td>
+              <td>{{data.timeReport}}</td>
+              <td>{{data.user}}</td>
+              <td>{{data.comment}}</td>
+              <td>{{data.status}}</td>
+              <td><button class="btn-view">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th class="header-parent" colspan="4">thông tin chất lượng sản phẩm</th>
+      <th class="header-parent" colspan="4">thông tin chất lượng bán thành phẩm</th>
+      <th class="header-parent" colspan="2">tình trạng phê duyệt</th>
+      <th class="header-parent" colspan="3">đánh giá chất lượng</th>
+    </tr>
+    <tr>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng nhập kho</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng không đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ sản phẩm đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi quá trình</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng nhập kho</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng không đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ sản phẩm đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi quá trình</th>
+      <th style="width: 5rem; border: 0.5px solid black">Chờ phê duyệt lệnh sản xuất</th>
+      <th style="width: 5rem; border: 0.5px solid black">Chờ phê duyệt BB KT</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lô kiểm tra</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lô không đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lô nhân nhượng</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 0.5px solid black">{{tongSlSpNhapKho}}</td>
+      <td style="border: 0.5px solid black">{{tongSlSpKhongDat}}</td>
+      <td style="border: 0.5px solid black">{{tiLeSpDat}}%</td>
+      <td style="border: 0.5px solid black">{{tiLeSpLoiQuaTrinh}}%</td>
+      <td style="border: 0.5px solid black">{{tongSlBTPNhapKho}}</td>
+      <td style="border: 0.5px solid black">{{tongSlBTPKhongDat}}</td>
+      <td style="border: 0.5px solid black">{{tiLeBTPDat}}%</td>
+      <td style="border: 0.5px solid black">{{tiLeBTPLoiQuaTrinh}}%</td>
+      <td style="border: 0.5px solid black">{{choPheDuyetLenhSX}}</td>
+      <td style="border: 0.5px solid black">{{choPheDuyetBBKT}}</td>
+      <td style="border: 0.5px solid black">{{soLoKT}}</td>
+      <td style="border: 0.5px solid black">{{soLoKhongDat}}</td>
+      <td style="border: 0.5px solid black">{{soLoNhanNhuong}}</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th class="header-parent" colspan="5">chất lượng vật tư</th>
+      <th class="header-parent" colspan="2">mua hàng</th>
+      <th class="header-parent" colspan="4">đánh giá thông số sản phẩm</th>
+      <th class="header-parent" colspan="4">đánh giá thông số btp driver</th>
+    </tr>
+    <tr>
+      <th style="width: 5rem; border: 0.5px solid black">Số lượng nhập hàng</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lượng đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lượng không đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số lượng nhân nhượng</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi vật tư trong QTSX</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số NCC</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số biên bản IQC</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số mẫu đo</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số mẫu đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">% Đạt thông số</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số mẫu không đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">Tổng số mẫu đo</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số mẫu đạt</th>
+      <th style="width: 5rem; border: 0.5px solid black">% Đạt thông số</th>
+      <th style="width: 5rem; border: 0.5px solid black">Số mẫu không đạt</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 0.5px solid black">{{slVatTuNhap}}</td>
+      <td style="border: 0.5px solid black">{{slVatTuDat}}</td>
+      <td style="border: 0.5px solid black">{{slVatTuKhongDat}}</td>
+      <td style="border: 0.5px solid black">{{slVatTuNhanNhuong}}</td>
+      <td style="border: 0.5px solid black">{{tiLeLoiVatTuQTSX}}%</td>
+      <td style="border: 0.5px solid black">{{tongSoNCC}}</td>
+      <td style="border: 0.5px solid black">{{tongSoBienBanIQC}}</td>
+      <td style="border: 0.5px solid black">{{tongSoMauDoSP}}</td>
+      <td style="border: 0.5px solid black">{{soMauSPDat}}</td>
+      <td style="border: 0.5px solid black">{{tiLeSPDatThongSo}}%</td>
+      <td style="border: 0.5px solid black">{{soMauSPKhongDat}}</td>
+      <td style="border: 0.5px solid black">{{tongSoMauDoBTPDrv}}</td>
+      <td style="border: 0.5px solid black">{{soMauBTPDrvDat}}</td>
+      <td style="border: 0.5px solid black">{{tiLeBTPDrvDatThongSo}}%</td>
+      <td style="border: 0.5px solid black">{{soMauBTPDrvKhongDat}}</td>
+
+    </tr>
+  </tbody>
+</table>
+
+
+<div class="chart-container">
+  <!-- column 1 -->
+  <div class="chart-column1">
+    <!-- Tỉ lệ lỗi các bộ phận SX so với mục tiêu -->
+    <div class="chartCard" style="width: 40vw; height: 23vw;">
+      <div class="chartBox">
+        <canvas id="myChart" style="width: 50vw;"></canvas>
+      </div>
+    </div>
+
+    <!-- Top sản phẩm nhiều lỗi nhất trong sx -->
+    <div class="chartCardSPNhieuLoi" style="width: 45vw; display: block; height: 23vw;">
+      <div class="chartBoxSPNhieuLoi">
+        <canvas id="myChartSPNhieuLoi"></canvas>
+      </div>
+    </div>
+
+    <!-- Tổng hợp tình trạng vật tư mua hàng -->
+    <div class="chartCardTTVatTu" style="width: 40vw; display: block;">
+      <div class="chartBoxTTVatTu">
+        <canvas id="myChartTTVatTu"></canvas>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- column 2 -->
+  <div class="chart-column2">
+    <!-- Phân tích nhóm lỗi trong sx -->
+    <div class="chartCardNhomLoi">
+      <div class="chartBoxNhomLoi">
+        <canvas id="myChartNhomLoi"></canvas>
+      </div>
+    </div>
+
+    <!-- Tổng hợp chất lượng nhập hàng hoá -->
+    <div class="chartCartChatLuongNhap">
+      <div class="chartBoxChatLuongNhap">
+        <canvas id="myChartChatLuongNhap"></canvas>
+      </div>
+    </div>
+
+    <div class="chartCartChatLuongHang">
+      <div class="chartBoxChatLuongHang">
+        <canvas id="myChartChatLuongHang"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row input-container">
+  <label for="">
+    <h4>Đánh giá tổng thế chất lượng</h4>
+  </label>
+  <textarea type="text" id="textInput" class="inp-DGCL" maxlength="1000"
+    placeholder="Đánh giá tổng thế chất lượng...."></textarea>
+</div>
+
+<button class="btn-export">Export</button>

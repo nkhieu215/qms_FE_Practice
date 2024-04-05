@@ -1,0 +1,324 @@
+<div *ngIf="lstview; else elseBlock1">
+
+  <app-pqc-show-list item_type="ASSEMBLES"></app-pqc-show-list>
+</div>
+
+
+<ng-template #elseBlock1>
+  <div>
+
+    <h2>Kiểm tra quá trình lắp ráp SP</h2>
+
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+            <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order" item_id="{{idWorkOrder}}"
+              item_type="ASSEMBLES"></pqc-show-work-order>
+
+
+            <div class="form-group row">
+              <div class="col-sm-12 table-responsive">
+                <div class="float-right btn-group" style="margin-bottom: 10px;" *ngIf="show_work_order">
+                  <button class="btn btn-success " *ngIf="create == true" (click)="open(myModal,'')">Thêm thông tin kiểm
+                    tra</button>
+                </div>
+
+                <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+                  [nzFrontPagination]="false">
+                  <thead>
+                    <tr>
+                      <th>Dây chuyền sx</th>
+                      <th>Công đoạn sản xuất</th>
+                      <th>Người kiểm tra</th>
+                      <th>Người vận hành</th>
+                      <th>Thời gian</th>
+                      <th>Số lượng ktra</th>
+                      <th>Số lượng đạt</th>
+                      <th>SL hỏng</th>
+                      <th>Tỷ lệ lỗi</th>
+                      <th>Kết luận</th>
+                      <th>Ghi chú</th>
+                      <th>Tùy chọn</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of lstAssemblesCompCheck let i=index;">
+                      <td>{{check.line}}</td>
+                      <td>{{check.processName}}</td>
+                      <td>{{check.checkPerson}}</td>
+                      <td>{{check.operators}}</td>
+                      <td>{{check.checkTime}}</td>
+                      <td>{{check.quatity}}</td>
+                      <td>{{check.quatityPass}}</td>
+                      <td>{{check.quatityFail}}</td>
+                      <td>{{check.ratio}}</td>
+                      <td>{{check.conclude}}</td>
+                      <td>{{check.note}}</td>
+                      <td>
+                        <div class="btn-group">
+                          <button (click)="open(myModalError,check.ids)" class="btn btn-primary btn-sm"
+                            title="Thêm thông tin lỗi"> <i class="fa fa-check"></i></button>
+
+                          <button (click)="openEdit(myModal,check.id)" class="btn btn-info btn-sm"
+                            *ngIf="create == true" title="Sửa thông tin"> <i class="fa fa-edit"></i></button>
+
+                          <button *ngIf="create == true" class="btn btn-danger btn-sm" title="Xóa"
+                            (click)="deleteCheck(check.ids)"> <i class="fa fa-trash"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </div>
+            <app-button-success item_type="ASSEMBLES" show_work_order="{{show_work_order}}"></app-button-success>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+
+    <ng-template #myModal let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
+                  <mat-label>Dây chuyền sản xuất</mat-label>
+                  <input type="text" [(ngModel)]="formEx.line" name="line" placeholder="Dây chuyền sản xuất"
+                    aria-label="Dây chuyền sản xuất" matInput [formControl]="myControl" [matAutocomplete]="auto">
+                  <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                      {{option}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Công đoạn sx</label>
+
+                <select [(ngModel)]="formEx.processName"  class="form-control {{ !processName.valid ? 'is-invalid' :''}}" required #processName="ngModel" name="processName">
+                  <option *ngFor="let process of lstProcess " value="{{process.name}}">{{process.name}}</option>
+
+                </select>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Thời gian</label>
+                <input [(ngModel)]="formEx.checkTime" class="form-control" name="checkTime" required
+                  placeholder="dd/mm/yyyy" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Người kiểm tra</label>
+                <input [(ngModel)]="formEx.checkPerson" type="text"
+                  class="form-control {{ !checkPerson.valid ? 'is-invalid' :''}}" #checkPerson="ngModel"
+                  name="checkPerson" required readonly placeholder="Người kiểm tra" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Số lượng kiểm tra</label>
+                <input [(ngModel)]="formEx.quatity" type="number" (ngModelChange)="calRatio()"
+                  class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity" required
+                  placeholder="Số kiểm tra" />
+              </div>
+            </div>
+
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Số lượng đạt</label>
+                <input [(ngModel)]="formEx.quatityPass" (ngModelChange)="calRatio()" type="number"
+                  class="form-control {{ !quatityPass.valid ? 'is-invalid' :''}}" #quatityPass="ngModel"
+                  name="quatityPass" required placeholder="Số lượng đạt" />
+              </div>
+            </div>
+
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Số lượng hỏng</label>
+                <input [(ngModel)]="formEx.quatityFail" (ngModelChange)="calRatio()" type="number"
+                  class="form-control {{ !quatityFail.valid ? 'is-invalid' :''}}" #quatityFail="ngModel" required
+                  name="quatityFail" placeholder="Số lượng hỏng" />
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Tỷ lệ lỗi</label>
+                <input [(ngModel)]="formEx.ratio" type="text" class="form-control" name="ratio" required readonly
+                  placeholder="Tỷ lệ lỗi" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Kết luận</label>
+                <select [(ngModel)]="formEx.conclude" class="form-control {{ !conclude.valid ? 'is-invalid' :''}}"
+                  #conclude="ngModel" required name="conclude">
+                  <option value="Đạt">Đạt</option>
+                  <option value="Không đạt">Không đạt</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Người vận hành</label>
+              <input [(ngModel)]="formEx.operators" type="text"
+                class="form-control {{ !operators.valid ? 'is-invalid' :''}}" #operators="ngModel" name="operators"
+                required placeholder="Người vận hành" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <button (click)="onAddError()" class="btn btn-success" type="submit" [disabled]="!(f.form.valid)"
+                *ngIf="formEx.id == null && create == true">Thêm mới</button>
+
+              <button (click)="onAddError()" class="btn btn-primary" type="submit" [disabled]="!(f.form.valid)"
+                *ngIf="formEx.id != null&& create == true">Cập nhật</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+
+    <ng-template #myModalError let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Khai báo lỗi</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="form" *ngIf="show_work_order && create == true" (ngSubmit)="f.form.valid && onAddErrorChild()"
+          #f="ngForm" novalidate>
+
+          <div class="form-group">
+            <label>Serial</label>
+            <input type="text" class="form-control" name="serial" [(ngModel)]="formErrorChild.serial" #level="ngModel"
+              placeholder="Serial" #quantity="ngModel" />
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Chọn nhóm lỗi</label>
+                <select required class="form-control" #errGroup="ngModel"
+                  (change)="onChangeErrorGroup(formErrorChild.errGroup)" name="errGroup"
+                  [(ngModel)]="formErrorChild.errGroup" #type="ngModel">
+                  <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
+
+                <div class="alert-danger" *ngIf="errGroup.errors && f.submitted">
+                  <div *ngIf="errGroup.errors['required']">Nhóm lỗi không được để trống</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Chọn lỗi</label>
+                <select required class="form-control" name="errName" [(ngModel)]="formErrorChild.errName"
+                  #type="ngModel" #errName="ngModel">
+                  <option *ngFor="let error of lstError; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
+                <div class="alert-danger" *ngIf="errName.errors && f.submitted">
+                  <div *ngIf="errName.errors['required']">Tên lỗi không được để trống</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lượng</label>
+                <input required="" type="number" (change)="onChangeQuantityError(formErrorChild.quantity)"
+                  class="form-control" name="regulationNevel" [(ngModel)]="formErrorChild.quantity" required
+                  #level="ngModel" placeholder="Số lượng lỗi" #quantity="ngModel" />
+                <div class="alert-danger" *ngIf="quantity.errors && f.submitted">
+                  <div *ngIf="quantity.errors['required']">Số lượng kiểm tra không được để trống</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Tỷ lệ lỗi</label>
+                <input readonly type="text" class="form-control" name="ratio" [(ngModel)]="formErrorChild.ratio"
+                  #level="ngModel" placeholder="tỷ lệ lỗi" />
+
+                <label style="color: red;">{{errorAdd}}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button class="btn btn-success" type="submit" *ngIf="create == true">Thêm mới</button>
+          </div>
+        </form>
+
+        <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th>Loại lỗi</th>
+              <th>Tên lỗi</th>
+              <th>Số lượng</th>
+              <th>Tỷ lệ lỗi</th>
+              <th width="50px">Tùy chọn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let error of arrErrChild">
+              <td>{{ error.errGroup }}</td>
+              <td>{{ error.errName }}</td>
+              <td>{{ error.quantity }}</td>
+              <td>{{ error.ratio }}</td>
+              <td>
+                <button *ngIf="show_work_order" class="btn btn-sm btn-danger" (click)="deleteErrorRow(error.ids)"><i
+                    class="fa fa-trash"></i>
+                  Xóa</button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>

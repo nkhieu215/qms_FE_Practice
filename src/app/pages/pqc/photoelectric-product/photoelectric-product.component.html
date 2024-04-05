@@ -1,0 +1,399 @@
+<div *ngIf="lstview; else elseBlock1">
+  <app-pqc-show-list item_type="PHOTOELECTRIC_PRODUCT"></app-pqc-show-list>
+</div>
+
+<ng-template #elseBlock1>
+  <div>
+    <h2>Chi tiết thông tin kiểm tra thông số quang điện thành phẩm</h2>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm">
+            <pqc-show-work-order show_check="{{show_check}}" item_type="PHOTOELECTRIC_PRODUCT" *ngIf="show_work_order"
+              item_id="{{ idWorkOrder }}"></pqc-show-work-order>
+
+            <div class="table-responsive">
+              <div class="float-right btn-group" style="margin-bottom: 10px" *ngIf="show_work_order">
+                <button class="btn btn-success" (click)="open(myModal ,'')">
+                  Thêm thông tin kiểm tra
+                </button>
+              </div>
+              <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+                [nzFrontPagination]="false">
+                <thead>
+                  <tr>
+                    <th rowspan="2">STT</th>
+                    <th colspan="2">SDCM</th>
+                    <th colspan="8">Thông số quang</th>
+                    <th colspan="6">Thông số điện</th>
+                    <th rowspan="2">Hệ số W-min</th>
+                    <th rowspan="2">Hệ số W-max</th>
+                    <th colspan="3">Độ tin cậy</th>
+                    <th rowspan="2">Số lô</th>
+                    <th rowspan="2">TBN</th>
+                    <th rowspan="2">Ghi chú</th>
+                    <th rowspan="2">Tùy chọn</th>
+                  </tr>
+                  <tr>
+                    <th>SDCM(min)</th>
+                    <th>SDCM(max)</th>
+                    <th>lm(min)</th>
+                    <th>lm(max)</th>
+                    <th>lm/W(min)</th>
+                    <th>lm/W(max)</th>
+                    <th>RA(min)</th>
+                    <th>RA(max)</th>
+                    <th>K(min)</th>
+                    <th>K(max)</th>
+                    <th>Điện nguồn min</th>
+                    <th>Điện nguồn max</th>
+                    <th>mA-min</th>
+                    <th>mA-max</th>
+                    <th>W-min</th>
+                    <th>W-max</th>
+                    <th>Số lượng kiểm tra</th>
+                    <th>Tỷ lệ đạt</th>
+                    <th>Nhiệt độ TS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let check of lstCheck; let i = index">
+                    <td>{{ i+1 }}</td>
+                    <td>{{ check.sdcmMin }}</td>
+                    <td>{{ check.sdcmMax }}</td>
+                    <td>{{ check.ectricMin }}</td>
+                    <td>{{ check.ectricMax }}</td>
+                    <td>{{ check.performanceMin }}</td>
+                    <td>{{ check.performanceMax }}</td>
+                    <td>{{ check.colorMin }}</td>
+                    <td>{{ check.colorMax }}</td>
+                    <td>{{ check.colorTempMin }}</td>
+                    <td>{{ check.colorTempMax }}</td>
+
+                    <td>{{ check.powSupplyMin }}</td>
+                    <td>{{ check.powSupplyMax }}</td>
+                    <td>{{ check.powMin }}</td>
+                    <td>{{ check.powMax }}</td>
+                    <td>{{ check.wattageMin }}</td>
+                    <td>{{ check.wattageMax }}</td>
+
+                    <td>{{ check.coefficientWattageMin }}</td>
+                    <td>{{ check.coefficientWattageMax }}</td>
+
+                    <td>{{ check.quatity }}</td>
+                    <td>{{ check.ratio }}</td>
+                    <td>{{ check.temp }}</td>
+                    <td>{{ check.lotNumber }}</td>
+                    <td>{{ check.tbn }}</td>
+                    <td>{{ check.note }}</td>
+                    <td>
+                      <button *ngIf="show_work_order" class="btn btn-sm btn-primary" style="margin-right: 10px ;"
+                        title="Chi tiết" (click)="open(myModal, check.id)">
+                        <i class="fa fa-check"></i>
+                      </button>
+
+                      <button *ngIf="show_work_order" class="btn btn-danger btn-sm" title="Xóa"
+                        (click)="delete(check.id)">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+
+            <!-- <div class="form-group row">
+              <div class="col-sm-4">
+                <label>Số liệu kiểm tra </label>
+                <input type="file" class="form-control" (change)="addfile($event)" placeholder="Upload file"
+                  accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+              </div>
+            </div> -->
+
+            <app-button-success item_type="PHOTOELECTRIC_PRODUCT"
+              show_work_order="{{show_work_order}}"></app-button-success>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #myModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">
+        Thêm thông tin kiểm tra
+      </h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Lựa chọn file dữ liệu</label>
+              <input type="file" class="form-control" (change)="addfile($event)" placeholder="Upload file"
+                accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Export file dữ liệu</label>
+              <br>
+              <button (click)="exportToExcel()">
+                Export File
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Lô sản xuất</label>
+              <input [(ngModel)]="formEx.lotNumber" type="text" class="form-control" name="lotNumber" required
+                placeholder="Lô sản xuất" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Ngày kiểm tra</label>
+              <input [(ngModel)]="formEx.checkTime" type="text" class="form-control" name="checkTime" required
+                placeholder="Người kiểm tra" />
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>SDCM min</label>
+              <input [(ngModel)]="formEx.sdcmMin" type="text" #sdcmMin="ngModel"
+                class="form-control {{ !sdcmMin.valid ? 'is-invalid' :''}}" name="sdcmMin" required
+                placeholder="SDCM min" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>SDCM max</label>
+              <input [(ngModel)]="formEx.sdcmMax" type="text" #sdcmMax="ngModel"
+                class="form-control {{ !sdcmMax.valid ? 'is-invalid' :''}}" name="sdcmMax" required
+                placeholder="SDCM max" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-body primary-breadcrumb" style="padding: 10px; margin-bottom: 10px">
+          <h5 style="font-size: 18px; margin-bottom: 0px">Thông số quang</h5>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Quang thông min</label>
+              <input [(ngModel)]="formEx.ectricMin" type="text" #ectricMin="ngModel"
+                class="form-control {{ !ectricMin.valid ? 'is-invalid' :''}}" name="ectricMin" required
+                placeholder="" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Quang thông max</label>
+              <input [(ngModel)]="formEx.ectricMax" type="text" #ectricMax="ngModel"
+                class="form-control {{ !ectricMax.valid ? 'is-invalid' :''}}" name="ectricMax" required
+                placeholder="" />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Hiệu xuất min</label>
+              <input [(ngModel)]="formEx.performanceMin" type="text" #performanceMin="ngModel"
+                class="form-control {{ !performanceMin.valid ? 'is-invalid' :''}}" name="performanceMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Hiệu xuất max</label>
+              <input [(ngModel)]="formEx.performanceMax" type="text" #performanceMax="ngModel"
+                class="form-control {{ !performanceMax.valid ? 'is-invalid' :''}}" name="performanceMax" required />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Nhiệt độ màu min</label>
+              <input [(ngModel)]="formEx.colorTempMin" type="text" #colorTempMin="ngModel"
+                class="form-control {{ !colorTempMin.valid ? 'is-invalid' :''}}" name="colorTempMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Nhiệt độ màu max</label>
+              <input [(ngModel)]="formEx.colorTempMax" type="text" #colorTempMax="ngModel"
+                class="form-control {{ !colorTempMax.valid ? 'is-invalid' :''}}" name="colorTempMax" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Độ trả màu min</label>
+              <input [(ngModel)]="formEx.colorMin" type="text" class="form-control" #colorMin="ngModel"
+                class="form-control {{ !colorMin.valid ? 'is-invalid' :''}}" name="colorMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Độ trả màu max</label>
+              <input [(ngModel)]="formEx.colorMax" type="text" #colorMax="ngModel"
+                class="form-control {{ !colorMax.valid ? 'is-invalid' :''}}" name="colorMax" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-body primary-breadcrumb" style="padding: 10px; margin-bottom: 10px">
+          <h5 style="font-size: 18px; margin-bottom: 0px">Thông số điện</h5>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Điện nguồn min</label>
+              <input [(ngModel)]="formEx.powSupplyMin" type="text" #powSupplyMin="ngModel"
+                class="form-control {{ !powSupplyMin.valid ? 'is-invalid' :''}}" name="powSupplyMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Điện nguồn max</label>
+              <input [(ngModel)]="formEx.powSupplyMax" type="text" #powSupplyMax="ngModel"
+                class="form-control {{ !powSupplyMax.valid ? 'is-invalid' :''}}" name="powSupplyMax" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Dòng điện min</label>
+              <input [(ngModel)]="formEx.powMin" type="text" #powMin="ngModel"
+                class="form-control {{ !powMin.valid ? 'is-invalid' :''}}" name="powMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Dòng điện max</label>
+              <input [(ngModel)]="formEx.powMax" type="text" #powMax="ngModel"
+                class="form-control {{ !powMax.valid ? 'is-invalid' :''}}" name="powMax" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Công suất min</label>
+              <input [(ngModel)]="formEx.wattageMin" type="text" #wattageMin="ngModel"
+                class="form-control {{ !wattageMin.valid ? 'is-invalid' :''}}" name="wattageMin" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Công suất max</label>
+              <input [(ngModel)]="formEx.wattageMax" type="text" #wattageMax="ngModel"
+                class="form-control {{ !wattageMax.valid ? 'is-invalid' :''}}" name="wattageMax" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Hệ số công suất min</label>
+              <input [(ngModel)]="formEx.coefficientWattageMin" type="text" #coefficientWattageMin="ngModel"
+                class="form-control {{ !coefficientWattageMin.valid ? 'is-invalid' :''}}" name="coefficientWattageMin"
+                required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Hệ số công suất max</label>
+              <input [(ngModel)]="formEx.coefficientWattageMax" type="text" #coefficientWattageMax="ngModel"
+                class="form-control {{ !coefficientWattageMax.valid ? 'is-invalid' :''}}" name="coefficientWattageMax"
+                required />
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-body primary-breadcrumb" style="padding: 10px; margin-bottom: 10px">
+          <h5 style="font-size: 18px; margin-bottom: 0px">Độ tin cậy</h5>
+        </div>
+        <div class="row"></div>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Số lượng kiểm tra</label>
+              <input [(ngModel)]="formEx.quatity" type="number" #quatity="ngModel"
+                class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" name="quatity" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Tỷ lệ đạt</label>
+              <input [(ngModel)]="formEx.ratio" type="text" #ratio="ngModel"
+                class="form-control {{ !ratio.valid ? 'is-invalid' :''}}" name="ratio" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>Nhiệt độ TS</label>
+              <input [(ngModel)]="formEx.temp" type="text" #temp="ngModel"
+                class="form-control {{ !temp.valid ? 'is-invalid' :''}}" name="temp" required />
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group">
+              <label>TBN(0.5s on/0.5s off)</label>
+              <input [(ngModel)]="formEx.tbn" type="text" #tbn="ngModel"
+                class="form-control {{ !tbn.valid ? 'is-invalid' :''}}" name="tbn" required
+                placeholder="TBN(0.5s on/0.5s off)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Người kiểm tra</label>
+              <input [(ngModel)]="formEx.checkPerson" type="text" #checkPerson="ngModel"
+                class="form-control {{ !checkPerson.valid ? 'is-invalid' :''}}" name="checkPerson" required
+                placeholder="Người kiểm tra" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Kết luận</label>
+              <select [(ngModel)]="formEx.conclude" required name="conclude" #conclude="ngModel"
+                class="form-control {{ !conclude.valid ? 'is-invalid' :''}}">
+                <option value="Đạt">Đạt</option>
+                <option value="Không đạt">Không đạt</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label>Ghi chú</label>
+            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
+              placeholder="Ghi chú" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <button *ngIf="formEx.id" (click)="onCheck()" class="btn btn-primary" type="submit"
+              [disabled]="!(f.form.valid)">
+              Cập nhật
+            </button>
+
+            <button *ngIf="formEx.id == '' || formEx.id == null" (click)="onCheck()" class="btn btn-success"
+              [disabled]="!(f.form.valid)" type="submit">
+              Thêm mới
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+</ng-template>

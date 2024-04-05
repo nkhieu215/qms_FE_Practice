@@ -1,0 +1,16 @@
+<div class="form-group" style="margin-top: 20px;"  *ngIf="show_work_order == 'true'">
+  <button class="btn  btn-secondary" routerLink="{{ strUrl }}"><i class="fa fa-list"></i> Danh sách</button>
+
+  <!-- <button class="btn btn-primary" type="submit" *ngIf="show_work_order == 'true'"
+      (click)="onSubmit('save')" style="margin-left: 30px;">
+      <i class="fa fa-save"></i>
+      Lưu thông tin
+  </button> -->
+
+  <button class="btn btn-success" type="submit" *ngIf="showButtonSuccess"
+    (click)="onSubmit('finish')" style="margin-left: 30px;">
+    <i class="fa fa-save"></i>
+    Hoàn thành
+  </button>
+
+</div>

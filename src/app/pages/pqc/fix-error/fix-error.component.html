@@ -1,0 +1,315 @@
+<div *ngIf="lstview; else elseBlock1">
+  <app-pqc-show-list item_type="FIX_ERR"></app-pqc-show-list>
+</div>
+
+<ng-template #elseBlock1>
+  <div>
+
+    <h2>Kiểm tra lỗi sửa lại</h2>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm">
+            <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order" item_id="{{ idWorkOrder }}" (eventData)="changeWo($event)"
+              item_type="FIX_ERR"></pqc-show-work-order>
+
+            <div class="form-group row">
+              <div class="col-sm-12 table-responsive">
+                <div class="float-right btn-group" style="margin-bottom: 10px" *ngIf="show_work_order">
+                  <button class="btn btn-success" (click)="open(myModal, '')">
+                    Thêm thông tin kiểm tra
+                  </button>
+                </div>
+
+                <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+                  [nzFrontPagination]="false">
+                  <thead>
+                    <tr>
+                      <th>Số lô</th>
+                      <th>Công đoạn</th>
+                      <th>Nhóm lỗi</th>
+                      <th>Tên lỗi</th>
+                      <th>Serial</th>
+                      <th>Số lượng kiểm tra</th>
+                      <th>Số lượng lỗi</th>
+                      <th>Tỷ lệ</th>
+                      <th>Ghi chú</th>
+                      <th>Tùy chọn</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of lstErrorFix; let i = index">
+                      <td>{{ check.lotNumber }}</td>
+                      <td>{{ check.stage}}</td>
+                      <td>{{ check.errGr }}</td>
+                      <td>{{ check.errName }}</td>
+                      <td>{{ check.serial }}</td>
+                      <td>{{ check.quantity }}</td>
+                      <td>{{ check.quantityErr }}</td>
+                      <td>{{ check.ratio }}</td>
+                      <td>{{ check.note }}</td>
+                      <td>
+                        <button *ngIf="show_work_order" class="btn btn-danger btn-sm" title="Xóa"
+                          (click)="deleteCheck(check.ids)">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" *ngIf="show_work_order" title="Sửa"
+                          (click)="open(myModalEdit, check.ids)">
+                          Sửa
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </div>
+            <app-button-success item_type="FIX_ERR" show_work_order="{{show_work_order}}"></app-button-success>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #myModal let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">
+          Thêm thông tin kiểm tra
+        </h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lượng kiểm tra</label>
+                <input [(ngModel)]="formEx.quantity" (blur)="ratioCal()" type="number"
+                  class="form-control {{ !quantity.valid ? 'is-invalid' :''}}" #quantity="ngModel" name="quantity"
+                  required placeholder="Số lượng" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lỗi</label>
+                <input [(ngModel)]="formEx.quantityErr" type="number"
+                  class="form-control {{ !quantityErr.valid ? 'is-invalid' :''}}" #quantityErr="ngModel"
+                  name="quantityErr" required placeholder="Số lỗi" (blur)="ratioCal()" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Nhóm lỗi</label>
+                <select required #errGroup="ngModel" class="form-control {{ !errGroup.valid ? 'is-invalid' :''}}"
+                  (change)="onChangeErrorGroup(formEx.errGr)" name="errGr" [(ngModel)]="formEx.errGr" #type="ngModel">
+                  <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">
+                    {{ error.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;" >
+                  <mat-label>Tên lỗi</mat-label>
+                  <input matInput [(ngModel)]="formEx.errName" name="line" placeholder="Tên lỗi" required
+                    aria-label="Tên lỗi" matInput [formControl]="errorNameForm" [matAutocomplete]="autoMachine">
+                  <mat-autocomplete #autoMachine="matAutocomplete" >
+                    <mat-option *ngFor="let option of filteredError | async" [value]="option">
+                      {{option}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
+
+
+                <!-- <select required class="form-control {{ !errName.valid ? 'is-invalid' :''}}" name="errName"
+                  [(ngModel)]="formEx.errName" #type="ngModel" #errName="ngModel">
+                  <option *ngFor="let error of lstError; let idx = index" [value]="error.name">
+                    {{ error.name }}
+                  </option>
+                </select> -->
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Serial</label>
+                <input [(ngModel)]="formEx.serial" type="text" class="form-control" name="serial"
+                  placeholder="Serial " />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Tỷ lệ lỗi</label>
+                <input [(ngModel)]="formEx.ratio" type="text" class="form-control" name="ratio"
+                  placeholder="Tỷ lệ lỗi" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lô</label>
+                <input [(ngModel)]="formEx.lotNumber" type="text" class="form-control" name="lotNumber"  class="form-control {{ !lotNumber.valid ? 'is-invalid' :''}}" #lotNumber="ngModel" required
+                  placeholder="Số lô" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Công đoạn</label>
+                <select [(ngModel)]="formEx.stage" class="form-control" name="stage"
+                  class="form-control {{ !stage.valid ? 'is-invalid' :''}}" #stage="ngModel" required>
+                  <option *ngFor="let process of lstProcess " value="{{process.name}}">{{process.name}}</option>
+                </select>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Nguyên vật liệu thay thế</label>
+              <input [(ngModel)]="formEx.materials" type="text" class="form-control" name="materials"
+                placeholder="Nguyên vật liệu thay thế" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
+                placeholder="Ghi chú" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <button (click)="onAddError()" class="btn btn-success"  [disabled]="!(f.form.valid && errorNameForm.valid)" type="submit">
+                <i class="fa fa-plus"></i> Thêm mới
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+    <ng-template #myModalEdit let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">
+          Sửa thông tin kiểm tra
+        </h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lượng kiểm tra</label>
+                <input [(ngModel)]="formEx.quantity" (blur)="ratioCal()" type="text" class="form-control"
+                  name="quantity" required placeholder="Số lượng" />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lỗi</label>
+                <input [(ngModel)]="formEx.quantityErr" type="text" class="form-control" name="quantityErr" required
+                  placeholder="Số lỗi" (blur)="ratioCal()" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Nhóm lỗi</label>
+                <select required class="form-control" #errGroup="ngModel" (change)="onChangeErrorGroup(formEx.errGr)"
+                  name="errGr" [(ngModel)]="formEx.errGr" #type="ngModel">
+                  <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">
+                    {{ error.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Tên lỗi</label>
+                <select required class="form-control" name="errName" [(ngModel)]="formEx.errName" #type="ngModel"
+                  #errName="ngModel">
+                  <option *ngFor="let error of lstError; let idx = index" [value]="error.name">
+                    {{ error.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Serial</label>
+                <input [(ngModel)]="formEx.serial" type="text" class="form-control" name="serial" required
+                  placeholder="Serial " />
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Tỷ lệ lỗi</label>
+                <input [(ngModel)]="formEx.ratio" type="text" class="form-control" name="ratio" required
+                  placeholder="Tỷ lệ lỗi" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lô</label>
+                <input [(ngModel)]="formEx.lotNumber" type="text" class="form-control" name="lotNumber" required
+                  placeholder="Số lô" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Công đoạn</label>
+
+                <select [(ngModel)]="formEx.stage" class="form-control" name="stage">
+                  <option *ngFor="let process of lstProcess " value="{{process.name}}">{{process.name}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nguyên vật liệu thay thế</label>
+            <input [(ngModel)]="formEx.materials" type="text" class="form-control" name="materials" required
+              placeholder="Nguyên vật liệu thay thế" />
+          </div>
+
+          <div class="form-group">
+            <label>Ghi chú</label>
+            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" required
+              placeholder="Ghi chú" />
+          </div>
+
+          <div class="form-group">
+            <button (click)="onEditError()" class="btn btn-success" type="submit">
+              Cập nhật
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>

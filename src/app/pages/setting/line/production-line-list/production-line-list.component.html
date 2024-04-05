@@ -1,0 +1,79 @@
+<!-- Basic Form Inputs card start -->
+<div >
+  <h2>Danh sách dây chuyền</h2>
+
+
+  <div class="card-body">
+    <form name="form" (ngSubmit)="f.form.valid && refreshLine()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên dây chuyền</label>
+            <input type="text" class="form-control" name="lineName" [(ngModel)]="formSearch.lineName"
+              #lineName="ngModel" placeholder="Tên dây chuyền" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã dây chuyền</label>
+            <input type="text" class="form-control" name="lineCode" [(ngModel)]="formSearch.lineCode"
+              #lineCode="ngModel" placeholder="Mã dây chuyền" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <button class="btn btn-primary m-2" type="submit" style="margin-top: 10px">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+
+            <button class="btn btn-success" routerLink="/setting/production-line-add">
+              <i class="fa fa-plus"></i> Thêm dây chuyền
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false" [nzData]="productionLineList"
+    [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+    (nzPageIndexChange)="refreshLine()" (nzPageSizeChange)="refreshLine()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên dây chuyền</th>
+            <th scope="col">Mã dây chuyền</th>
+            <th scope="col">ID Scada</th>
+            <th scope="col">Mô tả</th>
+            <th scope="col">Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of productionLineList; let i = index">
+            <td scope="row">{{ i + 1 }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.code }}</td>
+            <td>{{ item.idScada }}</td>
+            <td>{{ item.description }}</td>
+            <td class="text-center">
+              <div class="btn-group" *ngIf="item.source == 'WEB'; then edit; else readonly"></div>
+              <ng-template #edit>
+                <button class="btn btn-sm btn-primary" routerLink="/setting/production-line-edit/{{ item.id }}">
+                  Sửa
+                </button>
+              </ng-template>
+              <ng-template #readonly>
+                <button class="btn btn-sm btn-info" routerLink="/setting/production-line-detail/{{ item.id }}"
+                  title="Chi tiết thông tin">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</div>

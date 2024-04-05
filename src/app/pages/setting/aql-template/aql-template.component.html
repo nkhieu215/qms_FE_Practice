@@ -1,0 +1,134 @@
+<div class="row">
+  <h2>Danh sách thông tin AQL</h2>
+  <form name="form" (ngSubmit)="f.form.valid && refreshExamination()" #f="ngForm" novalidate
+    style="margin-bottom: 10px;">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Mức kiểm tra</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.testLevel" #name="ngModel"
+            placeholder="Mức kiểm tra" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Mức chấp nhận</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.acceptanceLevel" #name="ngModel"
+            placeholder="Mức chấp nhận" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Lỗi cho phép</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.allowedError" #name="ngModel"
+            placeholder="Lỗi cho phép" />
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-12">
+
+      <button class="btn btn-primary m-2" type="button" (click)="refreshExamination()">
+        <i class="fa fa-search"></i> Tìm kiếm
+      </button>
+
+      <button class="btn btn-success" (click)="open(myModal, null)">
+        <i class="fa fa-plus"></i> Thêm mới
+      </button>
+    </div>
+  </form>
+  <div class="row col-md-12">
+    <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false" [nzData]="lstRest"
+      [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+      (nzPageIndexChange)="refreshExamination()" (nzPageSizeChange)="refreshExamination()">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Mức kiểm tra</th>
+          <th scope="col">Mức chấp nhận</th>
+          <th scope="col">Lỗi cho phép</th>
+          <th scope="col">Ghi chú</th>
+          <th scope="col">Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let aql of lstRest ;let i = index;">
+          <td scope="row">{{ page * i + 1 }}</td>
+          <td>
+            {{ aql.testLevel }}
+          </td>
+          <td>{{ aql.acceptanceLevel}}</td>
+          <td>
+            {{ aql.allowedError }}
+          </td>
+          <td>
+            {{ aql.note }}
+          <td class="text-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" (click)="open(myModal, aql)"><i class="fa fa-edit"></i></button>
+              <button class="btn btn-sm btn-danger" (click)="delete(aql)"><i class="fa fa-trash"></i></button>
+            </div>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<ng-template #myModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      Thông tin chỉ tiêu AQL
+    </h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Mức kiểm tra</label>
+            <input [(ngModel)]="formEx.testLevel" type="text" class="form-control" name="testLevel" required
+              placeholder="Mức kiểm tra" />
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Mức chấp nhận</label>
+            <input [(ngModel)]="formEx.acceptanceLevel" type="text" class="form-control" name="acceptanceLevel" required
+              placeholder="Mức chấp nhận" />
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Lỗi cho phép</label>
+            <input [(ngModel)]="formEx.allowedError" type="text" class="form-control" name="allowedError" required
+              placeholder="Lỗi cho phép" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>Ghi chú</label>
+            <input type="text" name="note" id="" [(ngModel)]="formEx.note" class="form-control" placeholder="Ghi chú" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button *ngIf="this.formEx.id == null;else buttonupdate " (click)="onCreate()" class="btn btn-success"
+          type="submit">
+          Thêm mới
+        </button>
+
+        <ng-template #buttonupdate>
+          <button (click)="onCreate()" class="btn btn-info" type="submit">
+            Cập nhật thông tin
+          </button>
+        </ng-template>
+
+      </div>
+    </form>
+  </div>
+</ng-template>

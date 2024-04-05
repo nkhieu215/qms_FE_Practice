@@ -1,0 +1,380 @@
+<div *ngIf="lstview; else elseBlock1">
+
+  <app-pqc-show-list item_type="SAP_STORE"></app-pqc-show-list>
+</div>
+
+<ng-template #elseBlock1>
+
+  <div>
+    <div class="card-header">
+      <h2>Thông tin chi tiết nhập kho</h2>
+    </div>
+    <div class="card-body">
+      <pqc-show-work-order item_id="{{id}}" show_check="SHOW" (eventData)="changeWo($event)"></pqc-show-work-order>
+
+      <div class="form-group row">
+        <div class="col-sm-12">
+
+          <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+            <thead>
+              <tr>
+                <th>Số lô</th>
+                <th>Thời gian</th>
+                <th>Màu</th>
+                <th>Người nhập</th>
+                <th>Tổng lỗi</th>
+                <th>Kết luận</th>
+                <th>Ngày nhập kho</th>
+                <th>Số lượng kiểm</th>
+                <th>Số lượng nhập</th>
+                <th>Số lượng nhập SAP</th>
+                <th>Ghi chú</th>
+                <th>Tùy chọn</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let check of lstStoreCheck; let i = index">
+                <td>{{ check.lot }}</td>
+                <td>{{ check.createdAt|date:'dd/MM/YYYY HH:mm' }}</td>
+                <td>{{ check.colorName }}</td>
+                <td>{{ check.checkPerson }}</td>
+                <td>{{ check.totalErr }}</td>
+                <td>{{ check.conclude }}</td>
+                <td>{{ check.checkDate }}</td>
+                <td>{{ check.quatity }}</td>
+                <td>{{ check.quatityStore }}</td>
+                <td>{{check.quantityStoreSap}}</td>
+                <td>{{ check.note }}</td>
+                <td>
+                  <button class="btn btn-info btn-sm" title="Chi tiết kiểm tra"
+                    (click)="openShowDetailStore(myModalView,check.id)" style="margin-right: 5px;">
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  <button class="btn btn-warning btn-sm" title="Duyệt nhập kho sap" (click)="open(approve,id,check.id)" *ngIf="show_work_order"
+                    style="margin-right: 5px;">
+                    <i class="fa fa-check"></i>
+                  </button>
+
+                  <button class="btn btn-primary btn-sm" title="Lịch sử nhập kho SAP"
+                    (click)="openShowHisSAP(historySap,check.id)" style="margin-right: 5px;">
+                    <i class="fa fa-history" style="color: white;"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+        <div class="col-sm-12">
+          <app-button-success item_type="SAP_STORE" show_work_order="{{show_work_order}}"></app-button-success>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #approve let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">Phê duyệt yêu cầu</h2>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+
+    <form name="form" (ngSubmit)="f.form.valid && onApprove('APPROVE')" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Số lượng nhập kho SAP</label>
+            <input [(ngModel)]="form.quantityStoreSap" type="number" class="form-control" name="quantityStoreSap"
+              required placeholder="Số lượng nhập kho SAP" #number="ngModel" />
+
+            <div class="alert-danger" *ngIf="number.errors && f.submitted">
+              <div *ngIf="number.errors['required']">Số lượng nhập không được để trống</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Ngày nhập kho SAP</label>
+
+
+            <input [ngModel]="form.dateApproveSap | date:'yyyy-MM-ddTHH:mm'"
+              (ngModelChange)="form.dateApproveSap = $event" type="datetime-local" class="form-control" required
+              #dateApproveSap="ngModel" name="dateApproveSap" placeholder="Ngày nhập kho SAP" />
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Kho nhập</label>
+            <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
+              <mat-label>Kho nhập</mat-label>
+              <input type="text" [(ngModel)]="form.whsCode" name="whsCode" placeholder="Kho nhập" aria-label="Kho nhập"
+                matInput [formControl]="myControl" [matAutocomplete]="khonhapauto">
+              <mat-autocomplete #khonhapauto="matAutocomplete">
+                <mat-option *ngFor="let option of filteredKhoNhap | async"
+                  (onSelectionChange)="setValueApprove(option.whsCode,'khonhap')" [value]="option.whsName">
+                  {{option.whsName + '-' + option.whsCode}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Kho bán hàng</label>
+            <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
+              <mat-label>Kho bán hàng</mat-label>
+              <input type="text" [(ngModel)]="form.khobh" name="khobh" placeholder="Kho bán hàng"
+                aria-label="Kho bán hàng" matInput [formControl]="khobhForm" [matAutocomplete]="khobanhang">
+              <mat-autocomplete #khobanhang="matAutocomplete">
+                <mat-option *ngFor="let option of filteredKhoBh | async"
+                  (onSelectionChange)="setValueApprove(option.code,'khoBh')" [value]="option.name">
+                  {{option.name + '-' + option.code}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Đối tượng</label>
+            <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
+              <mat-label>Đối tượng</mat-label>
+              <input type="text" [(ngModel)]="form.doituong" name="doituong" placeholder="Đối tượng"
+                aria-label="Đối tượng" matInput [formControl]="doituongForm" [matAutocomplete]="doituong">
+              <mat-autocomplete #doituong="matAutocomplete">
+                <mat-option *ngFor="let option of filteredDoiTuong | async"
+                  (onSelectionChange)="setValueApprove(option,'doituong')" [value]="option">
+                  {{option}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+          </div>
+        </div>
+
+        <div class="col-xs-6 col-sm-6">
+          <div class="form-group">
+            <label>Ghi chú</label>
+            <input [(ngModel)]="form.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
+          </div>
+        </div>
+
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+          <div class="form-group">
+            <button type="submit" class="btn btn-success" [disabled]="!f.form.valid" name="approve"
+              style="margin-right: 5px;"> Nhập kho SAP</button>
+            <!-- <button class="btn btn-warning" (click)="onApprove('REJECT')" name="reject"> Từ chối</button> -->
+          </div>
+        </div>
+      </div>
+    </form>
+
+
+  </div>
+</ng-template>
+
+
+<ng-template #historySap let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">Lịch sử nhập kho</h2>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Ngày nhập</th>
+          <th>Số lượng</th>
+          <th>Kho nhập</th>
+          <th>Kho bán</th>
+          <th>Đối tượng</th>
+          <th>Trạng thái</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="lstStoreHis">
+        <tr *ngFor="let check of lstStoreHis; let i = index">
+          <td>{{ check.dateApproveSap | date:'dd/MM/YYYY'}}</td>
+          <td>{{ check.quantityStoreSap }}</td>
+          <td>{{ check.khonhap }}</td>
+          <td>{{ check.khoBh }}</td>
+          <td>{{ check.doituong }}</td>
+          <td>{{ check.statusSap }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</ng-template>
+
+<ng-template #myModalView let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">Chi tiết thông tin kiểm tra</h2>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <h3>Kiểm tra thông tin ngoại quan</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Bậc rút nghiệm</th>
+          <th>Số lượng rút nghiệm</th>
+          <th>Mức chấp nhận</th>
+          <th>Số lỗi cho phép</th>
+          <th>Số lỗi thực tế</th>
+          <th>Kết luận</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="storeCheck.lstExternal">
+        <tr *ngFor="let check of storeCheck.lstExternal; let i = index">
+          <td>{{ check.testLevel }}</td>
+          <td>{{ check.quantity }}</td>
+          <td>{{ check.acceptanceLevel }}</td>
+          <td>{{ check.allow }}</td>
+          <td>{{ check.reality }}</td>
+          <td>{{ check.conclude }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+
+    <h3>Thông tin lỗi</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false"
+      *ngIf="storeCheck.lstErrorCheck">
+      <thead>
+        <tr>
+          <th>Dây chuyền</th>
+          <th>Số lô</th>
+          <th>Nhóm lỗi</th>
+          <th>Tên lỗi</th>
+          <th>Số lượng</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstErrorCheck; let i = index">
+          <td>{{ check.line }}</td>
+          <td>{{ check.lot }}</td>
+          <td>{{ check.grErr }}</td>
+          <td>{{ check.err }}</td>
+          <td>{{ check.quatity }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    <h3>Kiểm tra thông số điện</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Công suất</th>
+          <th>Dòng điện</th>
+          <th>Cos fi</th>
+          <th>Số lượng kiểm tra</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstElectronic; let i = index">
+          <td>{{ check.powCheck }}</td>
+          <td>{{ check.elecCheck }}</td>
+          <td>{{ check.cosFi }}</td>
+          <td>{{ check.quantityCheck }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+
+    <h3>Kích thước</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Số lượng kiểm tra</th>
+          <th>Kết luận</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstSize; let i = index">
+          <td>{{ check.quatity }}</td>
+          <td>{{ check.conclude }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    <h3>Kết cấu</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Số lượng kiểm tra</th>
+          <th>Kết luận</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstStructure; let i = index">
+          <td>{{ check.quatity }}</td>
+          <td>{{ check.conclude }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+      </nz-table>
+
+      <h3>An toàn</h3>
+      <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+          <th>Số lượng kiểm tra</th>
+          <th>Tiêu chí an toàn</th>
+          <th>Kết luận</th>
+          <th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let check of storeCheck.lstSafe; let i = index">
+            <td>{{ check.quatity }}</td>
+            <td>{{ check.standard }}</td>
+            <td>{{ check.conclude }}</td>
+            <td>{{ check.note }}</td>
+
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <h3>Lắp lẫn</h3>
+      <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+          <th>Số lượng kiểm tra</th>
+          <th>Kết luận</th>
+          <th>Ghi chú</th>
+          <th>Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let check of storeCheck.lstConfused; let i = index">
+            <td>{{ check.quatity }}</td>
+            <td>{{ check.conclude }}</td>
+            <td>{{ check.note }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+
+  </div>
+</ng-template>

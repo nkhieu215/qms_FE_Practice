@@ -1,0 +1,181 @@
+<div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Từ ngày</label>
+        <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+          placeholder="Từ ngày" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Đến ngày</label>
+        <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+          placeholder="Tới ngày" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Đơn vị sản xuất</label>
+        <input type="text" class="form-control" name="branch" [(ngModel)]="formSearch.branch" #name="ngModel"
+          placeholder="Đơn vị sx" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Tổ</label>
+        <input type="text" class="form-control" name="group" [(ngModel)]="formSearch.group" #name="ngModel"
+          placeholder="Tổ" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group" style="line-height: 70px;margin-bottom: 0px;">
+        <button class="btn btn-primary" type="button" style="margin-top: 10px;" (click)="loadData()">
+          <i class="fa fa-search"></i> Thực hiện
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <nz-table nzBordered [nzData]="['']" [nzFrontPagination]="false" nzTitle="Thông tin sản xuất">
+      <thead>
+        <tr>
+          <th colspan="4">Thông tin sản xuất</th>
+          <th colspan="2">Tình trạng phê duyệt</th>
+          <th colspan="3">Đánh giá chất lượng SP</th>
+        </tr>
+        <tr>
+          <th>Sản lượng cần sx</th>
+          <th>Sản lượng nhập kho</th>
+          <th>Tỷ lệ hoàn thành</th>
+          <th>Tỷ lệ lỗi</th>
+          <th>Chờ phê duyệt lệnh sx</th>
+          <th>Chờ phê duyệt BBKT</th>
+          <th>Đạt</th>
+          <th>Không đạt</th>
+          <th>Nhân nhượng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <h2>{{dataReport.quantityDemanded | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.quantityStore | number}}</h2>
+          </td>
+          <td>
+            <h2>{{(dataReport.quantityStore / dataReport.quantityDemanded) * 100 | number}} %</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.ratioError | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.pqcWaitApprove | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcWaitApprove | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.workOrderQuality | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.workOrderFail | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.workOrderConcessions | number}}</h2>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+
+  <div class="row">
+    <nz-table nzBordered [nzData]="['']" [nzFrontPagination]="false" nzTitle="Thông tin hàng hóa">
+      <thead>
+        <tr>
+          <th rowspan="2">Số lượng hàng nhập</th>
+          <th colspan="3">Đánh giá chất lượng hàng hóa</th>
+          <th rowspan="2">Tổng số biên bản IQC</th>
+          <th rowspan="2">Tổng số NCC</th>
+          <th colspan="5">Đánh giá chất lượng BTP DRIVER</th>
+        </tr>
+        <tr>
+          <th>Đạt</th>
+          <th>Không đạt</th>
+          <th>Nhân nhượng</th>
+          <th>Số lượt KT</th>
+          <th>Đạt</th>
+          <th>% Đạt</th>
+          <th>Không đạt</th>
+          <th>Nhân nhượng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <h2>{{dataReport.iqcQuantity | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcQuality | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcFail | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcConcessions | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcEx | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcVendor | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcBtpQuality | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcBtpQuantity | number}}</h2>
+          </td>
+          <td>
+            <h2>{{(dataReport.iqcBtpQuantity/ dataReport.iqcBtpQuality)*100 | number}} %</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcBtpFail | number}}</h2>
+          </td>
+          <td>
+            <h2>{{dataReport.iqcBtpConcessions | number}}</h2>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
+      [plotOptions]="chartOptions.plotOptions" [yaxis]="chartOptions.yaxis" [xaxis]="chartOptions.xaxis" [colors]="chartOptions.colors"
+      [legend]="chartOptions.legend"  [grid]="chartOptions.grid" [title]="chartOptions.title"></apx-chart>
+  </div>
+</div>
+
+
+
+<br/>
+<div class="row">
+  <div class="col-md-6">
+    <div id="chartPie">
+      <apx-chart [series]="chartOptionsPie.series" [chart]="chartOptionsPie.chart" [labels]="chartOptionsPie.labels" [colors]="chartOptionsPie.colors"
+        [responsive]="chartOptionsPie.responsive" [title]="chartOptionsPie.title" [theme]="chartOptionsPie.theme"></apx-chart>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div id="chartPieIqc">
+      <apx-chart [series]="chartOptionsPieIqc.series" [chart]="chartOptionsPieIqc.chart" [labels]="chartOptionsPieIqc.labels" [colors]="chartOptionsPieIqc.colors"
+        [responsive]="chartOptionsPieIqc.responsive" [title]="chartOptionsPieIqc.title" [theme]="chartOptionsPieIqc.theme"></apx-chart>
+    </div>
+  </div>
+</div>

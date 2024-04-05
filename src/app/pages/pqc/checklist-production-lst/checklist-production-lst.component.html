@@ -1,0 +1,102 @@
+<!-- Basic Form Inputs card start -->
+<div>
+
+  <div class="card-header">
+    <h2>Kiểm tra check list</h2>
+    <form name="form" (ngSubmit)="f.form.valid && refreshPage()" #f="ngForm" novalidate style="margin-top: 45px;">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên  biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã sản phẩm</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.nameElectrolic" #name="ngModel"
+              placeholder="Tên biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Số lô</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.no" #name="ngModel"
+              placeholder="Số lô" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Ngày thực hiện</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.no" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+
+  </div>
+
+  <div class="card-body">
+    <div class=" table-responsive">
+      <table class="table table-bordered mb-0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Số lô</th>
+            <th>Số lượng</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Ngày thực hiện</th>
+            <th scope="col">Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let work of lstWorkOrder let i=index;">
+            <td>{{++i}}</td>
+            <td>{{work.productionName}}</td>
+            <td>{{work.productionCode}}</td>
+            <td>{{work.lotNumber}}</td>
+            <td>{{work.quantityPlan}}</td>
+            <td>{{work.strStatus}}</td>
+            <td>{{work.createdAt| date:'dd/MM/YYYY'}}</td>
+
+            <td class="text-center">
+              <div class="btn-group">
+                <button class="btn btn-sm btn-info" routerLink="/checklist-production/show/{{work.id}}"
+                  title="Chi tiết thông tin"><i class="fa fa-eye"></i></button>
+
+                <button *ngIf="work.status == 'CREATE'"  class="btn btn-sm btn-primary" routerLink="/checklist-production/add/{{work.id}}"
+                  title="Thực hiện kiểm tra"><i class="fa fa-plus"></i></button>
+
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between p-2">
+      <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize"
+        (pageChange)="refreshPage()">
+      </ngb-pagination>
+
+      <select class="custom-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshPage()">
+        <option [ngValue]="10">10 dòng trên trang</option>
+        <option [ngValue]="20">20 dòng trên trang</option>
+        <option [ngValue]="50">50 dòng trên trang</option>
+      </select>
+    </div>
+  </div>
+</div>

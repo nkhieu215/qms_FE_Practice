@@ -1,0 +1,164 @@
+<div>
+  <div class="card-header">
+    <h2>Báo cáo sản xuất</h2>
+    <form name="form" #f="ngForm" novalidate style="margin-top: 45px;">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên  biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã sản phẩm</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Tên biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Số lô</label>
+            <input type="text" class="form-control" name="lot" [(ngModel)]="formSearch.lot" #name="ngModel"
+              placeholder="Số lô" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã lệnh sx SAP</label>
+            <input type="text" class="form-control" name="sap" [(ngModel)]="formSearch.sap" #name="ngModel"
+              placeholder="Mã lệnh sx SAP" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã đơn hàng</label>
+            <input type="text" class="form-control" name="woCode" [(ngModel)]="formSearch.woCode" #name="ngModel"
+              placeholder="Mã đơn hàng" />
+          </div>
+        </div>
+
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Ngành</label>
+            <input type="text" class="form-control" name="branchName" [(ngModel)]="formSearch.branchName"
+              #name="ngModel" placeholder="Ngành" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tổ</label>
+            <input type="text" class="form-control" name="groupName" [(ngModel)]="formSearch.groupName" #name="ngModel"
+              placeholder="Tổ" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select class="form-control" name="status" [(ngModel)]="formSearch.status">
+              <option value="">Tất cả</option>
+              <option value="WAIT">Đang thực hiện</option>
+              <option value="SUCCESS">Hoàn thành</option>
+              <option value="REJECT">Từ chối</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Đến ngày</label>
+            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+
+
+        <div class="col-md-3">
+          <div class="form-group" style="line-height: 80px;margin-bottom: 0px;">
+            <button class="btn btn-success" (click)="refreshPage()" type="button" name="search"
+              style="margin-top: 10px;margin-right: 10px;">
+              <i class="fa fa-search"></i> Thực hiện
+            </button>
+
+            <button class="btn btn-primary" type="button" (click)="exportFile('')" name="download"
+              style="margin-top: 10px;">
+              <i class="fa fa-save"></i> Xuất file
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-body">
+    <div class=" table-responsive">
+      <nz-table #columnTable [nzScroll]="{ x: '1100px' }" nzBordered [nzPageSize]="10" nzShowSizeChanger
+        [nzFrontPagination]="false" [nzData]="lstWorkOrder" [nzTotal]="collectionSize" [(nzPageIndex)]="page"
+        [(nzPageSize)]="pageSize" (nzPageIndexChange)="refreshPage()" (nzPageSizeChange)="refreshPage()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Mã đơn hàng</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th>Ngành</th>
+            <th>Tổ</th>
+            <th>Mã lệnh SAP</th>
+            <th>Version</th>
+            <th>Số lô</th>
+            <th scope="col">Số lượng KH</th>
+            <th>Số lượng kiểm</th>
+            <th>Số lượng nhập</th>
+            <th>Số lượng nhập SAP</th>
+            <th>Tổng lỗi</th>
+            <th>Kết luận</th>
+            <th scope="col">Ngày thực hiện</th>
+            <!-- <th scope="col">Tùy chọn</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let work of lstWorkOrder let i=index;">
+            <td>{{++i}}</td>
+            <td>{{work.lotNumber}}</td>
+            <td>{{work.productionCode}}</td>
+            <td>{{work.productionName}}</td>
+            <td>{{work.branchName}}</td>
+            <td>{{work.groupName}}</td>
+            <td>{{work.sapWo}}</td>
+            <td>{{work.bomVersion}}</td>
+            <td>{{work.lot}}</td>
+            <td>{{work.quantityPlan}}</td>
+            <td>{{work.quatity}}</td>
+            <td>{{work.quatityStore}}</td>
+            <td>{{work.quantityStoreSap}}</td>
+            <td>{{work.totalError}}</td>
+            <td>{{work.conclude}}</td>
+            <td>{{work.createdAt| date:'dd/MM/YYYY'}}</td>
+
+            <!-- <td class="text-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" (click)="exportFile(work.id)"
+                title="Thực hiện kiểm tra"><i class="fa fa-plus"></i></button>
+            </div>
+          </td> -->
+          </tr>
+        </tbody>
+        </nz-table>
+    </div>
+  </div>
+
+</div>

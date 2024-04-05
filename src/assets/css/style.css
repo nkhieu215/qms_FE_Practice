@@ -1,0 +1,7 @@
+body{
+  font-size: 10px;
+}
+
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 99999 !important;
+}

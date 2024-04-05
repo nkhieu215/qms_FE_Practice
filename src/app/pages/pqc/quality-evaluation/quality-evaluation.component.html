@@ -1,0 +1,275 @@
+<div *ngIf="lstview; else elseBlock1">
+  <app-pqc-show-list item_type="QC_CHECK"></app-pqc-show-list>
+</div>
+
+<ng-template #elseBlock1>
+  <div>
+    <div class="card-header">
+      <h2>Kiểm tra chất lượng sản phẩm</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm">
+            <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order" item_id="{{ idWorkOrder }}"
+              item_type="QC_CHECK"></pqc-show-work-order>
+
+            <div class="form-group row">
+              <div class="col-sm-12 table-responsive">
+                <div class="float-right btn-group" style="margin-bottom: 10px" *ngIf="show_work_order">
+                  <button class="btn btn-success" (click)="open(create,'')">
+                    Thêm thông tin kiểm tra
+                  </button>
+                </div>
+                <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+                  [nzFrontPagination]="false">
+                  <thead>
+                    <tr>
+                      <th>Người thực hiện</th>
+                      <th>Số lượng</th>
+                      <th>Ngày thực hiện</th>
+                      <th>Kết quả kiểm tra</th>
+                      <th>Ghi chú</th>
+                      <th>Tùy chọn</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of lstCheck; let i = index">
+                      <td>{{ check.checkPersion }}</td>
+                      <td>{{ check.quantity }}</td>
+                      <td>{{ check.createdAtClient |date:'dd/MM/YYYY HH:mm' }}</td>
+                      <td [ngSwitch]="check.conclude">
+                        <ng-container *ngSwitchCase="1"> Đạt </ng-container>
+                        <ng-container *ngSwitchCase="2"> Không đạt </ng-container>
+                        <ng-container *ngSwitchCase="3">
+                          Nhân nhượng
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Đạt'"> Đạt </ng-container>
+                        <ng-container *ngSwitchCase="'Không đạt'">
+                          Không đạt
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Nhân nhượng'">
+                          Nhân nhượng
+                        </ng-container>
+                      </td>
+                      <td>{{ check.note }}</td>
+                      <td>
+                        <button class="btn btn-sm btn-primary" type="submit" title="Sửa thông tin"
+                          *ngIf="show_work_order" (click)="open(create, check.ids)" style="margin-right: 5px">
+                          <i class="fa fa-edit"></i>
+                        </button>
+
+                        <button class="btn btn-sm btn-info" type="submit" title="Kiểm tra thông tin"
+                          (click)="open(myModal, check.ids)" style="margin-right: 5px">
+                          <i class="fa fa-check"></i>
+                        </button>
+
+                        <button *ngIf="show_work_order" class="btn btn-danger btn-sm" title="Xóa"
+                          (click)="delete(check.id)">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </div>
+
+            <app-button-success item_type="QC_CHECK" show_work_order="{{show_work_order}}"></app-button-success>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</ng-template>
+
+
+<ng-template #create let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra</h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-sm-12">
+          <input type="text" class="form-control" [(ngModel)]="selectExamination" value="{{ strSelect }}"
+            [matAutocomplete]="auto" class="form-control" [formControl]="searchExaminationCtrl"
+            placeholder="Mã mẫu biên bản" />
+          <mat-autocomplete style="z-index: 999999" [panelWidth]="400" #auto="matAutocomplete"
+            (optionSelected)="onSelected()" [displayWith]="displayWith">
+            <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
+            <ng-container *ngIf="!isLoading">
+              <mat-option *ngFor="
+                    let examination of filteredExamination.lstExamination
+                  " [value]="examination">
+                <span><b>{{ examination.name }}</b> ({{
+                  examination.code
+                  }})</span>
+              </mat-option>
+            </ng-container>
+          </mat-autocomplete>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 10px">
+        <div class="col-sm-12 table-responsive">
+          <button class="btn btn-success" style="float: right; margin-bottom: 5px;" (click)="addItem()">Thêm tiêu
+            chí</button>
+          <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra tiêu chí" [nzData]="['']"
+            [nzFrontPagination]="false">
+            <thead>
+              <tr>
+                <th>Chỉ tiêu kiểm tra</th>
+                <th>Bậc rút nghiệm</th>
+                <th>Yêu cầu kỹ thuật</th>
+                <th>Số lượng</th>
+                <th>Sai số thực tế</th>
+                <th>Đánh giá</th>
+                <th>Ghi chú</th>
+                <th>Tùy chọn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="
+                  let check of lstAuditCriteriaParam;
+                  let i = index
+                ">
+                <td>
+                  <input type="text" (change)="totalQuantity()" placeholder="Chỉ tiêu kiểm tra" class="form-control"
+                    name="auditContent[{{ i }}]" [(ngModel)]="check.auditContent" />
+
+                </td>
+                <td>
+                  <input type="text" (change)="totalQuantity()" placeholder="Bậc rút nghiệm" class="form-control"
+                    name="regulationLevel[{{ i }}]" [(ngModel)]="check.regulationLevel" />
+
+                </td>
+                <td>
+                  <input type="text" (change)="totalQuantity()" placeholder="Yêu cầu kỹ thuật" class="form-control"
+                    name="technicalRequirement[{{ i }}]" [(ngModel)]="check.technicalRequirement" />
+
+                </td>
+
+                <td>
+                  <input type="number" (change)="totalQuantity()" placeholder="Số lượng" class="form-control"
+                    name="quantity[{{ i }}]" [(ngModel)]="check.quantity" />
+                </td>
+
+                <td>
+                  <input type="number" placeholder="Sai số thực tế" class="form-control" name="invalidNumber[{{ i }}]"
+                    [(ngModel)]="check.invalidNumber" />
+                </td>
+                <td>
+                  <select class="form-control" name="conclude[{{ i }}]" [(ngModel)]="check.conclude" #type="ngModel">
+                    <option value="Đạt">Đạt</option>
+                    <option value="Không đạt">Không đạt</option>
+                    <option value="Nhân nhượng">Nhân nhượng</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input type="text" placeholder="KL" class="form-control" name="note[{{ i }}]"
+                    [(ngModel)]="check.note" />
+                </td>
+                <td>
+                  <button class="btn btn-danger btn-sm" (click)="deleteCheckItem(check)"><i
+                      class="fa fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Tổng số lượng</label>
+            <input [(ngModel)]="formEx.quantity" type="number" class="form-control" name="quantity" required
+              placeholder="" />
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Kết luận</label>
+            <select [(ngModel)]="formEx.conclude" class="form-control" name="conclude">
+              <option value="Đạt">Đạt</option>
+              <option value="Không đạt">Không đạt</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Ghi chú</label>
+            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" required
+              placeholder="Ghi chú" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+
+        <button (click)="onAddCheck()" class="btn btn-success" type="submit" *ngIf="formEx.id == null">
+          Thêm mới
+        </button>
+
+
+        <button (click)="onAddCheck()" class="btn btn-primary" type="submit" *ngIf="formEx.id != null">
+          Sửa thông tin
+        </button>
+      </div>
+    </form>
+  </div>
+
+</ng-template>
+
+<ng-template #myModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra</h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="col-sm-12 table-responsive">
+      <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th>Chỉ tiêu kiểm tra</th>
+            <th>Bậc rút nghiệm</th>
+            <th>Yêu cầu kỹ thuật</th>
+            <th>Số lượng</th>
+            <th>Sai số thực tế</th>
+            <th>Đánh giá</th>
+            <th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let check of paramCheck; let i = index">
+            <td>{{ check.auditContent }}</td>
+            <td>{{ check.regulationLevel }}</td>
+            <td>{{ check.technicalRequirement }}</td>
+            <td>{{ check.quantity }}</td>
+            <td>{{ check.invalidNumber }}</td>
+            <td [ngSwitch]="check.conclude">
+              <ng-container *ngSwitchCase="1"> Đạt </ng-container>
+              <ng-container *ngSwitchCase="2"> Không đạt </ng-container>
+              <ng-container *ngSwitchCase="3"> Nhân nhượng </ng-container>
+              <ng-container *ngSwitchCase="'Đạt'"> Đạt </ng-container>
+              <ng-container *ngSwitchCase="'Không đạt'">
+                Không đạt
+              </ng-container>
+              <ng-container *ngSwitchCase="'Nhân nhượng'">
+                Nhân nhượng
+              </ng-container>
+            </td>
+            <td>{{ check.note }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</ng-template>

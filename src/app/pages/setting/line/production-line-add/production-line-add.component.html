@@ -1,0 +1,56 @@
+<!-- Basic Form Inputs card start -->
+<div>
+
+  <h2>Thêm mới dây chuyền</h2>
+
+  <div class="card-body">
+    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>Tên dây chuyền</label>
+          <input type="text" class="form-control" name="lineName" [(ngModel)]="form.lineName" required
+            #lineName="ngModel" placeholder="Tên dây chuyền" />
+          <div class="alert-danger" *ngIf="lineName.errors && f.submitted">
+            <div *ngIf="lineName.errors['required']">
+              Tên dây chuyền không được để trống
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-3">
+          <label>Mã dây chuyền</label>
+          <input type="text" class="form-control" name="lineCode" [(ngModel)]="form.lineCode" required
+            #lineCode="ngModel" placeholder="Mã dây chuyền" />
+          <div class="alert-danger" *ngIf="lineCode.errors && f.submitted">
+            <div *ngIf="lineCode.errors['required']">
+              Mã dây chuyền không được để trống
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>ID Scada</label>
+          <input type="text" class="form-control" name="idScada" [(ngModel)]="form.idScada" #idScada="ngModel"
+            placeholder="ID Scada" />
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>Mô tả</label>
+          <textarea class="form-control" name="description" [(ngModel)]="form.description" #description="ngModel"
+            placeholder="Mô tả"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-info m-2" routerLink="/setting/production-line-list">
+          <i class="fa fa-list"></i> Danh sách
+        </button>
+
+        <button class="btn btn-primary" type="submit">
+          <i class="fa fa-save"></i>
+          Thêm mới
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

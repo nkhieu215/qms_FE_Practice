@@ -1,0 +1,32 @@
+<div>
+
+  <h2>Thông tin mã yêu cầu</h2>
+
+  <div class="card-body">
+    <pqc-show-work-order item_id="{{idWorkOrder}}"></pqc-show-work-order>
+  </div>
+
+
+  <app-nvl-production show_check="SHOW" *ngIf="lstCheckStep?.includes('NVL')"></app-nvl-production>
+  <br />
+  <app-nvl100-production show_check="SHOW" *ngIf="lstCheckStep?.includes('CHECK_NVL')"></app-nvl100-production>
+  <br />
+
+
+  <app-tin-check show_check="SHOW" *ngIf="lstCheckStep?.includes('TIN')"></app-tin-check>
+  <br />
+  <app-mount-comp-check show_check="SHOW" *ngIf="lstCheckStep?.includes('MOUNT_COMPONENTS')">
+  </app-mount-comp-check><br />
+  <app-solder-check show_check="SHOW" *ngIf="lstCheckStep?.includes('SOLDER')"></app-solder-check><br />
+  <app-interchangeability show_check="SHOW"
+    *ngIf="lstCheckStep?.includes('INTERCHANGEABILITY')"></app-interchangeability><br />
+  <app-assembles show_check="SHOW" *ngIf="lstCheckStep?.includes('ASSEMBLES')"></app-assembles><br />
+  <app-photoelectric show_check="SHOW" *ngIf="lstCheckStep?.includes('PHOTOELECTRIC')"></app-photoelectric><br />
+  <app-photoelectric-product show_check="SHOW"
+    *ngIf="lstCheckStep?.includes('PHOTOELECTRIC_PRODUCT')"></app-photoelectric-product><br />
+  <app-fix-error show_check="SHOW" *ngIf="lstCheckStep?.includes('FIX_ERR')"></app-fix-error><br />
+  <!-- <app-store-check show_check="SHOW"  *ngIf="lstCheckStep?.includes('STORE_CHECK')"></app-store-check> -->
+  <app-store-check show_check="SHOW"></app-store-check><br />
+  <app-quality-evaluation show_check="SHOW" *ngIf="lstCheckStep?.includes('QC_CHECK')"></app-quality-evaluation><br />
+
+</div>

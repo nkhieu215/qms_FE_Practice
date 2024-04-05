@@ -1,0 +1,78 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Danh sách máy</h2>
+  <div class="card-body">
+    <form name="form" (ngSubmit)="f.form.valid && refreshLine()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên máy</label>
+            <input type="text" class="form-control" name="machineName" [(ngModel)]="formSearch.machineName"
+              #machineName="ngModel" placeholder="Tên máy" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã máy</label>
+            <input type="text" class="form-control" name="machineCode" [(ngModel)]="formSearch.machineCode"
+              #machineCode="ngModel" placeholder="Mã máy" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <button class="btn btn-primary m-2" type="submit">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+
+            <button class="btn btn-success" routerLink="/setting/machine-add">
+              <i class="fa fa-plus"></i> Thêm máy
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false" [nzData]="machineList"
+    [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+    (nzPageIndexChange)="refreshLine()" (nzPageSizeChange)="refreshLine()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên máy</th>
+            <th scope="col">Mã máy</th>
+            <th scope="col">ID Scada</th>
+            <th scope="col">Mô tả</th>
+            <th scope="col">Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of machineList; let i = index">
+            <td scope="row">{{ i + 1 }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.code }}</td>
+            <td>{{ item.idScada }}</td>
+            <td>{{ item.description }}</td>
+
+            <td class="text-center">
+              <div class="btn-group" *ngIf="item.source == 'WEB'; then edit; else readonly"></div>
+              <ng-template #edit>
+                <button class="btn btn-sm btn-primary" routerLink="/setting/machine-edit/{{ item.id }}">
+                  Sửa
+                </button>
+              </ng-template>
+              <ng-template #readonly>
+                <button class="btn btn-sm btn-info" routerLink="/setting/machine-detail/{{ item.id }}"
+                  title="Chi tiết thông tin">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+        </nz-table>
+    </div>
+  </div>
+</div>

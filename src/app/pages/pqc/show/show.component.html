@@ -1,0 +1,139 @@
+<div class="form-group row">
+  <div class="col-sm-4">
+    <label>Tên sản phẩm</label>
+    <input type="text" class="form-control" placeholder="Tên sản phẩm" name="productionName" readonly
+      [(ngModel)]="form.productionName">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Mã sản phẩm</label>
+    <input type="text" class="form-control" placeholder="Mã sản phẩm" name="productionCode" readonly
+      [(ngModel)]="form.productionCode">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Version</label>
+    <input type="text" class="form-control" placeholder="Version" name="bomVersion" readonly
+      [(ngModel)]="form.bomVersion">
+  </div>
+</div>
+
+<div class="form-group row">
+  <div class="col-sm-4">
+    <label>Ngành</label>
+    <input type="text" class="form-control" placeholder="Ngành" name="branchName" readonly
+      [(ngModel)]="form.branchName">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Tổ</label>
+    <input type="text" class="form-control" placeholder="Tổ" name="groupName" readonly [(ngModel)]="form.groupName">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Thông tin Profile </label>
+    <input type="text" class="form-control" placeholder="Thông tin profile" name="profileName" readonly
+      [(ngModel)]="form.profileName">
+  </div>
+
+  <!-- <div class="col-sm-4">
+    <label>Đặc điểm chú ý</label>
+    <input type="text" class="form-control" placeholder="Đặc điểm chú ý" name="version" readonly
+      [(ngModel)]="form.version">
+  </div> -->
+</div>
+
+
+
+<div class="form-group row">
+  <div class="col-sm-4">
+    <label>Mã lệnh SAP</label>
+    <input type="text" class="form-control" placeholder="Mã lệnh" name="workOrderId" readonly [(ngModel)]="form.sapWo">
+  </div>
+
+
+  <div class="col-sm-4">
+    <label>Số lô</label>
+    <input type="text" class="form-control" placeholder="Số lô" name="lotNumber" readonly [(ngModel)]="form.lotNumber">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Mã đơn hàng</label>
+    <input type="text" class="form-control" placeholder="Mã đơn hàng" name="planingWorkOrderCode" readonly
+      [(ngModel)]="form.planingWorkOrderCode">
+  </div>
+</div>
+
+<div class="form-group row">
+  <div class="col-sm-4">
+    <label>Mã lệnh</label>
+    <input type="text" class="form-control" placeholder="Mã lệnh" name="workOrderId" readonly
+      [(ngModel)]="form.workOrderId">
+  </div>
+
+  <div class="col-sm-4">
+    <label>Số lượng</label>
+    <input type="text" class="form-control" placeholder="Số lượng" name="quantityPlan" readonly
+      [(ngModel)]="form.quantityPlan">
+  </div>
+
+
+  <div class="col-sm-4" style="line-height: 90px;">
+    <a href="{{form.udocURL != '' ? form.udocURL :'#'}}" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Hồ sơ</a>
+    <a href="{{form.udocURL2 != '' ? form.udocURL2 :'#'}}" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Chương trình</a>
+    <button class="btn btn-info" (click)="open(myModal)" style="margin-right: 10px;">
+      <i class="fa fa-info"> Thông tin Scada</i>
+    </button>
+    <button class="btn btn-success" (click)="exportExcelDetail()" type="submit">
+      <i class="fa fa-download"></i> Xuất excel
+    </button>
+
+  </div>
+
+
+</div>
+
+<ng-template #myModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      Thông tin máy sản xuất
+    </h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+
+    <div class="col-md-12"  *ngFor="let recipient of scadaMacine | keyvalue">
+        <button class="btn btn-success"   style="margin-right: 10px;"(click)="detailError(machine.ids)">
+          {{recipient.key}}
+        </button>
+
+        <div class="col-md-6">
+         <p>Số lượng đầu ra :  <strong>{{recipient.value.numberOutput}}</strong></p>
+
+        </div>
+        <div class="col-md-6">
+            <p>Số lượng đầu vào : <strong>{{recipient.value.numberInput}}</strong></p>
+        </div>
+
+
+        <table class="table table-bordered">
+          <thead>
+            <th>Thông tin lỗi</th>
+            <th>Số lỗi</th>
+          </thead>
+          <tbody class="table table-border">
+            <tr  *ngFor="let error of recipient.value.errorLst| keyvalue">
+              <td>{{error.key}}</td>
+              <td>{{error.value}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+    </div>
+
+
+
+
+
+  </div>
+</ng-template>

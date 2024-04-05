@@ -1,0 +1,84 @@
+<div>
+  <h2>Danh sách sản phẩm đang chờ sản xuất</h2>
+
+  <form name="form" (ngSubmit)="f.form.valid && refreshPage()" #f="ngForm" novalidate style="margin-top: 45px;">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Tên sản phẩm</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+            placeholder="Tên sản phẩm" />
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Mã sản phẩm</label>
+          <input type="text" class="form-control" name="productCode" [(ngModel)]="formSearch.productCode"
+            #name="ngModel" placeholder="Mã sản phẩm" />
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Số lô</label>
+          <input type="text" class="form-control" name="lot" [(ngModel)]="formSearch.lot" #name="ngModel"
+            placeholder="Số lô" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Mã YC</label>
+          <input type="text" class="form-control" name="woCode" [(ngModel)]="formSearch.woCode" #name="ngModel"
+            placeholder="Mã YC" />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
+            <i class="fa fa-search"></i> Tìm kiếm
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card-body">
+  <div class=" table-responsive">
+    <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
+      [nzData]="lstOrderPending" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+      (nzPageIndexChange)="refreshPage()" (nzPageSizeChange)="refreshPage()">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th>Tên sản phẩm</th>
+          <th>Mã sản phẩm</th>
+          <th>Số lô</th>
+          <th>Mã YC</th>
+          <th>Số lượng sản xuất</th>
+          <th>Ngày thực hiện</th>
+          <th>Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of lstOrderPending;let i = index;">
+          <td>{{ i+1 }}</td>
+          <td>{{ order.productName}}</td>
+          <td>{{ order.productCode}}</td>
+          <td>{{order.lotNumber}} </td>
+          <td>{{order.woId}} </td>
+          <td>{{ order.quantityPlan }}</td>
+          <td>{{order.createTime | date: 'dd/MM/YYYY HH:mm'}}</td>
+          <td class="text-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-info" routerLink="/pqc/make-order-production-crud/add/{{order.id}}"
+                title="Thêm mới lệnh sản xuất"><i class="fa fa-plus"></i></button>
+            </div>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>

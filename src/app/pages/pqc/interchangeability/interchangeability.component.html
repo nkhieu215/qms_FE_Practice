@@ -1,0 +1,298 @@
+<div *ngIf="lstview; else elseBlock1">
+  <app-pqc-show-list item_type="INTERCHANGEABILITY"></app-pqc-show-list>
+</div>
+
+
+<ng-template #elseBlock1>
+  <div>
+    <div class="card-header">
+      <h2>Kiểm tra lắp lẫn</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+
+            <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order" item_id="{{idWorkOrder}}"
+              item_type="INTERCHANGEABILITY"></pqc-show-work-order>
+
+            <div class="form-group row">
+              <div class="col-sm-12 table-responsive">
+                <div class="float-right btn-group" style="margin-bottom: 10px;">
+                  <button class="btn btn-success " (click)="open(myModal,'')" *ngIf="show_work_order">Thêm thông tin
+                    kiểm tra</button>
+                  <button class="btn btn-success " disabled *ngIf="edit==true">Thêm thông tin kiểm tra</button>
+                </div>
+
+                <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+                  [nzFrontPagination]="false">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Dây chuyền sx</th>
+                      <th rowspan="2">Người kiểm tra</th>
+                      <th rowspan="2">Thời gian</th>
+                      <th rowspan="2">Số lượng ktra</th>
+                      <th rowspan="2">Ngoại quan</th>
+                      <th colspan="2">Công suất</th>
+                      <th colspan="2">Cos fi</th>
+                      <th colspan="2">Dòng điện</th>
+                      <th rowspan="2">Số sp lắp lẫn</th>
+                      <th rowspan="2">Kết luận</th>
+                      <th rowspan="2">Ghi chú</th>
+                      <th rowspan="2">Vận hành</th>
+                      <th rowspan="2">Tùy chọn</th>
+                    </tr>
+                    <tr>
+                      <th>Min</th>
+                      <th>Max</th>
+                      <th>Min</th>
+                      <th>Max</th>
+                      <th>Min</th>
+                      <th>Max</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let check of lstInterchangeabilityompCheck let i=index;">
+                      <td>{{check.line}}</td>
+                      <td>{{check.checkPerson}}</td>
+                      <td>{{check.checkTime}}</td>
+                      <td>{{check.quatity}}</td>
+                      <td>{{check.externalInspection}}</td>
+                      <td>{{check.powMin}}</td>
+                      <td>{{check.powMax}}</td>
+                      <td>{{check.fiMin}}</td>
+                      <td>{{check.fiMax}}</td>
+                      <td>{{check.elecMin}}</td>
+                      <td>{{check.elecMax}}</td>
+                      <td>{{check.total}}</td>
+                      <td>{{check.conclude}}</td>
+                      <td>{{check.operators}}</td>
+                      <td>{{check.note}}</td>
+                      <td>
+                        <div class="btn-group">
+                          <button class="btn btn-sm btn-danger" *ngIf="show_work_order"
+                            (click)="deleteCheck(check.ids)"> <i class="fa fa-trash"></i></button>
+                          <button type="button " class="btn btn-primary btn-sm" (click)="open(myModal, check.ids)"
+                            *ngIf="show_work_order"><i class="fa fa-edit"></i></button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </div>
+
+            <app-button-success item_type="INTERCHANGEABILITY" show_work_order="{{show_work_order}}">
+            </app-button-success>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+
+    <ng-template #myModal let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+
+          <div class="row">
+            <div class="col-sm-6 form-container">
+              <div class="form-group">
+
+                <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
+                  <mat-label>Dây chuyền sản xuất</mat-label>
+                  <input type="text" [(ngModel)]="formEx.line" name="line" placeholder="Dây chuyền sản xuất"
+                    aria-label="Dây chuyền sản xuất" matInput [formControl]="myControl" [matAutocomplete]="planetAuto">
+
+                  <mat-autocomplete #planetAuto="matAutocomplete">
+                    <ng-container *ngFor="let option of filteredOptions | async">
+                      <mat-option *ngIf="option" [value]="option">
+                        {{option}}
+                      </mat-option>
+                    </ng-container>
+
+                  </mat-autocomplete>
+                </mat-form-field>
+
+
+
+                <!-- <mat-form-field appearance="outline">
+                  <mat-select [formControl]="bankCtrl" placeholder="Dây chuyền sảm xuất" #singleSelect>
+                    <mat-option>
+                      <ngx-mat-select-search [formControl]="bankFilterCtrl"></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let line of lstProductionLine" [value]="line">
+                      {{line.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>  -->
+
+
+                <!-- <label>Dây chuyền sản xuất</label>
+                <input [(ngModel)]="formEx.line" type="text" class="form-control" name="line"
+                  placeholder="Dây chuyền sản xuất" /> -->
+                <!-- <select [(ngModel)]="formEx.line" class="form-control" name="line">
+                  <option *ngFor="let machine of lstProductionLine" value="{{machine.name}}">{{machine.name}}</option>
+                </select> -->
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Nguời kiểm tra</label>
+                <input type="text" class="form-control" name="checkPerson" [(ngModel)]="formEx.checkPerson" readonly
+                  placeholder="Người kiểm tra" />
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Thời gian</label>
+                <input type="text" class="form-control  {{ !checkTime.valid ? 'is-invalid' :''}}" #checkTime="ngModel"
+                  required name="checkTime" [(ngModel)]="formEx.checkTime" placeholder="dd/mm/yyyy" />
+
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số lượng kiểm tra</label>
+                <input [(ngModel)]="formEx.quatity" type="number"
+                  class="form-control  {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity"
+                  required placeholder="Số lượng kiểm tra" />
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Cống suất Min</label>
+                <input [(ngModel)]="formEx.powMin" type="number" name="powMin" placeholder="min"
+                  class="form-control  {{ !powMin.valid ? 'is-invalid' :''}}" #powMin="ngModel" required />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Công suất Max</label>
+                <input [(ngModel)]="formEx.powMax" type="number" name="powMax" placeholder="max"
+                  class="form-control  {{ !powMax.valid ? 'is-invalid' :''}}" #powMax="ngModel" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Cos fi Min</label>
+                <input [(ngModel)]="formEx.fiMin" type="number"
+                  class="form-control  {{ !fiMin.valid ? 'is-invalid' :''}}" #fiMin="ngModel" required name="fiMin"
+                  placeholder="min" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Cos fi Max</label>
+                <input [(ngModel)]="formEx.fiMax" type="number" name="fiMax"
+                  class="form-control  {{ !fiMax.valid ? 'is-invalid' :''}}" #fiMax="ngModel" required
+                  placeholder="max" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Dòng điện Min</label>
+                <input [(ngModel)]="formEx.elecMin" type="number"
+                  class="form-control  {{ !elecMin.valid ? 'is-invalid' :''}}" #elecMin="ngModel" required
+                  name="elecMin" placeholder="min" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Dòng điện Max</label>
+                <input [(ngModel)]="formEx.elecMax" type="number"
+                  class="form-control  {{ !elecMax.valid ? 'is-invalid' :''}}" #elecMax="ngModel" required
+                  name="elecMax" placeholder="max" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Số sản phẩm lắp lẫn</label>
+                <input [(ngModel)]="formEx.total" type="number"
+                  class="form-control  {{ !total.valid ? 'is-invalid' :''}}" #total="ngModel" required name="total"
+                  placeholder="Số sp lắp lẫn" />
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Kết luận</label>
+                <select [(ngModel)]="formEx.conclude" class="form-control  {{ !conclude.valid ? 'is-invalid' :''}}"
+                  #conclude="ngModel" required name="conclude">
+                  <option value="Đạt">Đạt</option>
+                  <option value="Không đạt">Không đạt</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!--  -->
+          <div class="row">
+            <div class="form-group">
+              <label>Ngoại quan</label>
+              <input [(ngModel)]="formEx.externalInspection" type="text"
+                class="form-control  {{ !externalInspection.valid ? 'is-invalid' :''}}" #externalInspection="ngModel"
+                required name="externalInspection" placeholder="Ngoại quan" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Người vận hành</label>
+              <input [(ngModel)]="formEx.operators" type="text"
+                class="form-control  {{ !operators.valid ? 'is-invalid' :''}}" #operators="ngModel" required
+                name="operators" placeholder="Người vận hành" />
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="form-group">
+              <button *ngIf="!formEx.id" (click)="onAddError()" class="btn btn-success" type="submit"
+                [disabled]="!(f.form.valid)">Thêm mới</button>
+              <button *ngIf="formEx.id" (click)="onAddError()" class="btn btn-success" [disabled]="!(f.form.valid)"
+                type="submit">Cập nhật</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+  </div>
+</ng-template>

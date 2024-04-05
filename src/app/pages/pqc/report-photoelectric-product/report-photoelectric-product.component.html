@@ -1,0 +1,126 @@
+<div>
+  <div class="card-header">
+    <h2>Báo cáo thông số đo kiểm quang điện sản phẩm</h2>
+    <form name="form" #f="ngForm" novalidate style="margin-top: 45px;">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên sản phẩm" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã sản phẩm</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Mã sản phẩm" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã đơn hàng</label>
+            <input type="text" class="form-control" name="woCode" [(ngModel)]="formSearch.woCode" #name="ngModel"
+              placeholder="Mã đơn hàng" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Đến ngày</label>
+            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group" style="line-height: 75px;">
+            <button class="btn btn-success" (click)="refreshPage()" type="button" name="search"
+              style="margin-top: 10px;margin-right: 10px;">
+              <i class="fa fa-search"></i> Thực hiện
+            </button>
+
+            <button class="btn btn-primary" type="button" (click)="exportFile('')" name="download"
+              style="margin-top: 10px;">
+              <i class="fa fa-save"></i> Xuất file
+            </button>
+          </div>
+        </div>
+
+        <!-- <div class="col-md-3">
+          <div class="form-group" style="line-height: 80px;margin-bottom: 0px;">
+            <button  class="btn btn-success" (click)="refreshPage()" type="button" name="search" style="margin-top: 10px;margin-right: 10px;">
+              <i class="fa fa-search"></i> Thực hiện
+            </button>
+
+            <button class="btn btn-primary" type="button"  (click)="exportFile('')" name="download" style="margin-top: 10px;">
+              <i class="fa fa-save"></i> Xuất file
+            </button>
+          </div>
+        </div> -->
+      </div>
+    </form>
+  </div>
+
+  <div class="card-body">
+    <div class=" table-responsive">
+      <nz-table #columnTable [nzScroll]="{ x: '1100px' }" nzBordered [nzPageSize]="10" nzShowSizeChanger
+        [nzFrontPagination]="false" [nzData]="lstWorkOrder" [nzTotal]="collectionSize" [(nzPageIndex)]="page"
+        [(nzPageSize)]="pageSize" (nzPageIndexChange)="refreshPage()" (nzPageSizeChange)="refreshPage()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th>Ngày kiểm tra</th>
+            <th scope="col">Mã đơn hàng</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Tên sản phẩm</th>
+
+            <th>Số lượng kế hoạch</th>
+            <th>Só lô</th>
+
+            <th>SDCM</th>
+            <th scope="col">Thông số quang min</th>
+            <th>RA</th>
+            <th>Thông số K</th>
+            <th>Điện nguồn</th>
+            <th>Dòng điện</th>
+            <th>Công suất</th>
+            <th>Hệ số công suất</th>
+            <th>Số lượng kiểm tra</th>
+            <th>TBN</th>
+            <th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let work of lstWorkOrder let i=index;">
+            <td>{{ (page -1 )*pageSize + i +1}}</td>
+            <td>{{work.planingWorkOrderCode}}</td>
+            <td>{{work.workOrderId}}</td>
+            <td>{{work.sapWo}}</td>
+            <td>{{work.lotNumber}}</td>
+            <td>{{work.productionCode}}</td>
+            <td>{{work.productionName}}</td>
+            <td>{{work.dttdType}}</td>
+            <!-- <td></td> -->
+            <td>{{work.createdAt| date:'dd/MM/YYYY'}}</td>
+            <td>{{work.errGroup}}</td>
+            <td>{{work.errName}}</td>
+            <td>{{work.quantity}}</td>
+            <!-- <td>{{work.note}}</td> -->
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+
+  </div>
+
+</div>

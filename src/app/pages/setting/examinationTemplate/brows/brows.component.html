@@ -1,0 +1,104 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Mẫu biên bản kiểm tra</h2>
+
+
+  <form name="form" (ngSubmit)="f.form.valid && refreshExamination()" #f="ngForm" novalidate style="margin-top: 20px;">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Tên mẫu biên bản</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+            placeholder="Tên mẫu biên bản" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Loại mẫu biên bản</label>
+          <select class="form-control" name="type" [(ngModel)]="formSearch.type" #type="ngModel">
+            <option selected value="1">NVL / BTP/ TP</option>
+            <option value="2">LKDT/BTP</option>
+            <option value="3">Đánh giá chất lượng SP</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Mã biên bản</label>
+          <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+            placeholder="Mã biên bản" />
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-primary m-2" type="submit" style="margin-top: 28px;">
+          <i class="fa fa-search"></i> Tìm kiếm
+        </button>
+
+        <button class="btn btn-success" routerLink="/setting/examination-add">
+          <i class="fa fa-plus"></i> Thêm mẫu biên bản
+        </button>
+
+      </div>
+    </div>
+  </form>
+
+  <!-- <span>Add class of <code>.form-control</code> with <code>&lt;input&gt;</code> tag</span> -->
+  <div class="card-header-right">
+
+  </div>
+
+
+
+
+  <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
+    [nzData]="auditCriteria" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+    (nzPageIndexChange)="refreshExamination()" (nzPageSizeChange)="refreshExamination()">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Tên mẫu biên bản</th>
+        <th scope="col">Mã biên bản</th>
+        <th scope="col">Trạng thái</th>
+        <th scope="col">Loại biên bản</th>
+        <th scope="col">Ngày tạo</th>
+        <th scope="col">Tùy chọn</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let examination of auditCriteria let i=index">
+        <td scope="row">{{ i+1 }}</td>
+        <td>
+          {{ examination.name }}
+        </td>
+        <td>{{ examination.code}}</td>
+        <td>
+          <p *ngIf="examination.status ==1"> Hoạt động </p>
+          <p *ngIf="examination.status ==0"> Tạm dừng </p>
+        </td>
+        <td>
+          <p *ngIf="examination.type ==1"> NVL / BTP/ TP</p>
+          <p *ngIf="examination.type ==2"> LKDT/BTP</p>
+        </td>
+        <td>{{ examination.createdAt | date:'dd/MM/YYYY hh:ss'}}</td>
+        <td class="text-center">
+          <div class="btn-group">
+            <button class="btn btn-sm btn-success" (click)="copy(examination.id)" title="Copy mẫu biên bản">
+              <i class="fa fa-copy"></i>
+            </button>
+
+            <a class="btn btn-sm btn-primary" title="Sửa thông tin" target="_blank"
+              routerLink="/examination-edit/{{examination.id}}">
+              <i class="fa fa-edit"></i>
+            </a>
+            <button class="btn btn-sm btn-danger" (click)="delete(examination.id)" title="Xóa biên bản kiểm tra">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+
+      </tr>
+    </tbody>
+  </nz-table>
+</div>

@@ -1,0 +1,933 @@
+<div *ngIf="lstview; else elseBlock1">
+  <div class="card-header">
+    <h2>Danh sách biên bản LKDT/BTP</h2>
+    <form name="form" (ngSubmit)="f.form.valid && refreshExamination()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên nguyên vật liệu</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên nguyên vật liệu" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã NVL</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Mã nguyên vật liệu" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã biên bản</label>
+            <input type="text" class="form-control" name="reportCode" [(ngModel)]="formSearch.reportCode"
+              #name="ngModel" placeholder="Mã biên bản" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Số hóa đơn</label>
+            <input type="text" class="form-control" name="invoiceNumber" [(ngModel)]="formSearch.invoiceNumber"
+              #name="ngModel" placeholder="Số hóa đơn" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+              placeholder="Từ ngày" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tới ngày</label>
+            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+              placeholder="Tới ngày" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select class="form-control" name="type" [(ngModel)]="formSearch.status" #type="ngModel">
+              <option selected value="DRAFF">Nháp</option>
+              <option value="WAIT_APPROVE">Chờ duyệt</option>
+              <option value="APPROVE">Đã duyệt</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Xuất xứ</label>
+            <select class="form-control" name="itemType" [(ngModel)]="formSearch.itemType" #type="ngModel">
+              <option value="">Tất cả</option>
+              <option value="Hàng nhập">Hàng nhập</option>
+              <option value="Hàng mẫu">Hàng mẫu</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <button class="btn btn-primary m-2" type="submit">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+
+            <button class="btn btn-success" routerLink="/iqc/iqc-lkdt-check/0/add">
+              <i class="fa fa-plus"></i> Thêm biên bản
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </form>
+
+
+  </div>
+  <div class="card-body">
+    <div class=" table-responsive">
+      <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
+        [nzData]="auditnvl" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+        (nzPageIndexChange)="refreshExamination()" (nzPageSizeChange)="refreshExamination()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Mã biên bản</th>
+            <th scope="col">Mã linh kiện</th>
+            <th scope="col">Tên linh kiện</th>
+            <th scope="col">Ngày thực hiện</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Số lô</th>
+            <th scope="col">Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let audit of auditnvl;let i = index;">
+            <td>{{ i+1 }}</td>
+            <td>{{ audit.reportCode}}</td>
+            <td>{{ audit.elecCompCode}}</td>
+            <td>{{ audit.electCompName }}</td>
+            <td> {{ audit.createdAt | date:'dd/MM/YYYY HH:mm:ss'}}</td>
+            <td>
+              <p *ngIf="audit.status =='DRAFF'"> Nháp</p>
+              <p *ngIf="audit.status =='WAIT_APPROVE'"> Chờ duyệt </p>
+              <p *ngIf="audit.status =='APPROVE'"> Đã duyệt </p>
+              <p *ngIf="audit.status =='REJECT'"> Từ chối </p>
+            </td>
+
+            <td>{{ audit.batchNumber}}</td>
+
+
+            <td class="text-center">
+              <div class="btn-group">
+                <div class="btn-group">
+                  <button class="btn btn-warning  btn-sm" style="color: white;" title="Copy"
+                    (click)="copyCheckNvl(audit.id, 'NVL')"><i class="fa fa-copy"></i></button>
+
+                  <button *ngIf="audit.status =='DRAFF' || audit.status =='REJECT'" class="btn btn-sm btn-primary"
+                    title="Sửa" routerLink="/iqc/iqc-lkdt-check/{{audit.id}}/edit"><i class="fa fa-edit"></i></button>
+                  <button *ngIf="audit.status =='DRAFF' || audit.status =='REJECT' || audit.status ==''"
+                    class="btn btn-sm btn-danger" title="Xóa" (click)="delete(audit.id)"><i
+                      class="fa fa-trash"></i></button>
+                  <button class="btn btn-sm btn-info" routerLink="/iqc/iqc-lkdt-check/{{audit.id}}/show"
+                    title="Chi tiết"><i class="fa fa-eye"></i></button>
+                  <button class="btn btn-sm btn-success" (click)="report(audit.id, audit.reportCode)"
+                    title="Xuất file báo cáo"><i class="fa fa-download"></i></button>
+                </div>
+              </div>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #elseBlock1>
+  <div>
+    <h2>Thông tin biên bản kiểm tra LKDT/BTP</h2>
+
+
+    <div class="card-body">
+      <div class="col-xs-12 col-sm-12 pt-3 pb-3"
+        *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS')">
+        <div class="row">
+          <h2>Thông tin phê duyệt</h2>
+          <div class="col-xs-6 col-sm-6">
+            <label>Nhận xét</label>
+            <input type="text" readonly="true" class="form-control" placeholder="Tên linh kiện" name="templateCode"
+              [(ngModel)]="form.approveNote" />
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <label>Kết luận</label>
+            <input type="text" readonly="true" class="form-control" placeholder="Kết luận" name="statusStr"
+              value="{{statusStr}}" [(ngModel)]="statusStr" />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <h2>Thông tin kiểm tra</h2>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+            <div class="row pb-3">
+              <div *ngIf="isEdit == false" class="col-sm-4">
+                <label>Mẫu biên bản</label>
+                <input type="text" class="form-control" [(ngModel)]="selectExamination" value={{strSelect}}
+                  [matAutocomplete]="auto" class="form-control" [formControl]="searchExaminationCtrl"
+                  placeholder="Mã mẫu biên bản">
+                <mat-autocomplete [panelWidth]="400" #auto="matAutocomplete" (optionSelected)="onSelected()"
+                  [displayWith]="displayWith">
+                  <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
+                  <ng-container *ngIf="!isLoading">
+                    <mat-option *ngFor="let examination of filteredExamination.lstExamination" [value]="examination">
+                      <span><b>{{examination.name}}</b> ({{examination.code}})</span>
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+              </div>
+              <div class="col-sm-4">
+                <label>Số biên bản</label>
+                <input type="text" class="form-control" placeholder="Số biên bản" name="reportCode"
+                  [(ngModel)]="form.reportCode">
+              </div>
+              <div class="col-sm-4">
+                <label>Loại hàng</label>
+                <select class="form-control" name="itemType" [(ngModel)]="form.itemType" #type="ngModel">
+                  <option value="Hàng nhập">Hàng nhập</option>
+                  <option value="Hàng mẫu">Hàng mẫu</option>
+                </select>
+              </div>
+            </div>
+
+
+            <div class="row pb-3">
+              <div class="col-sm-4">
+                <label>Mã linh kiện</label>
+                <input type="text" class="form-control" [(ngModel)]="selectedElectronic" value={{strSelectElec}}
+                  [matAutocomplete]="auto33" [formControl]="searchELectronicCtrl" placeholder="Mã linh kiện">
+                <mat-autocomplete [panelWidth]="400" #auto33="matAutocomplete" (optionSelected)="onSelectedElectronic()"
+                  [displayWith]="displayWith">
+                  <mat-option *ngIf="isLoadingElec" class="is-loading">Loading...</mat-option>
+                  <ng-container *ngIf="!isLoadingElec">
+                    <mat-option *ngFor="let oitm of filteredOitm.lstOitm" [value]="oitm">
+                      <span><b>{{oitm.itemName}}</b> ({{oitm.itemCode}})</span>
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+
+              </div>
+              <div class="col-sm-4">
+                <label>Tên linh kiện</label>
+                <input type="text" class="form-control" placeholder="Tên linh kiện" name="electCompName"
+                  [(ngModel)]="form.electCompName">
+              </div>
+              <div class="col-sm-4">
+                <label>Số lượng theo PO</label>
+                <input type="text" class="form-control" placeholder="Số lượng theo PO" name="poQuantity"
+                  [(ngModel)]="form.poQuantity">
+              </div>
+            </div>
+
+            <div class="row pb-3">
+              <div class="col-sm-4">
+                <label>Số lô (cách nhau bởi dấu phẩy)</label>
+                <input type="text" class="form-control" placeholder="Số lô" name="batchNumber"
+                  [(ngModel)]="form.batchNumber">
+              </div>
+
+              <div class="col-sm-4">
+                <label>Ngày nhận hàng</label>
+                <input class="form-control" type="date" name="importDate"
+                  [ngModel]="form.importDate | date:'yyyy-MM-dd'" (ngModelChange)="form.importDate = $event" />
+              </div>
+
+              <div class="col-sm-4">
+                <label>Ngày kiểm</label>
+                <input class="form-control" type="date" name="checkDate" [ngModel]="form.checkDate | date:'yyyy-MM-dd'"
+                  (ngModelChange)="form.checkDate = $event" />
+
+              </div>
+            </div>
+
+
+            <div class="row pb-3">
+              <div class="col-sm-4">
+                <label>Số hóa đơn</label>
+                <input type="text" class="form-control" placeholder="Số hóa đơn" name="invoiceNumber"
+                  [(ngModel)]="form.invoiceNumber">
+              </div>
+              <div class="col-sm-4">
+                <label>Xuất xứ</label>
+
+                <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{strSelectOrigin}}
+                  name="origin" [matAutocomplete]="origin" [formControl]="searchOriginCtrl" placeholder="Xuất xứ">
+
+                <mat-autocomplete [panelWidth]="400" #origin="matAutocomplete" (optionSelected)="onSelectedOrigin()"
+                  [displayWith]="displayWith">
+                  <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
+                  <ng-container *ngIf="!isLoadingOrigin">
+                    <mat-option *ngFor="let oitm of filteredOrigin.lstOcrd" [value]="oitm">
+                      <span><b>{{oitm.name}}</b> ({{oitm.code}})</span>
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+
+              </div>
+              <div class="col-sm-4">
+                <label>GRPO</label>
+                <input type="text" class="form-control" placeholder="GRPO" name="grpoNumber"
+                  [(ngModel)]="form.grpoNumber">
+              </div>
+            </div>
+
+
+            <div class="row pb-3">
+              <div class="col-sm-4">
+                <label>Số lượng kiểm tra</label>
+                <input type="number" (change)="onChangeQuantity()" class="form-control" placeholder="Số lượng"
+                  name="checkingQuantity" [(ngModel)]="form.checkingQuantity">
+              </div>
+              <div class="col-sm-4">
+                <label>Lập phiếu SPKPH</label>
+                <input type="text" class="form-control" placeholder="SPKPH" name="spkphNumber"
+                  [(ngModel)]="form.spkphNumber">
+              </div>
+              <div class="col-sm-4">
+                <label>Kết luận</label>
+
+                <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
+                  <option value="Đạt nhập kho">Đạt nhập kho</option>
+                  <option value="Không đạt trả về">Không đạt trả về</option>
+                  <option value="Nhập kho nhân nhượng">Nhập kho nhân nhượng</option>
+                </select>
+              </div>
+            </div>
+
+
+            <div class="row pb-3">
+              <div class="col-sm-12">
+                <label>Ghi chú</label>
+                <input type="text" class="form-control" placeholder="Ghi chú"
+                  name="note" [(ngModel)]="form.note">
+              </div>
+
+            </div>
+
+
+            <!-- thong tin kiem tra nvl -->
+
+            <div class="table-responsive">
+              <div class="float-right btn-group" style="margin-bottom: 10px;">
+                <button class="btn  btn-primary" (click)="open(thongso)"
+                  *ngIf=" typeAction == 'edit' || typeAction =='add' "><i class="fa fa-plus"></i> Thông số kiểm
+                  tra</button>
+                <button class="btn  btn-success" (click)="open(tieuchi)"
+                  *ngIf=" typeAction == 'edit' || typeAction =='add' "><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
+                  tra</button>
+                <button class="btn  btn-danger" (click)="open(myModalError)" style = "margin-right: 10px;"><i class="fa fa-plus"></i>
+                  <span *ngIf=" typeAction == 'edit' || typeAction =='add'; else show ">Thêm thông tin lỗi</span>
+                  <ng-template #show>Thông tin lỗi</ng-template>
+                </button>
+                <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()" type="submit">
+                  <i class="fa fa-download"></i> Xuất excel
+                </button>
+              </div>
+
+              <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+                [nzFrontPagination]="false">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Chỉ tiêu kiểm tra</th>
+                    <th>Mức quy định</th>
+                    <th>Yêu cầu kỹ thuật</th>
+                    <th>Số lượng</th>
+                    <th>Sai số thực tế</th>
+                    <th style="width: 190px;">Đánh giá</th>
+                    <th>Nội dung đánh giá</th>
+                    <th>Tùy chọn</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let auditLKDT of lstAuditCriteriaLKDT;let i = index;">
+                    <td>{{ i +1 }}</td>
+                    <td>{{ auditLKDT.auditContent }}</td>
+                    <td>{{ auditLKDT.regulationLevel }}</td>
+                    <td>{{ auditLKDT.technicalRequirement}}</td>
+                    <td>
+                      <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
+                        [(ngModel)]="auditLKDT.auditQuantity">
+
+                    </td>
+                    <td>
+                      <input type="text" placeholder="Sai số" class="form-control" name="inaccuracy[{{i}}]"
+                        [(ngModel)]="auditLKDT.inaccuracy">
+                    </td>
+                    <td>
+                      <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
+                        #type="ngModel">
+                        <option value="Đạt">Đạt</option>
+                        <option value="Không đạt">Không đạt</option>
+                        <option value="Nhân nhượng">Nhân nhượng</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" placeholder="Ghi chú" class="form-control" name="checkContent[{{i}}]"
+                        [(ngModel)]="auditLKDT.checkContent">
+                    </td>
+
+                    <td>
+                      <button *ngIf=" typeAction == 'edit' || typeAction =='add' " class="btn btn-danger" type="button"
+                        (click)="removeAuditLKDT(auditLKDT.ids)"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+
+              <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+                [nzFrontPagination]="false">
+                <thead>
+                  <tr>
+                    <th rowspan="2">#</th>
+                    <th rowspan="2">Thông số</th>
+                    <th rowspan="2">Điều kiện</th>
+                    <th colspan="3">Tiêu chuẩn</th>
+                    <th rowspan="2">Q Trung bình</th>
+                    <th rowspan="2">Số lượng</th>
+                    <th rowspan="2">Min</th>
+                    <th rowspan="2">Max</th>
+                    <th rowspan="2">Trung bình</th>
+                    <th rowspan="2">S</th>
+                    <th rowspan="2">KU</th>
+                    <th rowspan="2">KL</th>
+                    <th rowspan="2">KMin</th>
+                    <th rowspan="2">CPK up</th>
+                    <th rowspan="2">CPK Low</th>
+                    <th rowspan="2">CPK</th>
+                    <th rowspan="2">Đánh giá</th>
+                    <th rowspan="2">Nội dung</th>
+                    <th rowspan="2">Tùy chọn</th>
+                  </tr>
+                  <tr>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Đơn vị</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let auditLKDT of lstAuditCriteriaParam;let i = index;">
+                    <td>{{ i +1}}</td>
+                    <td>{{ auditLKDT.parameterName }}</td>
+                    <td>{{ auditLKDT.conditions }}</td>
+                    <td>{{ auditLKDT.min | number }}</td>
+                    <td>{{ auditLKDT.max | number }}</td>
+                    <td>{{ auditLKDT.unit }}</td>
+                    <td>
+                      <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg[{{i}}]"
+                        [(ngModel)]="auditLKDT.auditQAvg">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="Số lượng" class="form-control" name="quantity[{{i}}]"
+                        [(ngModel)]="auditLKDT.quantity">
+                    </td>
+
+                    <td>
+                      <input type="text" placeholder="Min" class="form-control" name="minAudit{{i}}]"
+                        [(ngModel)]="auditLKDT.minAudit">
+                    </td>
+
+                    <td>
+                      <input type="text" placeholder="Max" class="form-control" name="maxAudit{{i}}]"
+                        [(ngModel)]="auditLKDT.maxAudit">
+                    </td>
+
+                    <td>
+                      <input type="text" placeholder="Trung bình" class="form-control" name="avgResult[{{i}}]"
+                        [(ngModel)]="auditLKDT.avgResult">
+                    </td>
+
+                    <td>
+                      <input type="text" placeholder="S" class="form-control" name="s[{{i}}]" [(ngModel)]="auditLKDT.s">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="KU" class="form-control" name="ku[{{i}}]"
+                        [(ngModel)]="auditLKDT.ku">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="KL" class="form-control" name="kl[{{i}}]"
+                        [(ngModel)]="auditLKDT.kl">
+                    </td>
+
+                    <td>
+                      <input type="text" placeholder="Kmin" class="form-control" name="kmin[{{i}}]"
+                        [(ngModel)]="auditLKDT.kmin">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="CPK up" class="form-control" name="cpkUp[{{i}}]"
+                        [(ngModel)]="auditLKDT.cpkUp">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="CPK Low" class="form-control" name="cpkLow[{{i}}]"
+                        [(ngModel)]="auditLKDT.cpkLow">
+                    </td>
+                    <td>
+                      <input type="text" placeholder="CPK" class="form-control" name="cpk[{{i}}]"
+                        [(ngModel)]="auditLKDT.cpk">
+                    </td>
+
+                    <td>
+                      <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
+                        #type="ngModel">
+                        <option value="Đạt">Đạt</option>
+                        <option value="Không đạt">Không đạt</option>
+                        <option value="Nhân nhượng">Nhân nhượng</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" placeholder="Ghi chú" class="form-control" name="content[{{i}}]"
+                        [(ngModel)]="auditLKDT.content">
+                    </td>
+
+                    <td>
+                      <button *ngIf=" typeAction == 'edit' || typeAction =='add' " class="btn btn-danger" type="button"
+                        (click)="removeAuditParam(auditLKDT.ids)"><i class="fa fa-trash"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+
+            <div class="form-group row" *ngIf=" typeAction == 'edit' || typeAction =='add' ">
+              <div class="col-md-4">
+                <label>Số liệu kiểm tra </label>
+                <input type="file" (change)="addfile($event)" placeholder="Upload file"
+                  accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-success" (click)="downloadTemplate()">
+                  <i class="fa fa-download"></i> Tải mẫu
+                </button>
+                <label> Vui lòng chọn mẫu biên bản trước khi tải mẫu</label>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+              <button class="btn btn-default" routerLink="/iqc/iqc-lkdt-check"><i class="fa fa-list"></i> Danh
+                sách</button>
+
+              <button *ngIf="typeAction =='add' || typeAction =='edit'" class="btn btn-primary" type="submit"
+                (click)="onSubmit('save')">
+                <i class="fa fa-save"></i>
+                <span *ngIf="typeAction =='add'"> Thêm mới biên bản</span>
+                <span *ngIf="typeAction =='edit'"> Cập nhật thông tin</span>
+              </button>
+
+              <button *ngIf="typeAction =='add' || typeAction =='edit'" class="btn btn-info" type="submit"
+                style="margin-left: 30px" (click)="onSubmit('send_approve')">
+                <i class="fa fa-check"></i>
+                Gửi duyệt
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+
+<!-- thong tin kiem tra nvl -->
+<ng-template #myModalError let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Khai báo lỗi</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid && onAddErrorChild()" #f="ngForm" novalidate
+      *ngIf=" typeAction == 'edit' || typeAction =='add' ">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Chọn nhóm lỗi</label>
+            <select required class="form-control" #errGroup="ngModel"
+              (change)="onChangeErrorGroup(formErrorChild.errGroup)" name="errGroup"
+              [(ngModel)]="formErrorChild.errGroup" #type="ngModel">
+              <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">{{error.name}}</option>
+            </select>
+
+            <div class="alert-danger" *ngIf="errGroup.errors && f.submitted">
+              <div *ngIf="errGroup.errors['required']">Nhóm lỗi không được để trống</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Chọn lỗi</label>
+            <select required class="form-control" name="errName" [(ngModel)]="formErrorChild.errName" #type="ngModel"
+              #errName="ngModel">
+              <option *ngFor="let error of lstError; let idx = index" [value]="error.name">{{error.name}}</option>
+            </select>
+            <div class="alert-danger" *ngIf="errName.errors && f.submitted">
+              <div *ngIf="errName.errors['required']">Tên lỗi không được để trống</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Số lượng</label>
+            <input required="" type="number" (change)="onChangeQuantityError(formErrorChild.quantity)"
+              class="form-control" name="regulationNevel" [(ngModel)]="formErrorChild.quantity" required
+              #level="ngModel" placeholder="Số lượng lỗi" #quantity="ngModel" />
+            <div class="alert-danger" *ngIf="quantity.errors && f.submitted">
+              <div *ngIf="quantity.errors['required']">Số lượng kiểm tra không được để trống</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Tỷ lệ lỗi</label>
+            <input readonly type="text" class="form-control" name="ratio" [(ngModel)]="formErrorChild.ratio"
+              #level="ngModel" placeholder="tỷ lệ lỗi" />
+
+            <label style="color: red;">{{errorAdd}}</label>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label>Serial</label>
+        <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formErrorChild.serial"
+          #level="ngModel" placeholder="Serial" #quantity="ngModel" />
+      </div>
+
+      <div class="form-group">
+        <label>Tỷ lệ lỗi</label>
+        <input readonly type="text" class="form-control" name="ratio" [(ngModel)]="formErrorChild.ratio"
+          #level="ngModel" placeholder="tỷ lệ lỗi" />
+
+        <label style="color: red;">{{errorAdd}}</label>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-success" type="submit">Thêm mới</button>
+      </div>
+    </form>
+
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>Loại lỗi</th>
+          <th>Tên lỗi</th>
+          <th>Số lượng</th>
+          <th>Tỷ lệ lỗi</th>
+          <th width="50px">Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let error of arrErrChild">
+          <td>{{ error.errGroup }}</td>
+          <td>{{ error.errName }}</td>
+          <td>{{ error.quantity }}</td>
+          <td>{{ error.ratio }}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" (click)="deleteErrorRow(error.ids)"
+              *ngIf=" typeAction == 'edit' || typeAction =='add' "><i class="fa fa-trash"></i>
+              Xóa</button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</ng-template>
+
+
+<ng-template #tieuchi let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thêm mới tiêu chí</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid && addAuditCriterialLKDT()" #f="ngForm" novalidate>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Chỉ tiêu kiểm tra</label>
+            <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditCriteriaLKDT.auditContent"
+              placeholder="Chỉ tiêu kiểm tra" />
+
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Mức quy định</label>
+            <input type="text" class="form-control" name="regulationLevel"
+              [(ngModel)]="formAuditCriteriaLKDT.regulationLevel" placeholder="Mức quy định" />
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Yêu cầu kỹ thuật</label>
+            <input required="" type="text" class="form-control" name="technicalRequirement"
+              [(ngModel)]="formAuditCriteriaLKDT.technicalRequirement" placeholder="Yêu cầu kỹ thuật" />
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label> Số lượng</label>
+            <input type="text" class="form-control" name="auditQuantity"
+              [(ngModel)]="formAuditCriteriaLKDT.auditQuantity" placeholder="Số lượng" />
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Sai số thực tế</label>
+            <input required="" type="text" class="form-control" name="inaccuracy"
+              [(ngModel)]="formAuditCriteriaLKDT.inaccuracy" placeholder="Sai số thực tế" />
+
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label> Đánh giá</label>
+            <select class="form-control" name="checkResult" [(ngModel)]="formAuditCriteriaLKDT.checkResult"
+              #type="ngModel">
+              <option value="Đạt">Đạt</option>
+              <option value="Không đạt">Không đạt</option>
+              <option value="Nhân nhượng">Nhân nhượng</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label> Ghi chú</label>
+        <input type="text" class="form-control" name="checkContent" [(ngModel)]="formAuditCriteriaLKDT.checkContent"
+          placeholder="Ghi chú" />
+      </div>
+
+
+      <div class="form-group">
+        <button class="btn btn-success" type="submit">Thêm mới</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #thongso let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Khai báo thông số</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid && addAuditCriterialParam()" #f="ngForm" novalidate>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Thông số</label>
+            <input type="text" class="form-control" name="parameterName" [(ngModel)]="formAuditParam.parameterName"
+              placeholder="Thông số" />
+
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Điều kiện</label>
+            <input type="text" class="form-control" name="conditions" [(ngModel)]="formAuditParam.conditions"
+              placeholder="Điều kiện" />
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Tiêu chuẩn min</label>
+            <input required="" type="text" class="form-control" name="min" [(ngModel)]="formAuditParam.min"
+              placeholder="Tiêu chuẩn min" />
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label> Tiêu chuẩn max</label>
+            <input type="text" class="form-control" name="max" [(ngModel)]="formAuditParam.max"
+              placeholder="Tiêu chuẩn max" />
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label> Đơn vị</label>
+            <input type="text" class="form-control" name="unit" [(ngModel)]="formAuditParam.unit"
+              placeholder="Đơn vị" />
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Q trung bình</label>
+            <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg"
+              [(ngModel)]="formAuditParam.auditQAvg">
+
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label> Số lượng</label>
+            <input type="text" placeholder="Số lượng" class="form-control" name="quantity"
+              [(ngModel)]="formAuditParam.quantity">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Max</label>
+            <input type="text" placeholder="Max" class="form-control" name="maxAudit"
+              [(ngModel)]="formAuditParam.maxAudit">
+
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Min</label>
+            <input type="text" placeholder="Min" class="form-control" name="minAudit"
+              [(ngModel)]="formAuditParam.minAudit">
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Trung bình</label>
+            <input type="text" placeholder="Trung bình" class="form-control" name="avgResult"
+              [(ngModel)]="formAuditParam.avgResult">
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>S</label>
+            <input type="text" placeholder="S" class="form-control" name="s" [(ngModel)]="formAuditParam.s">
+
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>KU</label>
+            <input type="text" placeholder="KU" class="form-control" name="ku" [(ngModel)]="formAuditParam.ku">
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>KL</label>
+            <input type="text" placeholder="KL" class="form-control" name="kl" [(ngModel)]="formAuditParam.kl">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Kmin</label>
+            <input type="text" placeholder="Kmin" class="form-control" name="kmin" [(ngModel)]="formAuditParam.kmin">
+
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>CPKUP</label>
+            <input type="text" placeholder="CPK up" class="form-control" name="cpkUp"
+              [(ngModel)]="formAuditParam.cpkUp">
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>CPK Low</label>
+            <input type="text" placeholder="CPK Low" class="form-control" name="cpkLow"
+              [(ngModel)]="formAuditParam.cpkLow">
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>CPK</label>
+            <input type="text" placeholder="CPK" class="form-control" name="cpk" [(ngModel)]="formAuditParam.cpk">
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Kết luận</label>
+            <select class="form-control" name="checkResult" [(ngModel)]="formAuditParam.checkResult" #type="ngModel">
+              <option value="Đạt">Đạt</option>
+              <option value="Không đạt">Không đạt</option>
+              <option value="Nhân nhượng">Nhân nhượng</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label> Ghi chú</label>
+        <input type="text" placeholder="Ghi chú" class="form-control" name="content"
+          [(ngModel)]="formAuditParam.content">
+      </div>
+
+
+      <div class="form-group">
+        <button class="btn btn-success" type="submit">Thêm mới</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

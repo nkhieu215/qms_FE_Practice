@@ -1,0 +1,190 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Danh sách lệnh sản xuất</h2>
+  <div class="card-header">
+    <form name="form" (ngSubmit)="f.form.valid && refreshPage()" #f="ngForm" novalidate style="margin-top: 45px;">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên  biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã sản phẩm</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Tên biên bản" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Số lô</label>
+            <input type="text" class="form-control" name="lot" [(ngModel)]="formSearch.lot" #name="ngModel"
+              placeholder="Số lô" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã lệnh sx SAP</label>
+            <input type="text" class="form-control" name="sap" [(ngModel)]="formSearch.sap" #name="ngModel"
+              placeholder="Mã lệnh sx SAP" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã đơn hàng</label>
+            <input type="text" class="form-control" name="woCode" [(ngModel)]="formSearch.woCode" #name="ngModel"
+              placeholder="Mã đơn hàng" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Ngành</label>
+            <input type="text" class="form-control" name="branchName" [(ngModel)]="formSearch.branchName"
+              #name="ngModel" placeholder="Ngành" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tổ</label>
+            <input type="text" class="form-control" name="groupName" [(ngModel)]="formSearch.groupName" #name="ngModel"
+              placeholder="Tổ" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select class="form-control" name="status" [(ngModel)]="formSearch.status">
+              <option value="">Tất cả</option>
+              <option value="WAIT_APPROVE">Chờ phê duyệt</option>
+              <option value="CREATE">Đang thực hiện</option>
+              <option value="APPROVE">Hoàn thành</option>
+              <option value="REJECT">Từ chối phê duyệt</option>
+              <option value="CANCEL">Hủy Lệnh</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Đến ngày</label>
+            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+              placeholder="Ngày thực hiện" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" style="line-height: 80px;margin-bottom: 0px;">
+            <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+
+  </div>
+
+  <div class="card-body">
+    <div class=" table-responsive">
+      <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
+        [nzData]="lstWorkOrder" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
+        (nzPageIndexChange)="refreshPage()" (nzPageSizeChange)="refreshPage()">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Số lô</th>
+            <th>Số lượng</th>
+            <th>Mã Wo</th>
+            <th>Mã lệnh SAP</th>
+            <th>Mã đơn hàng</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Ngày thực hiện</th>
+            <th>Tổng nhập kho</th>
+            <th>Tổng nhập SAP</th>
+            <th scope="col">Tùy chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let work of lstWorkOrder let i=index;">
+            <td>{{i+1}}</td>
+            <td>{{work.productionName}}</td>
+            <td>{{work.productionCode}}</td>
+            <td>{{work.lotNumber}}</td>
+            <td>{{work.quantityPlan}}</td>
+            <td>{{work.workOrderId}}</td>
+            <td>{{work.sapWo}}</td>
+            <td>{{work.planingWorkOrderCode}}</td>
+
+            <td>{{work.strStatus}}</td>
+            <td>{{work.createdAt| date:'dd/MM/YYYY hh:ss'}}</td>
+            <td>{{work.total | number}}</td>
+            <td>{{work.totalSap | number}}</td>
+
+            <td class="text-center">
+              <div class="btn-group">
+                <a class="btn btn-sm btn-info" routerLink="/pqc/pqc-show-detail/{{work.id}}" target="_blank"
+                  title="Chi tiết thông tin"><i class="fa fa-eye"></i></a>
+
+                <button class="btn btn-sm btn-success" (click)="open(myModalEdit,work.id)" title="Chi tiết thông tin"><i
+                    class="fa fa-address-book"></i></button>
+
+                <button *ngIf="work.status == 'WAIT' || work.status == 'CREATE'  " class="btn btn-sm btn-danger"
+                  (click)="cancelWo(work.workOrderId,work.id)" title="Hủy bỏ lệnh"><i class="fa fa-trash"></i></button>
+
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #myModalEdit let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">
+      Chi tiết thông tin kiểm tra
+    </h2>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin người thực hiện kiểm tra" [nzData]="lstCheck" [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên tài khoản</th>
+          <th>Công đoạn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of lstCheck; let i = index">
+          <td>{{ i+1 }}</td>
+          <td>{{ check.userId }}</td>
+          <td>{{ check.nameStep }}</td>
+          <td>{{ check.status }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</ng-template>

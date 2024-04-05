@@ -1,0 +1,183 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Thêm mới thông tin sản xuất</h2>
+
+  <div class="card-body">
+    <div class="row">
+
+      <div class="col-xs-12 col-sm-12">
+        <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+          <div class="row">
+            <div class="col-sm-4">
+              <label>Tên sản phẩm</label>
+              <input type="text" class="form-control" placeholder="Tên sản phẩm" name="productName" readonly
+                [(ngModel)]="form.productName">
+            </div>
+
+            <div class="col-sm-4">
+              <label>Mã sản phẩm</label>
+              <input type="text" class="form-control" placeholder="Mã sản phẩm" name="productCode" readonly
+                [(ngModel)]="form.productCode">
+            </div>
+
+            <div class="col-sm-4">
+              <label>Version</label>
+              <input type="text" class="form-control" placeholder="bomVersion" name="bomVersion" readonly
+                [(ngModel)]="form.bomVersion">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-3">
+              <label>Ngành</label>
+              <input type="text" class="form-control" placeholder="Ngành" name="branchName" readonly
+                [(ngModel)]="form.branchName">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Tổ</label>
+              <input type="text" class="form-control" placeholder="Tổ" name="groupName" readonly
+                [(ngModel)]="form.groupName">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Đặc điểm chú ý</label>
+              <input type="text" class="form-control" placeholder="Đặc điểm chú ý" name="note" readonly
+                [(ngModel)]="form.note">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Mã lệnh SAP</label>
+              <input type="text" class="form-control" placeholder="Mã lệnh SAP" name="sapWo" readonly
+                [(ngModel)]="form.sapWo">
+            </div>
+
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-3">
+              <label>Mã lệnh</label>
+              <input type="text" class="form-control" placeholder="Mã lệnh" name="woId" readonly
+                [(ngModel)]="form.woId">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Số lượng</label>
+              <input type="text" class="form-control" placeholder="Số lượng" name="quantityPlan" readonly
+                [(ngModel)]="form.quantityPlan">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Số lô</label>
+              <input type="text" class="form-control" placeholder="Số lô" name="lotNumber" readonly
+                [(ngModel)]="form.lotNumber">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Mã đơn hàng</label>
+              <input type="text" class="form-control" placeholder="Mã đơn hàng" name="productOrder" readonly
+                [(ngModel)]="form.productOrder">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-3">
+              <label>Ngày bắt đầu</label>
+              <input type="text" class="form-control" placeholder="Ngày bắt đầu" name="startDate" readonly
+                [(ngModel)]="form.startDate">
+            </div>
+
+            <div class="col-sm-3">
+              <label>Ngày kết thúc</label>
+              <input type="text" class="form-control" placeholder="Ngày kết thúc" name="endDate" readonly
+                [(ngModel)]="form.endDate">
+            </div>
+
+            <div class="col-sm-3">
+              <label style="width: 100%;">Hồ sơ</label>
+              <a class="btn btn-primary" href="{{form.udocURL }}" target="_blank">Hồ sơ</a>
+              <input type="hidden" class="form-control" placeholder="Hồ sơ" name="udocURL" readonly
+                [(ngModel)]="form.udocURL">
+            </div>
+
+            <div class="col-sm-3">
+              <label style="width: 100%;">Chương trình</label>
+              <a class="btn btn-primary" href="{{form.udocURL2  }}" target="_blank">Chương trình</a>
+
+              <input type="hidden" class="form-control" placeholder="Profile" name="udocURL2" readonly
+                [(ngModel)]="form.udocURL2">
+              <input type="hidden" class="form-control" placeholder="profileId" name="profileId"
+                value="{{form.profile}}" [(ngModel)]="form.profileId">
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-6">
+              <table class="table table-bordered table-responsive">
+
+                <tr *ngFor="let userDetail  of lstUserDetail ;let i = index;">
+                  <td>{{userDetail.stageName}}</td>
+                  <td><input type="text" class="form-control" placeholder="Chọn NV" name="userId[{{i}}]" required
+                      [(ngModel)]="userDetail.userName"></td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="col-sm-6 table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <th>Tên vật tư</th>
+                  <th>Mã</th>
+                  <th>Số lượng</th>
+                  <th>Partnumber</th>
+                  <th>Vender</th>
+                  <th>Version</th>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let bom of bomversion;let i = index;">
+                    <td>{{bom.uitemName}}</td>
+                    <td>{{bom.uitemCode}}</td>
+                    <td>{{bom.uquantity | number}}</td>
+                    <td>{{bom.upartNumber }}</td>
+                    <td>{{bom.uvendor}}</td>
+                    <td>{{bom.uversions}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+
+          <div class="form-group" style="margin-top: 20px;">
+            <button class="btn" routerLink="/pqc/make-order-production"><i class="fa fa-list"></i> Danh sách</button>
+            <button class="btn btn-primary" type="submit" (click)="onSubmit('save')" style="margin-left: 30px;">
+              <i class="fa fa-save"></i>
+              Thêm mới
+            </button>
+            <!-- <button class="btn btn-info" type="submit" style="margin-left: 30px;" (click)="onSubmit('send_approve')">
+              <i class="fa fa-check"></i>
+              Sửa
+            </button> -->
+
+          </div>
+
+
+
+          <div class="col-xs-12 col-sm-12">
+            <div *ngIf="error" class={{classError}} role="alert">
+              {{error}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,447 @@
+<div *ngIf="lstview; else elseBlock1">
+  <app-pqc-show-list item_type="PHOTOELECTRIC"></app-pqc-show-list>
+</div>
+
+
+<ng-template #elseBlock1>
+  <div>
+    <div class="card-header">
+      <h2>Kiểm tra thông số quang điện BTP</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+
+            <pqc-show-work-order show_check="{{show_check}}" item_type="PHOTOELECTRIC" *ngIf="show_work_order"
+              item_id="{{idWorkOrder}}"></pqc-show-work-order>
+
+            <div class="float-right btn-group" style="margin-bottom: 10px" *ngIf="show_work_order">
+              <button class="btn btn-success" (click)="open(addnewCheck, '')">
+                Thêm thông tin kiểm tra
+              </button>
+            </div>
+
+            <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Người thực hiện</th>
+                  <th>Số lượng kiểm tra</th>
+                  <th>Thời gian thực hiện</th>
+                  <th>Kết luận</th>
+                  <th>Ghi chú</th>
+                  <th>Tùy chọn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let check of lstCheck;let i = index;">
+                  <td>{{i +1 }}</td>
+                  <td>{{check.createdBy}}</td>
+                  <td>{{check.quantity}}</td>
+                  <td>{{check.createdAt | date:'dd/MM/YYYY hh:ss' }}</td>
+                  <td>{{check.conclude}}</td>
+                  <td>{{check.note}}</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" style="margin-right: 10px ;" title="Chi tiết"
+                      (click)="open(myModal, check.id)">
+                      <i class="fa fa-check"></i>
+                    </button>
+
+                    <button *ngIf="show_work_order" class="btn btn-danger btn-sm" title="Xóa"
+                      (click)="delete(check.id)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+
+            <app-button-success item_type="PHOTOELECTRIC" show_work_order="{{show_work_order}}">
+
+            </app-button-success>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #myModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="table-responsive">
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Thông tin kiểm tra</h3>
+        </div>
+      </div>
+      <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th>Chỉ tiêu kiểm tra</th>
+            <th>Mức quy định</th>
+            <th>Yêu cầu kỹ thuật</th>
+            <th>Số lượng</th>
+            <th>Sai số thực tế</th>
+            <th>Đánh giá</th>
+            <th>Nội dung đánh giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let auditLKDT of lstAuditCriteriaLKDT;let i = index;">
+            <td>{{ auditLKDT.auditContent }}</td>
+            <td>{{ auditLKDT.regulationLevel }}</td>
+            <td>{{ auditLKDT.technicalRequirement}}</td>
+            <td>
+              <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
+                [(ngModel)]="auditLKDT.auditQuantity">
+
+            </td>
+            <td>
+              <input type="text" placeholder="Sai số" class="form-control" name="inaccuracy[{{i}}]"
+                [(ngModel)]="auditLKDT.inaccuracy">
+            </td>
+            <td>
+              <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
+                #type="ngModel">
+                <option value="Đạt">Đạt</option>
+                <option value="Không đạt">Không đạt</option>
+                <option value="Nhân nhượng">Nhân nhượng</option>
+              </select>
+            </td>
+            <td>
+              <input type="text" placeholder="Ghi chú" class="form-control" name="checkContent[{{i}}]"
+                [(ngModel)]="auditLKDT.checkContent">
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Thông số</h3>
+        </div>
+      </div>
+      <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th rowspan="2">Thông số</th>
+            <th rowspan="2">Điều kiện</th>
+            <th colspan="3">Tiêu chuẩn</th>
+            <th rowspan="2">Q Trung bình</th>
+            <th rowspan="2">Số lượng</th>
+            <th rowspan="2">Max</th>
+            <th rowspan="2">Min</th>
+            <th rowspan="2">Trung bình</th>
+            <th rowspan="2">S</th>
+            <th rowspan="2">KU</th>
+            <th rowspan="2">KL</th>
+            <th rowspan="2">KMin</th>
+            <th rowspan="2">CPK up</th>
+            <th rowspan="2">CPK Low</th>
+            <th rowspan="2">CPK</th>
+            <th rowspan="2">Đánh giá</th>
+            <th rowspan="2">Nội dung</th>
+          </tr>
+          <tr>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Đơn vị</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let auditLKDT of lstAuditCriteriaParam;let i = index;">
+            <td>{{ auditLKDT.parameterName }}</td>
+            <td>{{ auditLKDT.conditions }}</td>
+            <td>{{ auditLKDT.minAudit | number }}</td>
+            <td>{{ auditLKDT.maxAudit | number }}</td>
+            <td>{{ auditLKDT.unit }}</td>
+            <td>
+              <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg[{{i}}]"
+                [(ngModel)]="auditLKDT.auditQAvg">
+            </td>
+            <td>
+              <input type="text" placeholder="Số lượng" class="form-control" name="quantity[{{i}}]"
+                [(ngModel)]="auditLKDT.quantity">
+            </td>
+
+            <td>
+              <input type="text" placeholder="Max" class="form-control" name="max[{{i}}]" [(ngModel)]="auditLKDT.max">
+            </td>
+
+            <td>
+              <input type="text" placeholder="Min" class="form-control" name="min[{{i}}]" [(ngModel)]="auditLKDT.min">
+            </td>
+
+            <td>
+              <input type="text" placeholder="Trung bình" class="form-control" name="avgResult[{{i}}]"
+                [(ngModel)]="auditLKDT.avgResult">
+            </td>
+
+            <td>
+              <input type="text" placeholder="S" class="form-control" name="s[{{i}}]" [(ngModel)]="auditLKDT.s">
+            </td>
+            <td>
+              <input type="text" placeholder="KU" class="form-control" name="ku[{{i}}]" [(ngModel)]="auditLKDT.ku">
+            </td>
+            <td>
+              <input type="text" placeholder="KL" class="form-control" name="kl[{{i}}]" [(ngModel)]="auditLKDT.kl">
+            </td>
+
+
+            <td>
+              <input type="text" placeholder="Kmin" class="form-control" name="kl[{{i}}]" [(ngModel)]="auditLKDT.kmin">
+            </td>
+            <td>
+              <input type="text" placeholder="CPK up" class="form-control" name="kl[{{i}}]"
+                [(ngModel)]="auditLKDT.cpkUp">
+            </td>
+            <td>
+              <input type="text" placeholder="CPK Low" class="form-control" name="kl[{{i}}]"
+                [(ngModel)]="auditLKDT.cpkLow">
+            </td>
+            <td>
+              <input type="text" placeholder="CPK" class="form-control" name="kl[{{i}}]" [(ngModel)]="auditLKDT.cpk">
+            </td>
+
+            <td>
+              <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
+                #type="ngModel">
+                <option value="Đạt">Đạt</option>
+                <option value="Không đạt">Không đạt</option>
+                <option value="Nhân nhượng">Nhân nhượng</option>
+              </select>
+            </td>
+            <td>
+              <input type="text" placeholder="Ghi chú" class="form-control" name="content[{{i}}]"
+                [(ngModel)]="auditLKDT.content">
+            </td>
+          </tr>
+        </tbody>
+
+      </nz-table>
+    </div>
+
+  </div>
+</ng-template>
+
+
+<ng-template #addnewCheck let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+      <div class="form-group row" *ngIf="show_work_order">
+        <div class="col-sm-3">
+          <label>Mẫu biên bản</label>
+          <input type="text" class="form-control" [(ngModel)]="selectExamination" value={{strSelect}}
+            [matAutocomplete]="auto" class="form-control" [formControl]="searchExaminationCtrl"
+            placeholder="Mã mẫu biên bản">
+          <mat-autocomplete [panelWidth]="400" #auto="matAutocomplete" (optionSelected)="onSelected()"
+            [displayWith]="displayWith">
+            <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
+            <ng-container *ngIf="!isLoading">
+              <mat-option *ngFor="let examination of filteredExamination.lstExamination" [value]="examination">
+                <span><b>{{examination.name}}</b> ({{examination.code}})</span>
+              </mat-option>
+            </ng-container>
+          </mat-autocomplete>
+        </div>
+
+        <div class="col-sm-3">
+          <label>Số lượng</label>
+          <input type="number" class="form-control {{ !quantity.valid ? 'is-invalid' :''}}" #quantity="ngModel"
+            placeholder="Số lượng" name="quantity" [(ngModel)]="form.quantity" required>
+        </div>
+
+        <div class="col-sm-3">
+          <label>Kết luận</label>
+          <select [(ngModel)]="form.conclude" class="form-control {{ !conclude.valid ? 'is-invalid' :''}}"
+            #conclude="ngModel" name="conclude" required>
+            <option value="Đạt">Đạt</option>
+            <option value="Không đạt">Không đạt</option>
+          </select>
+        </div>
+
+        <div class="col-sm-3">
+          <label>Ghi chú</label>
+          <input type="text" class="form-control" placeholder="Ghi chú" name="note" [(ngModel)]="form.note">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th>Chỉ tiêu kiểm tra</th>
+              <th>Mức quy định</th>
+              <th>Yêu cầu kỹ thuật</th>
+              <th>Số lượng</th>
+              <th>Sai số thực tế</th>
+              <th>Đánh giá</th>
+              <th>Nội dung đánh giá</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let auditLKDT of lstAuditCriteriaLKDT;let i = index;">
+              <td>{{ auditLKDT.auditContent }}</td>
+              <td>{{ auditLKDT.regulationLevel }}</td>
+              <td>{{ auditLKDT.technicalRequirement}}</td>
+              <td>
+                <input type="number" placeholder="Số lượng" required
+                  class="form-control {{ !auditQuantity.valid ? 'is-invalid' :''}}" #auditQuantity="ngModel"
+                  name="auditQuantity[{{i}}]" [(ngModel)]="auditLKDT.auditQuantity">
+
+              </td>
+              <td>
+                <input type="text" placeholder="Sai số" required
+                  class="form-control {{ !inaccuracy.valid ? 'is-invalid' :''}}" #inaccuracy="ngModel"
+                  name="inaccuracy[{{i}}]" [(ngModel)]="auditLKDT.inaccuracy">
+              </td>
+              <td>
+                <select required name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
+                  class="form-control {{ !checkResult.valid ? 'is-invalid' :''}}" #checkResult="ngModel"
+                  #type="ngModel">
+                  <option value="Đạt">Đạt</option>
+                  <option value="Không đạt">Không đạt</option>
+                  <option value="Nhân nhượng">Nhân nhượng</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" placeholder="Ghi chú" class="form-control" name="checkContent[{{i}}]"
+                  [(ngModel)]="auditLKDT.checkContent">
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+
+        <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th rowspan="2">Thông số</th>
+              <th rowspan="2">Điều kiện</th>
+              <th colspan="3">Tiêu chuẩn</th>
+              <th rowspan="2">Q Trung bình</th>
+              <th rowspan="2">Số lượng</th>
+              <th rowspan="2">Max</th>
+              <th rowspan="2">Min</th>
+              <th rowspan="2">Trung bình</th>
+              <th rowspan="2">S</th>
+              <th rowspan="2">KU</th>
+              <th rowspan="2">KL</th>
+              <th rowspan="2">KMin</th>
+              <th rowspan="2">CPK up</th>
+              <th rowspan="2">CPK Low</th>
+              <th rowspan="2">CPK</th>
+              <th rowspan="2">Đánh giá</th>
+              <th rowspan="2">Nội dung</th>
+            </tr>
+            <tr>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Đơn vị</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let auditLKDT of lstAuditCriteriaParam;let i = index;">
+              <td>{{ auditLKDT.parameterName }}</td>
+              <td>{{ auditLKDT.conditions }}</td>
+              <td>{{ auditLKDT.minAudit | number }}</td>
+              <td>{{ auditLKDT.maxAudit | number }}</td>
+              <td>{{ auditLKDT.unit }}</td>
+              <td>
+                <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg[{{i}}]"
+                  [(ngModel)]="auditLKDT.auditQAvg">
+              </td>
+              <td>
+                <input type="number" placeholder="Số lượng" class="form-control {{ !quantity.valid ? 'is-invalid' :''}}"
+                  #quantity="ngModel" name="quantity[{{i}}]" required [(ngModel)]="auditLKDT.quantity">
+              </td>
+
+              <td>
+                <input type="text" placeholder="Max" class="form-control {{ !max.valid ? 'is-invalid' :''}}"
+                  #max="ngModel" name="max[{{i}}]" [(ngModel)]="auditLKDT.max" required>
+              </td>
+
+              <td>
+                <input type="text" placeholder="Min" class="form-control {{ !min.valid ? 'is-invalid' :''}}"
+                  #min="ngModel" name="min[{{i}}]" [(ngModel)]="auditLKDT.min" required>
+              </td>
+
+              <td>
+                <input type="text" placeholder="Trung bình"
+                  class="form-control {{ !avgResult.valid ? 'is-invalid' :''}}" #avgResult="ngModel"
+                  name="avgResult[{{i}}]" required [(ngModel)]="auditLKDT.avgResult">
+              </td>
+
+              <td>
+                <input type="text" placeholder="S" class="form-control" name="s[{{i}}]" [(ngModel)]="auditLKDT.s">
+              </td>
+              <td>
+                <input type="text" placeholder="KU" class="form-control" name="ku[{{i}}]" [(ngModel)]="auditLKDT.ku">
+              </td>
+              <td>
+                <input type="text" placeholder="KL" class="form-control" name="kl[{{i}}]" [(ngModel)]="auditLKDT.kl">
+              </td>
+
+
+              <td>
+                <input type="text" placeholder="Kmin" class="form-control" name="kl[{{i}}]"
+                  [(ngModel)]="auditLKDT.kmin">
+              </td>
+              <td>
+                <input type="text" placeholder="CPK up" class="form-control" name="kl[{{i}}]"
+                  [(ngModel)]="auditLKDT.cpkUp">
+              </td>
+              <td>
+                <input type="text" placeholder="CPK Low" class="form-control" name="kl[{{i}}]"
+                  [(ngModel)]="auditLKDT.cpkLow">
+              </td>
+              <td>
+                <input type="text" placeholder="CPK" class="form-control" name="kl[{{i}}]" [(ngModel)]="auditLKDT.cpk">
+              </td>
+
+              <td>
+                <select class="form-control {{ !checkResult.valid ? 'is-invalid' :''}}" #checkResult="ngModel"
+                  name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult" required #type="ngModel">
+                  <option value="Đạt">Đạt</option>
+                  <option value="Không đạt">Không đạt</option>
+                  <option value="Nhân nhượng">Nhân nhượng</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" placeholder="Ghi chú" class="form-control" name="content[{{i}}]"
+                  [(ngModel)]="auditLKDT.content">
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+
+      <div class="form-group row" *ngIf="show_work_order">
+        <div class="col-sm-4">
+          <label> Số liệu kiểm tra </label>
+          <input type="file" (change)="addfile($event)" placeholder="Upload file"
+            accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+
+          <button class="btn btn-success" (click)="downloadTemplate()">
+            <i class="fa fa-download"></i> Tải mẫu
+          </button>
+          <label> Vui lòng chọn mẫu trước khi tải mẫu</label>
+        </div>
+
+      </div>
+      <button class="btn btn-primary" (click)="onSubmit('save')" [disabled]="!(f.form.valid)"> Lưu thông tin kiểm
+        tra</button>
+    </form>
+  </div>
+</ng-template>

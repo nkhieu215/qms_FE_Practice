@@ -1,0 +1,11 @@
+.table td, .table th {
+    padding: 2px;
+    vertical-align: top;
+    border-top: 1px solid #e9ecef;
+}
+
+
+::ng-deep .modal-xxl .modal-dialog {
+  max-width: 90%;
+  width: 90%;
+}

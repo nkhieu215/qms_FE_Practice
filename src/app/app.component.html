@@ -1,0 +1,58 @@
+<nz-layout class="app-layout">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null"  nzBreakpoint="lg">
+    <div class="sidebar-logo">
+      <a routerLink="/">
+        <img src="{{isCollapsed ? '../assets/img/logo_hide.png' :'../assets/img/logo.png'}}" alt="logo">
+        <h1>QMS</h1>
+      </a>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline"  [nzInlineCollapsed]="isCollapsed">
+
+      <li nz-menu-item nz-tooltip nzTooltipPlacement="right" style="padding-left: 10px;">
+        <span nz-icon nzType="dashboard"></span>
+        <span routerLink="/dashboard">Dashboard</span>
+      </li>
+
+      <li nz-submenu nzTitle="{{menu.name}}" nzIcon="{{menu.classIcon}}" *ngFor="let menu of lstMenuRes" nzOpen="{{ isCollapsed ? 'false': 'true' }}"
+        [nzPaddingLeft]="10">
+        <a *ngIf="menu.lstChild == null" routerLink="{{menu.url}}" class="nav-link">
+          {{menu.name}}
+        </a>
+        <ul *ngIf="menu.lstChild != null">
+          <li nz-menu-item nzMatchRouter *ngFor="let menuChild of menu.lstChild" style="padding-left: 15px;">
+            <a routerLink="{{menuChild.url}}" enableForKeycloakAuthorization="resource#create" >
+              <span nz-icon nzType="{{menuChild.classIcon}}" nzTheme="outline"></span>
+              {{menuChild.name}}
+            </a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div class="app-header">
+        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+          <span class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></span>
+        </span>
+        <span class="header-trigger" style="float: right;  line-height: initial;">
+          <span nz-icon nzType="poweroff" nzTheme="outline" (click)="signOut()" title="Thoát"></span>
+        </span>
+        <span class="header-trigger" style="float: right;  line-height: initial;">
+          <span>{{strName}}</span>
+        </span>
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="inner-content">
+        <!-- <div class="breadcrumb">
+          <nz-breadcrumb [nzAutoGenerate]="true"></nz-breadcrumb>
+        </div> -->
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>
+
+<ng-http-loader></ng-http-loader>

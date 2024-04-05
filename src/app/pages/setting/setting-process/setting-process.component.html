@@ -1,0 +1,127 @@
+<div>
+
+  <div class="card-header">
+    <h1>Danh sách công đoạn</h1>
+    <div class="float-right">
+      <button class="btn btn-success" (click)="open(myModal, null)">
+        <i class="fa fa-plus"></i> Thêm mới
+      </button>
+    </div>
+
+    <form name="form" (ngSubmit)="f.form.valid && refreshExamination()" #f="ngForm" novalidate
+      style="margin-top: 20px;">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Tên công đoạn</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên công đoạn" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã công đoạn</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Mã công đoạn" />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <button class="btn btn-primary btn-sm" type="button" (click)="refreshExamination()"
+              style="margin-top: 28px;">
+              <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- <span>Add class of <code>.form-control</code> with <code>&lt;input&gt;</code> tag</span> -->
+
+  </div>
+
+  <div class="card-body">
+
+    <table class="table table-bordered mb-0">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Tên công đoạn</th>
+          <th scope="col">Mã công đoạn</th>
+          <th scope="col">Tùy chọn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let aql of lstRest ;let i = index;">
+          <th scope="row">{{ i+1 }}</th>
+          <td>{{ aql.name }}</td>
+          <td>{{ aql.code}}</td>
+          <td class="text-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" (click)="open(myModal, aql)"><i class="fa fa-edit"></i></button>
+              <button class="btn btn-sm btn-danger" (click)="delete(aql)"><i class="fa fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between p-2">
+      <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize"
+        (pageChange)="refreshExamination()">
+      </ngb-pagination>
+
+      <select class="custom-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshExamination()">
+        <option [ngValue]="10">10 items per page</option>
+        <option [ngValue]="20">20 items per page</option>
+        <option [ngValue]="50">50 items per page</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #myModal let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">
+      Thông tin công đoạn
+    </h2>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>Tên công đoạn</label>
+            <input [(ngModel)]="formEx.name" type="text" class="form-control" name="name" required
+              placeholder="Tên công đoạn" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <label>Mã công đoạn</label>
+            <input [(ngModel)]="formEx.code" type="text" class="form-control" name="code" required
+              placeholder="Mã công đoạn" />
+          </div>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <button *ngIf="this.formEx.id == null;else buttonupdate " (click)="onCreate()" class="btn btn-success"
+          type="submit">
+          Thêm mới
+        </button>
+
+        <ng-template #buttonupdate>
+          <button (click)="onCreate()" class="btn btn-info" type="submit">
+            Cập nhật thông tin
+          </button>
+        </ng-template>
+
+      </div>
+    </form>
+  </div>
+</ng-template>

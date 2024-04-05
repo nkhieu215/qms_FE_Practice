@@ -1,0 +1,427 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <h2>Chỉnh sửa thông tin mẫu biên bản</h2>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12">
+      <div *ngIf="error" class={{classError}} role="alert">
+        {{error}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="col-xs-3 col-sm-3 col-md-3">
+      <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+            <label>Loại biên bản</label>
+            <select (change)="onChangeType(form.type)" class="form-control" name="type" [(ngModel)]="form.type"
+              #type="ngModel" [(ngModel)]='examinationType'>
+              <option selected value="1">NVL / BTP/ TP</option>
+              <option value="2">LKDT/BTP</option>
+              <option value="3">Đánh giá chất lượng SP</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+            <label>Tên biên bản</label>
+            <input type="text" class="form-control" name="name" [(ngModel)]="form.name" required #name="ngModel"
+              placeholder="Tên biên bản" />
+            <div class="alert-danger" *ngIf="name.errors && f.submitted">
+              <div *ngIf="name.errors['required']">Tên biên bản không được để trống</div>
+              <div *ngIf="name.errors['minlength']">
+                Tối thiểu 3 ký tự
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+            <label>Mã biên bản</label>
+            <input type="text" class="form-control" name="code" [(ngModel)]="form.code" required #code="ngModel"
+              placeholder="Mã biên bản" />
+          </div>
+        </div>
+
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+            <label>Mô tả</label>
+            <textarea class="form-control" name="description" [(ngModel)]="form.description"
+              #description="ngModel"></textarea>
+          </div>
+        </div>
+
+
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+            <label style="margin-right: 10px;">Kích hoạt biên bản </label>
+            <input type="checkbox" [checked]="form.status" name="status" [(ngModel)]="form.status" #status="ngModel"
+              placeholder="Kích hoạt" />
+          </div>
+        </div>
+
+        <div class="col-md-12 pb-3">
+          <div class="form-group">
+
+            <button class="btn btn-info m-2" routerLink="/setting/examination"><i class="fa fa-list"></i> Danh
+              sách</button>
+
+            <button class="btn btn-primary">
+              <span nz-icon nzType="save"></span>
+              Lưu thông tin
+            </button>
+
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- thong tin kiem tra nvl -->
+    <div *ngIf="examinationType == '1'" class="col-xs-9 col-sm-9 col-md-9">
+      <div class="table-responsive ">
+        <div class="float-right" style="margin-bottom: 10px;">
+          <button class="btn  btn-success" (click)="open(mymodal,'','')"><i class="fa fa-plus"></i> Thêm tiêu
+            chí</button>
+        </div>
+        <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAudit"
+          [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th rowspan="2">#</th>
+              <th colspan="2">Chỉ tiêu kiểm tra</th>
+              <th colspan="3">Yêu cầu</th>
+              <th rowspan="2" style="line-height: 65px;">Nội dung lưu ý</th>
+              <th rowspan="2">Tùy chọn</th>
+            </tr>
+            <tr>
+              <th>Tiêu chí</th>
+              <th>Mức quy định</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Đơn vị</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let audit of arrayAudit let i=index">
+              <td>{{ i+1}}</td>
+              <td>{{ audit.criteriaName }}</td>
+              <td>{{ audit.regulationLevel }}</td>
+              <td>{{ audit.min | number }}</td>
+              <td>{{ audit.max | number }}</td>
+              <td>{{ audit.unit }}</td>
+              <td>{{ audit.note }}</td>
+              <td class="text-center">
+
+                <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
+                  (click)="open(mymodal, audit.id,'NVL')">Sửa</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'NVL')">
+                  Xóa
+                </button>
+
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+
+    <!-- thông tin kiểm tra LKDT -->
+    <div *ngIf="examinationType == '2'" class="col-xs-9 col-sm-9 col-md-9">
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="table-responsive">
+          <div class="float-right">
+            <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','')"><i class="fa fa-plus"></i> Thông
+              tin kiểm tra</button>
+          </div>
+          <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditLKDT2"
+            [nzFrontPagination]="false">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th>Chỉ tiêu kiểm tra</th>
+                <th>Mức quy định</th>
+                <th>Yêu cầu kỹ thuật</th>
+                <th>Tùy chọn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let audit of arrayAuditLKDT2  let i=index;">
+                <td>{{++i}}</td>
+                <td>{{ audit.auditContent }}</td>
+                <td>{{ audit.regulationLevel }}</td>
+                <td>{{ audit.technicalRequirement }}</td>
+
+                <td class="text-center">
+                  <div class="btn-group">
+                    <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
+                      (click)="open(mymodal_lkdt, audit.id,'LKDT1')">Sửa</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT1')">Xóa</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+
+        <div class="table-responsive">
+          <div class="float-right">
+            <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','')"><i class="fa fa-plus"></i>
+              Thông tin kiểm tra</button>
+          </div>
+          <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditParam"
+            [nzFrontPagination]="false">
+            <thead>
+              <tr>
+                <th rowspan="2">#</th>
+                <th rowspan="2">Thông số</th>
+                <th rowspan="2">Điều kiện</th>
+                <th colspan="3">Tiêu chuẩn</th>
+                <th rowspan="2">Tùy chọn</th>
+              </tr>
+              <tr>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Đơn vị</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let audit of arrayAuditParam let i= index">
+                <td>{{ ++i }}</td>
+                <td>{{ audit.parameterName }}</td>
+                <td>{{ audit.conditions }}</td>
+                <td>{{ audit.min | number }}</td>
+                <td>{{ audit.max | number }}</td>
+                <td>{{ audit.unit }}</td>
+                <td class="text-center">
+                  <div class="btn-group">
+                    <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
+                      (click)="open(mymodal_parameter, audit.id,'LKDT2')">Sửa</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'LKDT2')">Xóa</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </div>
+
+    <div class="" *ngIf="examinationType == '3'" class="col-xs-9 col-sm-9 col-md-9">
+      <div class="table-responsive col-xs-12 col-sm-12 col-md-12">
+        <div class="float-right">
+          <button class="btn btn-success" (click)="open(mymodal_clsp,'','')"><i class="fa fa-plus"></i> Thông tin
+            kiểm tra</button>
+        </div>
+        <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditCLSP"
+          [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Chỉ tiêu kiểm tra</th>
+              <th>Bậc rút nghiệm</th>
+              <th>Yêu cầu kỹ thuật</th>
+              <th>Tùy chọn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let audit of arrayAuditCLSP let i=index">
+              <td>{{ ++i}}</td>
+              <td>{{ audit.auditContent }}</td>
+              <td>{{ audit.regulationLevel }}</td>
+              <td>{{ audit.technicalRequirement }}</td>
+
+              <td class="text-center">
+                <div class="btn-group">
+                  <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
+                    (click)="open(mymodal_clsp, audit.id,'CLSP')">Sửa</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'CLSP')">Delete</button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- thong tin kiem tra nvl -->
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông tin mẫu kiểm tra NVL/BTP/TP</h4>
+
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+      <div class="form-group">
+        <label>Tên tiêu chí</label>
+        <input type="text" class="form-control" name="criteriaName" [(ngModel)]="formAudit.criteriaName" required
+          #criteriaName="ngModel" placeholder="Tên tiêu chí" />
+        <div class="alert-danger" *ngIf="criteriaName.errors && f.submitted">
+          <div *ngIf="criteriaName.errors['required']">Tên biên tiêu chí không được để trống</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Định mức quy định</label>
+        <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formAudit.regulationLevel" required
+          #level="ngModel" placeholder="Định mức quy định" />
+      </div>
+
+      <div class="form-group">
+        <label>Thông số min</label>
+        <input type="text" class="form-control" name="min" [(ngModel)]="formAudit.min" #min="ngModel"
+          placeholder="Định mức quy định min" />
+      </div>
+      <div class="form-group">
+        <label>Thông số max</label>
+        <input type="text" class="form-control" name="max" [(ngModel)]="formAudit.max" #max="ngModel"
+          placeholder="Định mức quy định max" />
+      </div>
+      <div class="form-group">
+        <label>Đơn vị</label>
+        <input type="text" class="form-control" name="unit" [(ngModel)]="formAudit.unit" #max="ngModel"
+          placeholder="Đơn vị" />
+      </div>
+      <div class="form-group">
+        <label>Ghi chú</label>
+        <textarea class="form-control" name="note" [(ngModel)]="formAudit.note" required #note="ngModel"></textarea>
+      </div>
+      <div class="form-group">
+        <button *ngIf="formAudit.id == null" (click)="onAddAudit('NVL','ADD')" class="btn btn-success"
+          type="submit">Thêm mới</button>
+        <button *ngIf="formAudit.id != null" (click)="onAddAudit('NVL','EDIT')" class="btn btn-primary"
+          type="submit">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- thông tin kiểm tra LKDT -->
+<ng-template #mymodal_lkdt let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+      <div class="form-group">
+        <label>Chỉ tiêu</label>
+        <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent"
+          #content="ngModel" placeholder="Chỉ tiêu kiểm tra" />
+        <div class="alert-danger" *ngIf="content.errors && f.submitted">
+          <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Định mức quy định</label>
+        <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAuditLKDT2.regulationLevel"
+          #level="ngModel" placeholder="Định mức quy định" />
+      </div>
+
+      <div class="form-group">
+        <label>Yêu cầu kỹ thuật</label>
+        <input type="text" class="form-control" name="technicalRequirement"
+          [(ngModel)]="formAuditLKDT2.technicalRequirement" #min="ngModel" placeholder="Yêu cầu kỹ thuật" />
+      </div>
+      <div class="form-group">
+        <button *ngIf="formAuditLKDT2.id == null" (click)="onAddAudit('LKDT1','ADD')" class="btn btn-success"
+          type="submit">Thêm mới</button>
+        <button *ngIf="formAuditLKDT2.id != null" (click)="onAddAudit('LKDT1','EDIT')" class="btn btn-primary"
+          type="submit">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- thông tin kiểm tra LKDT -->
+<ng-template #mymodal_parameter let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra thông số</h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+      <div class="form-group">
+        <label>Thông số</label>
+        <input type="text" class="form-control" name="parameterName" [(ngModel)]="formAuditParam.parameterName" required
+          minlength="1" #name="ngModel" placeholder="Tên tiêu chí" />
+      </div>
+
+      <div class="form-group">
+        <label>Điều kiện</label>
+        <input type="text" class="form-control" name="conditions" [(ngModel)]="formAuditParam.conditions"
+          #conditions="ngModel" placeholder="Định mức quy định" />
+      </div>
+
+      <div class="form-group">
+        <label>Thông số min</label>
+        <input type="text" class="form-control" name="min" [(ngModel)]="formAuditParam.min" #min="ngModel"
+          placeholder="Định mức quy định min" />
+      </div>
+      <div class="form-group">
+        <label>Thông số max</label>
+        <input type="text" class="form-control" name="max" [(ngModel)]="formAuditParam.max" #max="ngModel"
+          placeholder="Định mức quy định max" />
+      </div>
+      <div class="form-group">
+        <label>Đơn vị</label>
+        <input type="text" class="form-control" name="unit" [(ngModel)]="formAuditParam.unit" #max="ngModel"
+          placeholder="Đơn vị" />
+      </div>
+
+      <div class="form-group">
+        <button *ngIf="formAuditParam.id == null" (click)="onAddAudit('LKDT2','ADD')" class="btn btn-success"
+          type="submit">Thêm mới</button>
+        <button *ngIf="formAuditParam.id != null" (click)="onAddAudit('LKDT2','EDIT')" class="btn btn-primary"
+          type="submit">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- thông tin kiểm tra chất lượng sp -->
+<ng-template #mymodal_clsp let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
+<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+      <div class="form-group">
+        <label>Chỉ tiêu</label>
+        <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
+          #content="ngModel" placeholder="Chỉ tiêu kiểm tra" />
+        <div class="alert-danger" *ngIf="content.errors && f.submitted">
+          <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Bậc rút nghiệm</label>
+        <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAuditLKDT2.regulationLevel"
+          #level="ngModel" placeholder="Bậc rút nghiệm" />
+      </div>
+
+      <div class="form-group">
+        <label>Yêu cầu kỹ thuật</label>
+        <input type="text" class="form-control" name="technicalRequirement"
+          [(ngModel)]="formAuditLKDT2.technicalRequirement" #min="ngModel" placeholder="Yêu cầu kỹ thuật" />
+      </div>
+      <div class="form-group">
+        <button *ngIf="formAuditLKDT2.id == null" (click)="onAddAudit('CLSP','ADD')" class="btn btn-success"
+          type="submit">Thêm mới</button>
+        <button *ngIf="formAuditLKDT2.id != null" (click)="onAddAudit('CLSP','EDIT')" class="btn btn-primary"
+          type="submit">Cập nhật</button>
+
+      </div>
+    </form>
+  </div>
+</ng-template>

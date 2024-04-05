@@ -1,0 +1,360 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <div class="card-header">
+    <h2 class="card-title">Kiểm tra rút nghiệm NVL</h2>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12">
+        <pqc-show-work-order *ngIf="show_work_order" item_id="{{idWorkOrder}}" item_type="CHECK_NVL"
+          show_check="{{show_check}}"></pqc-show-work-order>
+
+        <div class="form-group row" *ngIf="show_work_order">
+          <div class="col-sm-3">
+            <label>Thông tin Profile </label>
+            <input type="text" class="form-control" placeholder="Thông tin profile" name="profileName"
+              [(ngModel)]="form.profileName" />
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên vật tư</th>
+                  <th>Mã</th>
+                  <th>Tên khác</th>
+                  <th>Thông số KT</th>
+                  <th>Control level</th>
+                  <th>Partnumber</th>
+                  <th>Location</th>
+                  <th>Số lượng cơ bản</th>
+                  <th>Vendor</th>
+                  <th>Mã vật tư thay thế</th>
+                  <th>Version</th>
+                  <th>Lưu ý</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bom of lstbom; let i = index">
+                  <td style="text-align: center;">{{i+1}}</td>
+                  <td>{{ bom.itemName }}</td>
+                  <td>{{ bom.itemCode }}</td>
+                  <td>{{ bom.uotherNam }}</td>
+                  <td>{{ bom.uitmTech }}</td>
+                  <td>{{ bom.uctrLevel }}</td>
+                  <td>{{ bom.partNumber }}</td>
+                  <td>{{ bom.ulocation }}</td>
+                  <td>{{ bom.quantity }}</td>
+                  <td>{{ bom.vendor }}</td>
+                  <td>{{ bom.ualter }}</td>
+                  <td>{{ bom.version }}</td>
+                  <td>{{ bom.uremarks }}</td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+            <div class="float-right btn-group" style="margin-bottom: 10px;" *ngIf="show_work_order">
+              <button class="btn btn-success" (click)="open(myModal5,'add',null,'')">
+                <i class="fa fa-plus"></i>
+                Khai báo thông tin kiểm tra
+              </button>
+            </div>
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>Người thực hiện</th>
+                  <th>Ngày thực hiện</th>
+                  <th>Kết quả kiểm tra</th>
+                  <th>Ghi chú</th>
+                  <th>Tùy chọn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let check of lstCheck; let i = index">
+                  <td>{{check.checkPerson}}</td>
+                  <td>{{check.createdAt | date: 'dd/MM/YYYY HH:mm'}}</td>
+                  <td>{{check.conclude}}</td>
+                  <td>{{check.note}}</td>
+                  <td>
+                    <div class="btn-group">
+                      <button class="btn btn-primary" (click)="open(myModal5, 'show', check.ids, check.id)">
+                        <i class="fa fa-check"></i>
+                      </button>
+
+                      <button class="btn btn-success" title="Thêm file ảnh"
+                        (click)="open(uploadfile, 'show_img', check.ids, check.id)">
+                        <i class="fa fa-upload"></i>
+                      </button>
+
+                      <button class="btn btn-danger" (click)="delete(check.ids, check.id)" *ngIf="show_work_order">
+                        <i class="fa fa-trash"></i>
+                      </button>
+
+                    </div>
+
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+
+        <app-button-success item_type="NVL" show_work_order="{{show_work_order}}"></app-button-success>
+
+
+
+        <div class="col-xs-12 col-sm-12">
+          <div *ngIf="error" class="{{ classError }}" role="alert">
+            {{ error }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #myModal5 let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra NVL</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+        <div class="form-group row" style="margin-top: 20px;">
+          <div class="col-sm-12 table-responsive">
+
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th  rowspan="2">STT</th>
+                  <th rowspan="2">Tên vật tư</th>
+                  <th rowspan="2">Mã</th>
+                  <th rowspan="2">Partnumber</th>
+                  <th rowspan="2">Số mẫu thử</th>
+                  <th rowspan="2">Ngày ktra</th>
+                  <th colspan="3">Kiểm tra rút nghiệm</th>
+                  <!-- <th colspan="9">Ngoại quan thông số</th> -->
+                  <th colspan="3">Kiểm tra thông số</th>
+                  <th rowspan="2">Ngày về</th>
+                  <th rowspan="2" style="width: 20%;">Ghi chú</th>
+                </tr>
+                <tr>
+                  <th>Quy định KT</th>
+                  <th>Kết quả cho phép</th>
+                  <th>Thực tế</th>
+                  <!-- <td>Số mẫu thử</td>
+              <td>Ngoại quan</td>
+              <td colspan="2">Công suất</td>
+              <td colspan="2">Cos fi</td>
+              <td colspan="2">Dòng điện</td> -->
+                  <th>Thông số min</th>
+                  <th>Thông số max</th>
+                  <th>Đơn vị</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bom of myClonedArray; let i = index">
+                  <td style="text-align: center;">{{i+1}}</td>
+                  <td>
+                    {{bom.itemName}}
+                  </td>
+                  <td>
+                    {{bom.itemCode}}
+                  </td>
+                  <td>
+                    {{bom.partNumber}}
+
+                  </td>
+                  <td>
+                    <input type="number" class="form-control {{ !sampleQuantity.valid ? 'is-invalid' :''}}" required
+                      #sampleQuantity="ngModel" placeholder="Số mẫu thử" name="sampleQuantity[{{i}}]"
+                      [(ngModel)]="bom.sampleQuantity" />
+                  </td>
+                  <td>
+                    <input type="date" class="form-control" placeholder="Ngày kiểm tra" name="checkDate[{{i}}]"
+                      [(ngModel)]="bom.checkDate" />
+                  </td>
+
+                  <td>
+                    <input type="text" class="form-control" placeholder="Quy định kiểm tra"
+                      name="regulationCheck[{{i}}]" [(ngModel)]="bom.regulationCheck" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" placeholder="Kết quả cho phép" name="allowResult[{{i}}]"
+                      [(ngModel)]="bom.allowResult" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" placeholder="Thực tế" name="realResult[{{i}}]"
+                      [(ngModel)]="bom.realResult" />
+                  </td>
+                  <!-- <td>
+                <input type="text" class="form-control" placeholder="Số mẫu thử" name="ex_sampleQuantity[{{i}}]"
+                  [(ngModel)]="bom.ex_sampleQuantity" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Ngoại quan" name="externalInspection[{{i}}]"
+                  [(ngModel)]="bom.externalInspection" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Min" name="minPower[{{i}}]"
+                  [(ngModel)]="bom.minPower" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Max" name="maxPower[{{i}}]"
+                  [(ngModel)]="bom.maxPower" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Min" name="minCosfi[{{i}}]"
+                  [(ngModel)]="bom.minCosfi" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Max" name="maxCosfi[{{i}}]"
+                  [(ngModel)]="bom.maxCosfi" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Min" name="minElectric[{{i}}]"
+                  [(ngModel)]="bom.minElectric" />
+              </td>
+              <td>
+                <input type="text" class="form-control" placeholder="Max" name="maxElectric[{{i}}]"
+                  [(ngModel)]="bom.maxElectric" />
+              </td> -->
+
+                  <td>
+                    <input type="text" class="form-control" placeholder="Min" name="paramMin[{{i}}]"
+                      [(ngModel)]="bom.paramMin" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" placeholder="Max" name="paramMax[{{i}}]"
+                      [(ngModel)]="bom.paramMax" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" placeholder="Đơn vị" name="unit[{{i}}]"
+                      [(ngModel)]="bom.unit" />
+                  </td>
+                  <td>
+                    <input type="date" [ngModel]="bom.returnDay | date:'dd/MM/yyyy'" class="form-control"
+                      placeholder="Ngày về" name="returnDay[{{i}}]" [(ngModel)]="bom.returnDay" />
+                  </td>
+
+                  <td>
+                    <input type="text" class="form-control" placeholder="Ghi chú" name="note[{{i}}]"
+                      [(ngModel)]="bom.note" />
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+
+          <div class="col-sm-12" *ngIf="show_work_order">
+            <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+              accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+            <button class="btn btn-success" (click)="exportTemplate()"><i class="fa fa-download"></i> Tải mẫu</button>
+          </div>
+
+          <div class="col-sm-4" style="margin-top: 20px;">
+            <label><strong>Kết quả kiểm tra </strong> * </label>
+            <select class="form-control {{ !conclude.valid ? 'is-invalid' :''}}" required #conclude="ngModel"
+              name="conclude" [(ngModel)]="form.conclude">
+              <option value="Đạt">Đạt</option>
+              <option value="Không đạt">Không đạt</option>
+            </select>
+          </div>
+          <div class="col-sm-8" style="margin-top: 20px;">
+            <label><strong>Ghi chú </strong></label>
+            <input type="text" class="form-control" placeholder="Ghi chú" name="note" [(ngModel)]="form.note" />
+          </div>
+
+        </div>
+        <div class="form-group row" style="margin-top: 20px;" *ngIf="show_work_order">
+          <div *ngIf="conclude.errors?.['required']">
+            Kết quả bắt buộc nhập
+          </div>
+
+          <div class="col-sm-12" style="margin-top: 20px;">
+            <button class="btn btn-info" type="submit" (click)="onAddListCheck(ids)" *ngIf="ids == '' || ids == null "
+              [disabled]="!f.form.valid">
+              <i class="fa fa-check"></i>
+              Thêm thông tin kiểm tra
+            </button>
+
+            <button class="btn btn-info" type="submit" (click)="onAddListCheck(ids)" *ngIf="ids != '' && ids!= null"
+              [disabled]="!f.form.valid">
+              <i class="fa fa-check"></i>
+              Cập nhật thông tin
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+
+  </ng-template>
+
+
+  <ng-template #uploadfile let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Upload file ảnh</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+
+      <div class="row" *ngIf="show_work_order">
+        <div class="col-8">
+          <label class="btn btn-default p-0">
+            <input type="file" multiple accept="image/*" (change)="selectFiles($event)" />
+          </label>
+        </div>
+
+        <div class="col-4">
+          <button class="btn btn-success btn-sm" [disabled]="!selectedFiles" (click)="uploadFiles()">
+            Upload
+          </button>
+        </div>
+      </div>
+
+      <div *ngFor="let progressInfo of progressInfos" class="mb-2">
+        <span>{{ progressInfo.fileName }}</span>
+        <div class="progress">
+          <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+            attr.aria-valuenow="{{ progressInfo.value }}" aria-valuemin="0" aria-valuemax="100"
+            [ngStyle]="{ width: progressInfo.value + '%' }">
+            {{ progressInfo.value }}%
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="message.length" class="alert alert-secondary my-3" role="alert">
+        <ul *ngFor="let msg of message; let i = index">
+          <li>{{ msg }}</li>
+        </ul>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-header">Danh sách file</div>
+        <ul class="list-group list-group-flush" *ngFor="let file of fileInfos">
+          <li class="list-group-item">
+            <img src="{{ 'data:image/jpg;base64,'+ file.contentFile }}" style="max-width: 200px;" />
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-template>
+
+</div>

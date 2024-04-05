@@ -1,0 +1,181 @@
+<!-- Basic Form Inputs card start -->
+<div>
+
+    <div class="card-header">
+      <h5>Kiểm tra checklist</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-xs-12 col-sm-12">
+          <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
+            <div class="form-group row">
+              <div class="col-sm-4">
+                <label>Tên sản phẩm</label>
+                <input type="text" class="form-control" placeholder="Tên sản phẩm" name="productionName" readonly
+                  [(ngModel)]="form.productionName">
+              </div>
+
+              <div class="col-sm-4">
+                <label>Mã sản phẩm</label>
+                <input type="text" class="form-control" placeholder="Mã sản phẩm" name="productionCode" readonly
+                  [(ngModel)]="form.productionCode">
+              </div>
+
+              <div class="col-sm-4">
+                <label>Version</label>
+                <input type="text" class="form-control" placeholder="Version" name="bomVersion" readonly
+                  [(ngModel)]="form.bomVersion">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <div class="col-sm-6">
+                <label>Ngành</label>
+                <input type="text" class="form-control" placeholder="Ngành" name="branchName" readonly
+                  [(ngModel)]="form.branchName">
+              </div>
+
+              <div class="col-sm-6">
+                <label>Tổ</label>
+                <input type="text" class="form-control" placeholder="Tổ" name="groupName" readonly
+                  [(ngModel)]="form.groupName">
+              </div>
+
+              <!-- <div class="col-sm-4">
+                <label>Đặc điểm chú ý</label>
+                <input type="text" class="form-control" placeholder="Đặc điểm chú ý" name="version" readonly
+                  [(ngModel)]="form.version">
+              </div> -->
+            </div>
+
+
+            <div class="form-group row">
+              <div class="col-sm-3">
+                <label>Mã lệnh</label>
+                <input type="text" class="form-control" placeholder="Mã lệnh" name="workOrderId" readonly
+                  [(ngModel)]="form.workOrderId">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Số lượng</label>
+                <input type="text" class="form-control" placeholder="Số lượng" name="quantityPlan" readonly
+                  [(ngModel)]="form.quantityPlan">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Số lô</label>
+                <input type="text" class="form-control" placeholder="Số lô" name="lotNumber" readonly
+                  [(ngModel)]="form.lotNumber">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Mã đơn hàng</label>
+                <input type="text" class="form-control" placeholder="Mã đơn hàng" name="planingWorkOrderCode" readonly
+                  [(ngModel)]="form.planingWorkOrderCode">
+              </div>
+            </div>
+
+            <!-- <div class="form-group row">
+              <div class="col-sm-3">
+                <label>Ngày bắt đầu</label>
+                <input type="text" class="form-control" placeholder="Ngày bắt đầu" name="productName" readonly
+                  [(ngModel)]="form.productName">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Ngày kết thúc</label>
+                <input type="text" class="form-control" placeholder="Ngày kết thúc" name="productCode" readonly
+                  [(ngModel)]="form.productCode">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Lưu ý version</label>
+                <input type="text" class="form-control" placeholder="Lưu ý version" name="version" readonly
+                  [(ngModel)]="form.version">
+              </div>
+
+              <div class="col-sm-3">
+                <label>Lưu ý sản xuất</label>
+                <input type="text" class="form-control" placeholder="Lưu ý sản xuất" name="version" readonly
+                  [(ngModel)]="form.version">
+              </div>
+            </div> -->
+
+
+            <div class="form-group row">
+              <div class="col-sm-12 table-responsive">
+                <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+                  <thead>
+                    <tr>
+                    <th>Tên vật tư</th>
+                    <th>Mã</th>
+                    <th>Tên khác</th>
+                    <th>Thông số KT</th>
+                    <th>Control level</th>
+                    <th>Partnumber</th>
+                    <th>Location</th>
+                    <th>Số lượng cơ bản</th>
+                    <th>Vendor</th>
+                    <th>Mã vật tư thay thế</th>
+                    <th>Version</th>
+                    <th>Lưu ý</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let bom of lstbom let i=index; ">
+                      <td>{{bom.itemName}}</td>
+                      <td>{{bom.itemCode}}</td>
+                      <td>{{bom.uotherNam}}</td>
+                      <td>{{bom.uitmTech}}</td>
+                      <td>{{bom.uctrLevel}}</td>
+                      <td>{{bom.partNumber}}</td>
+                      <td>{{bom.ulocation}}</td>
+                      <td>{{bom.quantity}}</td>
+                      <td>{{bom.vendor}}</td>
+                      <td>{{bom.ualter}}</td>
+                      <td>{{bom.version}}</td>
+                      <td>{{bom.uremarks}}</td>
+                    </tr>
+                  </tbody>
+                </nz-table>
+              </div>
+            </div>
+            <!-- <div class="form-group row">
+                <div class="col-sm-3">
+                    <label>Lựa chọn profile</label>
+                    <select  class="form-control" name="type" [(ngModel)]="form.profile" (change)="onChangeType(form.profile)"
+                      #type="ngModel">
+                      <option *ngFor="let profile of lstProfile" [value]="profile.id">{{profile.name}}</option>
+                    </select>
+                  </div>
+            </div> -->
+
+
+            <div class="form-group" style="margin-top: 20px;">
+              <button class="btn" routerLink="/checklist-production"><i class="fa fa-list"></i> Danh sách</button>
+              <button *ngIf="show == false" class="btn btn-primary" type="submit" (click)="onSubmit('save')" style="margin-left: 30px;">
+                <i class="fa fa-save"></i>
+               Lưu thông tin
+              </button>
+              <button  class="btn btn-primary" type="submit" (click)="onSubmit('success')" style="margin-left: 30px;">
+                <i class="fa fa-save"></i>
+                Hoàn thành
+              </button>
+
+            </div>
+            <div class="col-xs-12 col-sm-12">
+              <div *ngIf="error" class={{classError}} role="alert">
+                {{error}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

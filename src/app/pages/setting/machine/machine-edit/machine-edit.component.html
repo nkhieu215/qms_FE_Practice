@@ -1,0 +1,57 @@
+<!-- Basic Form Inputs card start -->
+<div>
+  <div class="card-header">
+    <h5>Sửa thông tin dây chuyền</h5>
+    <div class="card-header-left">
+      <button class="btn" routerLink="/machine-list">
+        <i class="fa fa-list"></i> Danh sách
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>Tên máy</label>
+          <input type="text" class="form-control" name="machineName" [(ngModel)]="form.machineName" required
+            #machineName="ngModel" placeholder="Tên máy" />
+          <div class="alert-danger" *ngIf="machineName.errors && f.submitted">
+            <div *ngIf="machineName.errors['required']">
+              Tên không được để trống
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-3">
+          <label>Mã máy</label>
+          <input type="text" class="form-control" name="machineCode" [(ngModel)]="form.machineCode" required
+            #machineCode="ngModel" placeholder="Mã máy" />
+          <div class="alert-danger" *ngIf="machineCode.errors && f.submitted">
+            <div *ngIf="machineCode.errors['required']">
+              Mã máy không được để trống
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-3">
+          <label>ID Scada</label>
+          <input type="text" class="form-control" name="idScada" [(ngModel)]="form.idScada" #idScada="ngModel"
+            placeholder="ID Scada" />
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>Mô tả</label>
+          <textarea class="form-control" name="description" [(ngModel)]="form.description" #description="ngModel"
+            placeholder="Mô tả"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="submit">
+          <i class="fa fa-save"></i>
+          Cập nhật máy
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
