@@ -81,7 +81,7 @@
     </div>
   </div>
   <div>
-    <button mat-fab extended style="background-color:#2196f3" (click)="testing()">
+    <button mat-fab extended style="background-color:#2196f3" (click)="search()">
       <mat-icon>search</mat-icon>
       Tìm kiếm
     </button>
@@ -330,18 +330,18 @@
         <th class="header-parent" colspan="4">đánh giá thông số sản phẩm</th>
       </tr>
       <tr>
-        <th class="container-header">{{tongSoMauDoSP | number}}</th>
-        <th class="container-header">{{soMauSPDat | number}}</th>
-        <th class="container-header">{{tiLeSPDatThongSo}}%</th>
-        <th class="container-header">{{soMauSPKhongDat | number}}</th>
+        <td class="container-header">{{tongSoMauDoSP | number}}</td>
+        <td class="container-header">{{soMauSPDat | number}}</td>
+        <td class="container-header">{{tiLeSPDatThongSo}}%</td>
+        <td class="container-header">{{soMauSPKhongDat | number}}</td>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="container-table-body-2">Tổng số mẫu đo</td>
-        <td class="container-table-body-2">Số mẫu đạt</td>
-        <td class="container-table-body-2">% Đạt thông số</td>
-        <td class="container-table-body-2">Số mẫu không đạt</td>
+        <th class="container-table-body-2">Tổng số mẫu đo</th>
+        <th class="container-table-body-2">Số mẫu đạt</th>
+        <th class="container-table-body-2">% Đạt thông số</th>
+        <th class="container-table-body-2">Số mẫu không đạt</th>
       </tr>
     </tbody>
   </table>
