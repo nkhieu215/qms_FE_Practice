@@ -1,48 +1,92 @@
 <!-- <img src="../assets/img/logo_home.jpg" alt="logo" style="width: 100%;"> -->
+<div class="search-time-container">
+  <div class="search-time-list">
+    <div class="search-time-item">
+      <label class="form-label" for="start-time">Thời gian bắt đầu</label>
+      <input class="form-control form-search" type="date" [(ngModel)]="startDate" id="startDate"
+        [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
+    </div>
 
-<div class="search-inputs">
-  <div class="row mb-3">
-    <label class="form-label" for="start-time">Thời gian bắt đầu</label>
-    <input class="form-control form-search" type="date"  [(ngModel)]="startDate"
-    [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
+    <div class="search-time-item">
+      <label class="form-label">Thời gian kết thúc</label>
+      <input class="form-control form-search" type="date" [(ngModel)]="endDate" id="endDate"
+        [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
+    </div>
   </div>
-
-  <div class="row mb-3">
-    <label class="form-label">Thời gian kết thúc</label>
-    <input class="form-control form-search" type="date"  [(ngModel)]="endDate"
-    [ngModelOptions]="{ standalone: true }" (change)="checkDate()">
-  </div>
-
-  <div class="row mb-3">
-    <label class="form-label" for="">Đơn vị sản xuất</label>
-    <input class="form-control form-search" type="search">
-  </div>
-
-  <div class="row mb-3">
-    <label class="form-label" for="">Tổ</label>
-    <input class="form-control form-search" type="search">
-  </div>
-
-  <div class="row mb-3">
-    <label class="form-label" for="">Mã sản phẩm</label>
-    <input class="form-control form-search" type="search">
-  </div>
-
-  <div class="row mb-3">
-    <label class="form-label" for="">Tên sản phẩm</label>
-    <input class="form-control form-search" type="search">
-  </div>
-  <div>
-    <button class="button-header" (click)="getAllDataDashBoard()">Find</button>
-  </div>
-  <div>
-    <button class="button-header" (click)="openPopupConfig()">Config</button>
-  </div>
-  <div>
-    <button class="button-header" (click)="openPopupReport()">Report</button>
+  <div class="search-time-list">
+    <div style="padding-top: 15px;">
+      <button mat-fab extended class="search-time-btn" (click)="getAllDataDashBoard()">
+        <mat-icon>search</mat-icon>Find</button>
+    </div>
+    <div style="padding-top: 15px;">
+      <button mat-fab extended class="search-time-btn" (click)="openPopupConfig()">
+        <mat-icon>border_color</mat-icon>Config</button>
+    </div>
+    <div style="padding-top: 15px;">
+      <button mat-fab extended class="search-time-btn" style="margin-right: 0;" (click)="openPopupReport()">
+        <mat-icon>subject</mat-icon>Report</button>
+    </div>
   </div>
 </div>
+<div class="search-container">
+  <div class="search-list">
+    <div class="search-item">
+      <mat-form-field class="search-item-body">
+        <mat-label>Đơn vị sản xuất</mat-label>
+        <mat-select multiple>
+          <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
+            [(ngModel)]="branchSearchKey" [ngModelOptions]="{ standalone: true }" (input)="OnBranchNameInputChange()">
+          <mat-option *ngFor="let item of _branchList"
+            (onSelectionChange)="onBranchNameChange(item.branchName,$event)">{{item.branchName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="search-item">
+      <mat-form-field class="search-item-body">
+        <mat-label>Tổ sản xuất</mat-label>
+        <mat-select multiple>
+          <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
+            [(ngModel)]="groupSearchKey" [ngModelOptions]="{ standalone: true }"
+            (input)="OnGroupNameInputChange($event)">
+          <mat-option *ngFor="let item of _groupList"
+            (onSelectionChange)="onGroupNameChange(item.groupName,$event)">{{item.groupName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
+    <div class="search-item">
+      <mat-form-field class="search-item-body">
+        <mat-label>Mã sản phẩm</mat-label>
+        <mat-select multiple>
+          <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
+            [(ngModel)]="productCodeSearchKey" [ngModelOptions]="{ standalone: true }"
+            (input)="OnGroupNameInputChange($event)">
+          <mat-option *ngFor="let item of _productionCodeList"
+            (onSelectionChange)="onGroupNameChange(item.productionCode,$event)">{{item.productionCode}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="search-item">
+      <mat-form-field class="ten-san-pham">
+        <mat-label>Tên sản phẩm</mat-label>
+        <mat-select multiple>
+          <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
+            [(ngModel)]="productNameSearchKey" [ngModelOptions]="{ standalone: true }"
+            (input)="OnGroupNameInputChange($event)">
+          <mat-option *ngFor="let item of _productionNameList"
+            (onSelectionChange)="onGroupNameChange(item.productionName,$event)">{{item.productionName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div>
+    <button mat-fab extended style="background-color:#2196f3" (click)="testing()">
+      <mat-icon>search</mat-icon>
+      Tìm kiếm
+    </button>
+  </div>
+</div>
 <!-- popup config -->
 <div class="table-responsive popup-background" role="dialog" *ngIf="popupConfig===true">
   <div class="popup-container">
@@ -158,7 +202,7 @@
 </div>
 
 <table style="width: 100%;">
-  <thead>
+  <thead class="table-header">
     <tr>
       <th class="header-parent" colspan="4">thông tin chất lượng sản phẩm</th>
       <th class="header-parent" colspan="4">thông tin chất lượng bán thành phẩm</th>
@@ -181,7 +225,7 @@
       <th style="width: 5rem; border: 0.5px solid black">Số lô nhân nhượng</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="table-body">
     <tr>
       <td style="border: 0.5px solid black">{{tongSlSpNhapKho}}</td>
       <td style="border: 0.5px solid black">{{tongSlSpKhongDat}}</td>
@@ -202,7 +246,7 @@
 <br>
 <br>
 <table style="width: 100%;">
-  <thead>
+  <thead class="table-header">
     <tr>
       <th class="header-parent" colspan="5">chất lượng vật tư</th>
       <th class="header-parent" colspan="2">mua hàng</th>
@@ -228,7 +272,7 @@
 
     </tr>
   </thead>
-  <tbody>
+  <tbody class="table-body">
     <tr>
       <td style="border: 0.5px solid black">{{slVatTuNhap}}</td>
       <td style="border: 0.5px solid black">{{slVatTuDat}}</td>
@@ -251,56 +295,83 @@
 </table>
 
 
+<!-- ----------------------------------------------- chart -------------------------------------------- -->
 <div class="chart-container">
   <!-- column 1 -->
-  <div class="chart-column1">
-    <!-- Tỉ lệ lỗi các bộ phận SX so với mục tiêu -->
-    <div class="chartCard" style="width: 40vw; height: 23vw;">
-      <div class="chartBox">
-        <canvas id="myChart" style="width: 50vw;"></canvas>
+  <!-- Tỉ lệ lỗi các bộ phận SX so với mục tiêu -->
+  <div class="chart-list">
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Tỉ lệ lỗi các bộ phận sản xuất/Mục tiêu</b></div>
+      <div class="chart-item-two-list">
+        <div  class="chart-item-two">
+          <canvas id="myChart" ></canvas>
+        </div>
       </div>
-    </div>
-
-    <!-- Top sản phẩm nhiều lỗi nhất trong sx -->
-    <div class="chartCardSPNhieuLoi" style="width: 45vw; display: block; height: 23vw;">
-      <div class="chartBoxSPNhieuLoi">
-        <canvas id="myChartSPNhieuLoi"></canvas>
-      </div>
-    </div>
-
-    <!-- Tổng hợp tình trạng vật tư mua hàng -->
-    <div class="chartCardTTVatTu" style="width: 40vw; display: block;">
-      <div class="chartBoxTTVatTu">
-        <canvas id="myChartTTVatTu"></canvas>
-      </div>
-    </div>
-
-
   </div>
 
-  <!-- column 2 -->
-  <div class="chart-column2">
-    <!-- Phân tích nhóm lỗi trong sx -->
-    <div class="chartCardNhomLoi">
-      <div class="chartBoxNhomLoi">
-        <canvas id="myChartNhomLoi"></canvas>
+  <!-- Phân tích nhóm lỗi trong sx -->
+  <div class="chart-list">
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Phân tích nhóm lỗi trong sản xuất</b></div>
+      <div class="chart-item-two-list">
+        <div  class="chart-item-two">
+          <canvas id="myChartNhomLoi"  class="pie-chart" ></canvas>
+        </div>
       </div>
-    </div>
-
-    <!-- Tổng hợp chất lượng nhập hàng hoá -->
-    <div class="chartCartChatLuongNhap">
-      <div class="chartBoxChatLuongNhap">
-        <canvas id="myChartChatLuongNhap"></canvas>
-      </div>
-    </div>
-
-    <div class="chartCartChatLuongHang">
-      <div class="chartBoxChatLuongHang">
-        <canvas id="myChartChatLuongHang"></canvas>
-      </div>
-    </div>
   </div>
 </div>
+<div class="chart-container">
+  <!-- Top sản phẩm nhiều lỗi nhất trong sx -->
+  <div class="chart-list">
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Top sản phẩm nhiều lỗi nhất trong sản xuất</b></div>
+      <div class="chart-item-two-list">
+        <div  class="chart-item-two">
+          <canvas id="myChartSPNhieuLoi"></canvas>
+        </div>
+      </div>
+  </div>
+  <!-- Tổng hợp chất lượng nhập hàng hoá -->
+  <div class="chart-list">
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Tổng hợp chất lượng nhập hàng hóa</b></div>
+      <div class="chart-item-two-list">
+        <div  class="chart-item-two">
+          <canvas id="myChartChatLuongNhap" class="pie-chart"></canvas>
+        </div>
+      </div>
+  </div>
+</div>
+<div class="chart-container">
+  <!-- Tổng hợp tình trạng vật tư mua hàng -->
+  <div class="chart-list" >
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Tổng hợp tình trạng vật tư mua hàng</b></div>
+      <div class="chart-item-two-list">
+        <div id="chartItemTwo" class="chart-item-two">
+          <canvas id="myChartTTVatTu"></canvas>
+        </div>
+      </div>
+  </div>
+
+<!-- Thống kê chất lượng hàng mua -->
+    <div class="chart-list">
+    <div class="chart-item-one">
+      <mat-icon> bar_chart</mat-icon>
+      <b style="margin-top: 3px">Thống kê chất lượng hàng mua</b></div>
+      <div class="chart-item-two-list">
+        <div  class="chart-item-two">
+          <canvas id="myChartChatLuongHang" class="chart-item-two"></canvas>
+        </div>
+      </div>
+    </div>
+</div>
+
 
 <div class="row input-container">
   <label for="">

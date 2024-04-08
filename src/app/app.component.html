@@ -12,7 +12,10 @@
         <span nz-icon nzType="dashboard"></span>
         <span routerLink="/dashboard">Dashboard</span>
       </li>
-
+      <li nz-menu-item nz-tooltip nzTooltipPlacement="right" style="padding-left: 10px;">
+        <span nz-icon nzType="dashboard"></span>
+        <span routerLink="/dashboard-qms">Dashboard QMS</span>
+      </li>
       <li nz-submenu nzTitle="{{menu.name}}" nzIcon="{{menu.classIcon}}" *ngFor="let menu of lstMenuRes" nzOpen="{{ isCollapsed ? 'false': 'true' }}"
         [nzPaddingLeft]="10">
         <a *ngIf="menu.lstChild == null" routerLink="{{menu.url}}" class="nav-link">

@@ -34,6 +34,7 @@
     "bootstrap": "^5.3.1",
     "chart.js": "^4.4.2",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "chartjs-plugin-zoom": "^2.0.1",
     "datatables.net": "^1.13.6",
     "datatables.net-dt": "^1.13.6",
     "exceljs": "^4.3.0",

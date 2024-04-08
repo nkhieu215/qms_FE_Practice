@@ -46,11 +46,12 @@ import { HomePageModule } from './pages/home-page/home-page.module';
 import { NgChartsModule } from 'ng2-charts';
 import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { Scale } from 'chart.js';
 registerLocaleData(en);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     MultiSelectModule,
@@ -91,7 +92,6 @@ registerLocaleData(en);
     PqcModule,
     NzBreadCrumbModule,
     NgChartsModule,
-
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

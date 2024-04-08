@@ -1,15 +1,4 @@
-.chart-container{
-  display: flex;
-  width: 100%;
-}
 
-.chart-column1{
-  width: 50%;
-}
-
-.chart-column2{
-  width: 50%;
-}
 
 .chartCard,
 .chartCardSPNhieuLoi,
@@ -177,7 +166,83 @@
 
 .header-parent{
   width: 10rem;
-  border: 0.5px solid black;
+  /* border: 0.5px solid black; */
   text-transform: uppercase;
   text-align: center;
+}
+/* css cho khung tìm kiếm theo các trường thông tin */
+.search-item{
+  display: inline-block;
+  margin-right: 12px;
+}
+.ten-san-pham{
+  width: 360px;
+}
+.search-item-body{
+  width: 165px;
+}
+.search-list{
+}
+.search-container{
+  display: flex;
+  justify-content: space-between;
+}
+/* css cho khung tìm kiếm theo khoảng thời gian */
+.search-time-container{
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+}
+.search-time-list{
+  display: flex;
+}
+.search-time-item{
+  display: block;
+  margin-right: 12px
+}
+.search-time-btn{
+  background-color:#2196f3;
+  width: 138px;
+  margin-right: 12px;
+}
+/* css cho phần table */
+.table-header{
+  font-size: 15px;
+}
+.table-body{
+  font-size: 18px;
+}
+/* css cho phần chart */
+.chart-container{
+  display: flex;
+  margin: 48px 0px;
+  height: 310px;
+  justify-content: space-between;
+}
+.chart-list{
+  width: 49%;
+  /* border: #000 solid 1px; */
+  border-radius: 12px;
+}
+.chart-item-one{
+  display: flex;
+  /* border-bottom: #000 solid 1px; */
+    font-size: 18px;
+    height: 25px;
+    margin: 0px;
+}
+.chart-item-two-list{
+  height: 277px;
+  width: 808px;
+  max-width: 808px;
+  overflow: auto;
+}
+.chart-item-two{
+  height: 277px;
+}
+/* css cho pie chart */
+.pie-chart{
+  margin: 0 auto;
+  height: 290px;
+  width: 400px;
 }
