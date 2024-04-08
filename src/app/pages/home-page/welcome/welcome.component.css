@@ -1,13 +1,80 @@
+.container-table-header-1,
+.container-table-header-2 {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
 
+.table-header-1 {
+  width: 32%;
+  background-color: #097D99;
+  color: #fff;
+}
+
+.table-header-2 {
+  width: 32%;
+  background-color: #097D99;
+  color: #fff;
+}
+
+.table-header-3 {
+  width: 15%;
+  background-color: #097D99;
+  color: #fff;
+}
+
+.table-header-4 {
+  width: 20%;
+  background-color: #097D99;
+  color: #fff;
+}
+
+.table-header-5 {
+  width: 32%;
+  background-color: #29A29E;
+  color: #fff;
+}
+
+.table-header-6 {
+  width: 15%;
+  background-color: #29A29E;
+  color: #fff;
+}
+
+.table-header-7 {
+  width: 26%;
+  background-color: #29A29E;
+  color: #fff;
+}
+
+.table-header-8 {
+  width: 26%;
+  background-color: #29A29E;
+  color: #fff;
+}
+
+.container-header {
+  text-align: center;
+  font-size: 18px
+}
+
+.container-table-body-1,
+.container-table-body-2 {
+  width: 5rem;
+  font-weight: 800;
+  text-align: center;
+  font-size: 16px;
+  color: #0F36E8
+}
 
 .chartCard,
 .chartCardSPNhieuLoi,
-.chartCardNhomLoi{
+.chartCardNhomLoi {
   width: 100%;
 }
 
 .chartBoxNhomLoi,
-.chartBoxChatLuongNhap{
+.chartBoxChatLuongNhap {
   width: 30rem;
   margin: 0 auto;
 }
@@ -19,14 +86,14 @@
   word-wrap: break-word;
 } */
 
-.inp-DGCL{
+.inp-DGCL {
   width: 80vw;
   height: 15vh;
   box-sizing: border-box;
   word-wrap: break-word;
 }
 
-.input-container{
+.input-container {
   margin: 0 auto
 }
 
@@ -92,7 +159,7 @@
   margin-bottom: 10px;
 }
 
-.search-inputs{
+.search-inputs {
   display: flex;
 }
 
@@ -101,7 +168,7 @@
   width: 10vw;
 }
 
-.button-header{
+.button-header {
   height: 3rem;
   align-items: center;
 }
@@ -117,13 +184,13 @@
   justify-content: space-around;
 }
 
-.custom-column{
+.custom-column {
   width: 15rem;
   background-color: #006699;
-  color:#fff;
+  color: #fff;
 }
 
-.inp-column-declare{
+.inp-column-declare {
   border: none;
   background-color: #fff;
   font-size: 16px;
@@ -164,84 +231,111 @@
   background-color: #0056b3;
 }
 
-.header-parent{
+.header-parent {
+  font-size: 18px;
   width: 10rem;
-  /* border: 0.5px solid black; */
+  height: 4rem;
+  /* border: 0.5px solid white; */
   text-transform: uppercase;
   text-align: center;
+  color: #0CFAA0;
 }
+
 /* css cho khung tìm kiếm theo các trường thông tin */
-.search-item{
+.search-item {
   display: inline-block;
   margin-right: 12px;
 }
-.ten-san-pham{
+
+.ten-san-pham {
   width: 360px;
 }
-.search-item-body{
+
+.search-item-body {
   width: 165px;
 }
-.search-list{
-}
-.search-container{
+
+.search-list {}
+
+.search-container {
   display: flex;
   justify-content: space-between;
 }
+
 /* css cho khung tìm kiếm theo khoảng thời gian */
-.search-time-container{
+.search-time-container {
   display: flex;
   justify-content: space-between;
   padding-bottom: 12px;
 }
-.search-time-list{
+
+.search-time-list {
   display: flex;
 }
-.search-time-item{
+
+.search-time-item {
   display: block;
   margin-right: 12px
 }
-.search-time-btn{
-  background-color:#2196f3;
+
+.search-time-btn {
+  background-color: #2196f3;
   width: 138px;
   margin-right: 12px;
 }
+
+.btn-search-header {
+  background-color: #45a049;
+}
+
+.btn-report-header {
+  background-color: #2ddbe6;
+}
+
 /* css cho phần table */
-.table-header{
+.table-header {
   font-size: 15px;
 }
-.table-body{
+
+.table-body {
   font-size: 18px;
 }
+
 /* css cho phần chart */
-.chart-container{
+.chart-container {
   display: flex;
   margin: 48px 0px;
   height: 310px;
   justify-content: space-between;
 }
-.chart-list{
+
+.chart-list {
   width: 49%;
   /* border: #000 solid 1px; */
   border-radius: 12px;
 }
-.chart-item-one{
+
+.chart-item-one {
   display: flex;
   /* border-bottom: #000 solid 1px; */
-    font-size: 18px;
-    height: 25px;
-    margin: 0px;
+  font-size: 18px;
+  height: 25px;
+  margin: 0px;
 }
-.chart-item-two-list{
+
+.chart-item-two-list {
   height: 277px;
   width: 808px;
   max-width: 808px;
   overflow: auto;
 }
-.chart-item-two{
+
+.chart-item-two {
   height: 277px;
 }
+
 /* css cho pie chart */
-.pie-chart{
+.pie-chart {
   margin: 0 auto;
   height: 290px;
   width: 400px;

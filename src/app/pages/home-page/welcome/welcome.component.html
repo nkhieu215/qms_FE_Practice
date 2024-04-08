@@ -15,15 +15,15 @@
   </div>
   <div class="search-time-list">
     <div style="padding-top: 15px;">
-      <button mat-fab extended class="search-time-btn" (click)="getAllDataDashBoard()">
+      <button mat-fab extended class="search-time-btn btn-search-header" (click)="getAllDataDashBoard()">
         <mat-icon>search</mat-icon>Find</button>
     </div>
     <div style="padding-top: 15px;">
-      <button mat-fab extended class="search-time-btn" (click)="openPopupConfig()">
+      <button mat-fab extended class="search-time-btn btn-config-header" (click)="openPopupConfig()">
         <mat-icon>border_color</mat-icon>Config</button>
     </div>
     <div style="padding-top: 15px;">
-      <button mat-fab extended class="search-time-btn" style="margin-right: 0;" (click)="openPopupReport()">
+      <button mat-fab extended class="search-time-btn btn-report-header" style="margin-right: 0;" (click)="openPopupReport()">
         <mat-icon>subject</mat-icon>Report</button>
     </div>
   </div>
@@ -201,99 +201,173 @@
   </div>
 </div>
 
-<table style="width: 100%;">
-  <thead class="table-header">
-    <tr>
-      <th class="header-parent" colspan="4">thông tin chất lượng sản phẩm</th>
-      <th class="header-parent" colspan="4">thông tin chất lượng bán thành phẩm</th>
-      <th class="header-parent" colspan="2">tình trạng phê duyệt</th>
-      <th class="header-parent" colspan="3">đánh giá chất lượng</th>
-    </tr>
-    <tr>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng nhập kho</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng không đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ sản phẩm đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi quá trình</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng nhập kho</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số lượng không đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ sản phẩm đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi quá trình</th>
-      <th style="width: 5rem; border: 0.5px solid black">Chờ phê duyệt lệnh sản xuất</th>
-      <th style="width: 5rem; border: 0.5px solid black">Chờ phê duyệt BB KT</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lô kiểm tra</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lô không đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lô nhân nhượng</th>
-    </tr>
-  </thead>
-  <tbody class="table-body">
-    <tr>
-      <td style="border: 0.5px solid black">{{tongSlSpNhapKho}}</td>
-      <td style="border: 0.5px solid black">{{tongSlSpKhongDat}}</td>
-      <td style="border: 0.5px solid black">{{tiLeSpDat}}%</td>
-      <td style="border: 0.5px solid black">{{tiLeSpLoiQuaTrinh}}%</td>
-      <td style="border: 0.5px solid black">{{tongSlBTPNhapKho}}</td>
-      <td style="border: 0.5px solid black">{{tongSlBTPKhongDat}}</td>
-      <td style="border: 0.5px solid black">{{tiLeBTPDat}}%</td>
-      <td style="border: 0.5px solid black">{{tiLeBTPLoiQuaTrinh}}%</td>
-      <td style="border: 0.5px solid black">{{choPheDuyetLenhSX}}</td>
-      <td style="border: 0.5px solid black">{{choPheDuyetBBKT}}</td>
-      <td style="border: 0.5px solid black">{{soLoKT}}</td>
-      <td style="border: 0.5px solid black">{{soLoKhongDat}}</td>
-      <td style="border: 0.5px solid black">{{soLoNhanNhuong}}</td>
-    </tr>
-  </tbody>
-</table>
+<div class="container-table-header-1">
+  <table class="table-header-1">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="4">thông tin chất lượng sản phẩm</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{tongSlSpNhapKho | number}}</th>
+        <th class="container-header">{{tongSlSpKhongDat | number}}</th>
+        <th class="container-header">{{tiLeSpDat}}%</th>
+        <th class="container-header">{{tiLeSpLoiQuaTrinh}}%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <td class="container-table-body-1">Tổng số lượng nhập kho</td>
+      <td class="container-table-body-1">Tổng số lượng không đạt</td>
+      <td class="container-table-body-1">Tỉ lệ sản phẩm đạt</td>
+      <td class="container-table-body-1">Tỉ lệ lỗi quá trình</td>
+    </tbody>
+  </table>
+
+  <table class="table-header-2">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="4">thông tin chất lượng bán thành phẩm</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{tongSlBTPNhapKho | number}}</th>
+        <th class="container-header">{{tongSlBTPKhongDat | number}}</th>
+        <th class="container-header">{{tiLeBTPDat}}%</th>
+        <th class="container-header">{{tiLeBTPLoiQuaTrinh}}%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <td class="container-table-body-1">Tổng số lượng nhập kho</td>
+      <td class="container-table-body-1">Tổng số lượng không đạt</td>
+      <td class="container-table-body-1">Tỉ lệ sản phẩm đạt</td>
+      <td class="container-table-body-1">Tỉ lệ lỗi quá trình</td>
+    </tbody>
+  </table>
+
+  <table class="table-header-3">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="2">tình trạng phê duyệt</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{choPheDuyetLenhSX | number}}</th>
+        <th class="container-header">{{choPheDuyetBBKT | number}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="container-table-body-1">Chờ phê duyệt lệnh sản xuất</td>
+        <td class="container-table-body-1">Chờ phê duyệt BB KT</td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table-header-4">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="3">đánh giá chất lượng</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{soLoKT | number}}</th>
+        <th class="container-header">{{soLoKhongDat | number}}</th>
+        <th class="container-header">{{soLoNhanNhuong | number}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <td class="container-table-body-1">Số lô kiểm tra</td>
+      <td class="container-table-body-1">Số lô không đạt</td>
+      <td class="container-table-body-1">Số lô nhân nhượng</td>
+    </tbody>
+  </table>
+</div>
+
 <br>
 <br>
-<table style="width: 100%;">
-  <thead class="table-header">
-    <tr>
-      <th class="header-parent" colspan="5">chất lượng vật tư</th>
-      <th class="header-parent" colspan="2">mua hàng</th>
-      <th class="header-parent" colspan="4">đánh giá thông số sản phẩm</th>
-      <th class="header-parent" colspan="4">đánh giá thông số btp driver</th>
-    </tr>
-    <tr>
-      <th style="width: 5rem; border: 0.5px solid black">Số lượng nhập hàng</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lượng đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lượng không đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số lượng nhân nhượng</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tỉ lệ lỗi vật tư trong QTSX</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số NCC</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số biên bản IQC</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số mẫu đo</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số mẫu đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">% Đạt thông số</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số mẫu không đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">Tổng số mẫu đo</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số mẫu đạt</th>
-      <th style="width: 5rem; border: 0.5px solid black">% Đạt thông số</th>
-      <th style="width: 5rem; border: 0.5px solid black">Số mẫu không đạt</th>
 
-    </tr>
-  </thead>
-  <tbody class="table-body">
-    <tr>
-      <td style="border: 0.5px solid black">{{slVatTuNhap}}</td>
-      <td style="border: 0.5px solid black">{{slVatTuDat}}</td>
-      <td style="border: 0.5px solid black">{{slVatTuKhongDat}}</td>
-      <td style="border: 0.5px solid black">{{slVatTuNhanNhuong}}</td>
-      <td style="border: 0.5px solid black">{{tiLeLoiVatTuQTSX}}%</td>
-      <td style="border: 0.5px solid black">{{tongSoNCC}}</td>
-      <td style="border: 0.5px solid black">{{tongSoBienBanIQC}}</td>
-      <td style="border: 0.5px solid black">{{tongSoMauDoSP}}</td>
-      <td style="border: 0.5px solid black">{{soMauSPDat}}</td>
-      <td style="border: 0.5px solid black">{{tiLeSPDatThongSo}}%</td>
-      <td style="border: 0.5px solid black">{{soMauSPKhongDat}}</td>
-      <td style="border: 0.5px solid black">{{tongSoMauDoBTPDrv}}</td>
-      <td style="border: 0.5px solid black">{{soMauBTPDrvDat}}</td>
-      <td style="border: 0.5px solid black">{{tiLeBTPDrvDatThongSo}}%</td>
-      <td style="border: 0.5px solid black">{{soMauBTPDrvKhongDat}}</td>
+<div class="container-table-header-2">
+  <table class="table-header-5">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="5">chất lượng vật tư</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{slVatTuNhap | number}}</th>
+        <th class="container-header">{{slVatTuDat | number}}</th>
+        <th class="container-header">{{slVatTuKhongDat | number}}</th>
+        <th class="container-header">{{slVatTuNhanNhuong | number}}</th>
+        <th class="container-header">{{tiLeLoiVatTuQTSX}}%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="container-table-body-2">Số lượng nhập hàng</td>
+        <td class="container-table-body-2">Số lượng đạt</td>
+        <td class="container-table-body-2">Số lượng không đạt</td>
+        <td class="container-table-body-2">Số lượng nhân nhượng</td>
+        <td class="container-table-body-2">Tỉ lệ lỗi vật tư trong QTSX</td>
+      </tr>
+    </tbody>
+  </table>
 
-    </tr>
-  </tbody>
-</table>
+  <table class="table-header-6">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="2">mua hàng</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{tongSoNCC | number}}</th>
+        <th class="container-header">{{tongSoBienBanIQC | number}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="container-table-body-2">Tổng số NCC</td>
+        <td class="container-table-body-2">Tổng số biên bản IQC</td>
+      </tr>
+    </tbody>
+  </table>
 
+  <table class="table-header-7">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="4">đánh giá thông số sản phẩm</th>
+      </tr>
+      <tr>
+        <td class="container-header">{{tongSoMauDoSP | number}}</td>
+        <td class="container-header">{{soMauSPDat | number}}</td>
+        <td class="container-header">{{tiLeSPDatThongSo}}%</td>
+        <td class="container-header">{{soMauSPKhongDat | number}}</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th class="container-table-body-2">Tổng số mẫu đo</th>
+        <th class="container-table-body-2">Số mẫu đạt</th>
+        <th class="container-table-body-2">% Đạt thông số</th>
+        <th class="container-table-body-2">Số mẫu không đạt</th>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table-header-8">
+    <thead>
+      <tr>
+        <th class="header-parent" colspan="4">đánh giá thông số btp driver</th>
+      </tr>
+      <tr>
+        <th class="container-header">{{tongSoMauDoBTPDrv | number}}</th>
+        <th class="container-header">{{soMauBTPDrvDat | number}}</th>
+        <th class="container-header">{{tiLeBTPDrvDatThongSo}}%</th>
+        <th class="container-header">{{soMauBTPDrvKhongDat | number}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="container-table-body-2">Tổng số mẫu đo</td>
+        <td class="container-table-body-2">Số mẫu đạt</td>
+        <td class="container-table-body-2">% Đạt thông số</td>
+        <td class="container-table-body-2">Số mẫu không đạt</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <!-- ----------------------------------------------- chart -------------------------------------------- -->
 <div class="chart-container">
