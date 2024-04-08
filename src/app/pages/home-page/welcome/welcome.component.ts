@@ -158,23 +158,27 @@ export class WelcomeComponent {
   checkDate() {
     this.searchBody.startDate = this.startDate
     this.searchBody.endDate = this.endDate
-    console.log(this.startDate, this.endDate)
+    // console.log(this.startDate, this.endDate)
   }
   // test function angular material
-  testing():void{
+  search():void{
     // lọc theo ngành
     if(this.listBranchNameSearch.length >0){
       this._listOfDataDashBoard = this.dashboardFilterByBranch(this.listBranchNameSearch)
       //lọc theo tổ
       if(this.listGroupNameSearch.length >0){
         this._listOfDataDashBoard = this.dashboardFilterByGroup(this.listGroupNameSearch);
-        console.log("test btn 2: ",this._listOfDataDashBoard)
+        // console.log("test btn 2: ",this._listOfDataDashBoard)
       }
     }else{
-      alert("Chưa chọn đơn vị sản xuất")
+      if(this.listGroupNameSearch.length > 0){
+        this._listOfDataDashBoard = this.dashboardFilterByGroupOnly(this.listGroupNameSearch);
+      }else{
+        alert("Chưa chọn đơn vị sản xuất")
+      }
     }
     this.resetDataAfterFilter()
-    console.log("test btn: ",this._listOfDataDashBoard)
+    // console.log("test btn: ",this._listOfDataDashBoard)
   }
   //---------------------------------- filter theo đơn vị sản xuất -------------------------------
   onBranchNameChange(item:any,e:any){
@@ -189,7 +193,7 @@ export class WelcomeComponent {
     }
     //cập nhật lại danh sách gợi ý mã sp và tên sp
   this.resetListGuideByBranch(this.listBranchNameSearch)
-  console.log("branch",this.listBranchNameSearch)
+  // console.log("branch",this.listBranchNameSearch)
   }
   OnBranchNameInputChange():void{
     this._branchList = this.branchList.filter((item:any)=> item.branchName.toLowerCase().includes(this.branchSearchKey.toLowerCase()))
@@ -209,12 +213,12 @@ export class WelcomeComponent {
     }
     //cập nhật lại danh sách gợi ý mã sp và tên sp
   this.resetListGuideByGroup(this.listGroupNameSearch)
-    console.log("test",this.listGroupNameSearch)
-    console.log("test1",e)
+    // console.log("test",this.listGroupNameSearch)
+    // console.log("test1",e)
   }
   OnGroupNameInputChange(e:Event):void{
     this._groupList = this.groupList.filter((item:any)=> item.groupName.toLowerCase().includes(this.groupSearchKey.toLowerCase()))
-    console.log("1111: ",e)
+    // console.log("1111: ",e)
   }
   // --------------------------------- filter theo mã sản phẩm (production code) ------------------------------------
   onProductionCodeChange(item:any,e:any){
@@ -230,13 +234,13 @@ export class WelcomeComponent {
     }
     //cập nhật lại danh sách gợi ý mã sp và tên sp
   this.resetListGuideByGroup(this.listGroupNameSearch)
-    console.log("test",this.listGroupNameSearch)
-    console.log("test1",e)
+    // console.log("test",this.listGroupNameSearch)
+    // console.log("test1",e)
   }
   // ------------------------------------------------------- chức năng lọc -------------------------------------------------------
   //Hàm lọc thông tin tìm kiếm theo ngành
   dashboardFilterByBranch(key:any[]):any{
-    console.log("key",key)
+    // console.log("key",key)
     let listOfDataDashBoard:any = {
       pqcPhotoElectDashResponseList:[],
       pqcPhotoElectProductDashResponseList:[],
@@ -247,12 +251,12 @@ export class WelcomeComponent {
       iqcElectCompErrsList:this.listOfDataDashBoard.iqcElectCompErrsList
     }
     for(let i = 0; i<key.length;i++){
-      const pqcPhotoElectDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectDashResponseList.filter((item:any)=> item.branchName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcPhotoElectProductDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectProductDashResponseList.filter((item:any)=> item.branchName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcQuantityDashResponseList: any[] = this.listOfDataDashBoard.pqcQuantityDashResponseList.filter((item:any)=> item.branchName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcStoreCheckList: any[] = this.listOfDataDashBoard.pqcStoreCheckList.filter((item:any)=> item.branchName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const workOrderWaitStatusResponseList: any[] = this.listOfDataDashBoard.workOrderWaitStatusResponseList.filter((item:any)=> item.branchName.toLowerCase().includes(key[i].key.toLowerCase()));
-      console.log("result: ",pqcPhotoElectDashResponseList)
+      const pqcPhotoElectDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectDashResponseList.filter((item:any)=> item.branchName === key[i].key);
+      const pqcPhotoElectProductDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectProductDashResponseList.filter((item:any)=> item.branchName === key[i].key);
+      const pqcQuantityDashResponseList: any[] = this.listOfDataDashBoard.pqcQuantityDashResponseList.filter((item:any)=> item.branchName === key[i].key);
+      const pqcStoreCheckList: any[] = this.listOfDataDashBoard.pqcStoreCheckList.filter((item:any)=> item.branchName === key[i].key);
+      const workOrderWaitStatusResponseList: any[] = this.listOfDataDashBoard.workOrderWaitStatusResponseList.filter((item:any)=> item.branchName === key[i].key);
+      // console.log("result: ",pqcPhotoElectDashResponseList)
       pqcPhotoElectDashResponseList.forEach((item:any)=>{
         listOfDataDashBoard.pqcPhotoElectDashResponseList.push(item)
       })
@@ -273,7 +277,7 @@ export class WelcomeComponent {
   }
   //Hàm lọc thông tin tìm kiếm theo tổ
   dashboardFilterByGroup(key:any[]):any{
-    console.log("key",key)
+    // console.log("key",key)
     let listOfDataDashBoard:any = {
       pqcPhotoElectDashResponseList:[],
       pqcPhotoElectProductDashResponseList:[],
@@ -284,12 +288,12 @@ export class WelcomeComponent {
       iqcElectCompErrsList:this._listOfDataDashBoard.iqcElectCompErrsList
     }
     for(let i = 0; i<key.length;i++){
-      const pqcPhotoElectDashResponseList: any[] = this._listOfDataDashBoard.pqcPhotoElectDashResponseList.filter((item:any)=> item.groupName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcPhotoElectProductDashResponseList: any[] = this._listOfDataDashBoard.pqcPhotoElectProductDashResponseList.filter((item:any)=> item.groupName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcQuantityDashResponseList: any[] = this._listOfDataDashBoard.pqcQuantityDashResponseList.filter((item:any)=> item.groupName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const pqcStoreCheckList: any[] = this._listOfDataDashBoard.pqcStoreCheckList.filter((item:any)=> item.groupName.toLowerCase().includes(key[i].key.toLowerCase()));
-      const workOrderWaitStatusResponseList: any[] = this._listOfDataDashBoard.workOrderWaitStatusResponseList.filter((item:any)=> item.groupName.toLowerCase().includes(key[i].key.toLowerCase()));
-      console.log("result: ",pqcPhotoElectDashResponseList)
+      const pqcPhotoElectDashResponseList: any[] = this._listOfDataDashBoard.pqcPhotoElectDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcPhotoElectProductDashResponseList: any[] = this._listOfDataDashBoard.pqcPhotoElectProductDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcQuantityDashResponseList: any[] = this._listOfDataDashBoard.pqcQuantityDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcStoreCheckList: any[] = this._listOfDataDashBoard.pqcStoreCheckList.filter((item:any)=> item.groupName === key[i].key);
+      const workOrderWaitStatusResponseList: any[] = this._listOfDataDashBoard.workOrderWaitStatusResponseList.filter((item:any)=> item.groupName === key[i].key);
+      // console.log("result: ",pqcPhotoElectDashResponseList)
       pqcPhotoElectDashResponseList.forEach((item:any)=>{
         listOfDataDashBoard.pqcPhotoElectDashResponseList.push(item)
       })
@@ -308,7 +312,43 @@ export class WelcomeComponent {
     }
     return listOfDataDashBoard
   }
-  //Hàm lọc thông tin tìm kiếm theo mã Sản phẩm
+  //Hàm lọc thông tin tìm kiếm chỉ theo tổ
+  dashboardFilterByGroupOnly(key:any[]):any{
+    // console.log("key",key)
+    let listOfDataDashBoard:any = {
+      pqcPhotoElectDashResponseList:[],
+      pqcPhotoElectProductDashResponseList:[],
+      pqcQuantityDashResponseList:[],
+      pqcStoreCheckList:[],
+      workOrderWaitStatusResponseList:[],
+      iqcElectCompDashList:this.listOfDataDashBoard.iqcElectCompDashList,
+      iqcElectCompErrsList:this.listOfDataDashBoard.iqcElectCompErrsList
+    }
+    for(let i = 0; i<key.length;i++){
+      const pqcPhotoElectDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcPhotoElectProductDashResponseList: any[] = this.listOfDataDashBoard.pqcPhotoElectProductDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcQuantityDashResponseList: any[] = this.listOfDataDashBoard.pqcQuantityDashResponseList.filter((item:any)=> item.groupName === key[i].key);
+      const pqcStoreCheckList: any[] = this.listOfDataDashBoard.pqcStoreCheckList.filter((item:any)=> item.groupName === key[i].key);
+      const workOrderWaitStatusResponseList: any[] = this.listOfDataDashBoard.workOrderWaitStatusResponseList.filter((item:any)=> item.groupName === key[i].key);
+      // console.log("result: ",pqcPhotoElectDashResponseList)
+      pqcPhotoElectDashResponseList.forEach((item:any)=>{
+        listOfDataDashBoard.pqcPhotoElectDashResponseList.push(item)
+      })
+      pqcPhotoElectProductDashResponseList.forEach((item:any)=>{
+        listOfDataDashBoard.pqcPhotoElectProductDashResponseList.push(item)
+      })
+      pqcQuantityDashResponseList.forEach((item:any)=>{
+        listOfDataDashBoard.pqcQuantityDashResponseList.push(item)
+      })
+      pqcStoreCheckList.forEach((item:any)=>{
+        listOfDataDashBoard.pqcStoreCheckList.push(item)
+      })
+      workOrderWaitStatusResponseList.forEach((item:any)=>{
+        listOfDataDashBoard.workOrderWaitStatusResponseList.push(item)
+      })
+    }
+    return listOfDataDashBoard
+  }
   //Hàm tính toán lại dữ liệu
   resetDataAfterFilter():void{
      //reset dữ liệu 
@@ -500,11 +540,11 @@ export class WelcomeComponent {
      this.tiLeSPDatThongSo = Number(((this.soMauSPDat / this.tongSoMauDoSP) * 100).toFixed(3));//Mục 31
      this.tiLeBTPDrvDatThongSo = Number(((this.soMauBTPDrvDat / this.tongSoMauDoBTPDrv) * 100).toFixed(3));//Mục 35
 
-     console.log('1',calculated);
-     console.log('dat',this.chartSLDat);
-     console.log('khong dat',this.chartSLKhongDat);
-     console.log('chart nhân nhượng',this.chartSLNhanNhuong);
-     console.log('chart tổng số lượng',this.chartTongSL);
+    //  console.log('1',calculated);
+    //  console.log('dat',this.chartSLDat);
+    //  console.log('khong dat',this.chartSLKhongDat);
+    //  console.log('chart nhân nhượng',this.chartSLNhanNhuong);
+    //  console.log('chart tổng số lượng',this.chartTongSL);
      //update chart mục 40
      if (this.chart40.length === 0) {// khi không có dữ liệu để hiển thị
        const datasets = [{
@@ -691,8 +731,8 @@ export class WelcomeComponent {
       this._productionCodeList =  this.productionCodeList;
     this._productionNameList = this.productionNameList;
     }
-    console.log("rs 4:",_productionCodeList);
-    console.log("rs 5:",_productionNameList);
+    // console.log("rs 4:",_productionCodeList);
+    // console.log("rs 5:",_productionNameList);
   }
    //reset danh sách gợi ý theo branch
    resetListGuideByBranch(group:any[]):void{
@@ -715,14 +755,14 @@ export class WelcomeComponent {
       this._productionCodeList =  this.productionCodeList;
     this._productionNameList = this.productionNameList;
     }
-    console.log("rs 1:",_groupList);
-    console.log("rs 2:",_productionCodeList);
-    console.log("rs 3:",_productionNameList);
+    // console.log("rs 1:",_groupList);
+    // console.log("rs 2:",_productionCodeList);
+    // console.log("rs 3:",_productionNameList);
   }
   ngOnInit(): void {
-    console.log("date", this.searchBody)
-    console.log("start date", this.startDate)
-    console.log("end date", this.endDate)
+    // console.log("date", this.searchBody)
+    // console.log("start date", this.startDate)
+    // console.log("end date", this.endDate)
     // document.getElementById("startDate")!.innerHTML = this.startDate!
     // Tỉ lệ lỗi các bộ phận SX so với mục tiêu
     const config = {
@@ -1249,7 +1289,7 @@ export class WelcomeComponent {
     this.soMauBTPDrvKhongDat = 0; //36.
     this.http.post<any>('http://localhost:8449/dashboard/home-default', this.searchBody).subscribe(res => {
       this.listOfDataDashBoard = res;
-      console.log('result dashboard', res);
+      // console.log('result dashboard', res);
       this.choPheDuyetLenhSX = res.countIqcWaitApproveStatus
       this.choPheDuyetBBKT = res.countWorkOrderWaitStatus
       // tính toán dữ liệu và lưu vào biến hiển thị
@@ -1410,7 +1450,7 @@ export class WelcomeComponent {
       // console.log('chart',this.chart40);
       // console.log('labels',this.chart40labels);
       // console.log('4',this.chartSLNhanNhuong);
-      // console.log('5',this.chartTongSL);
+      console.log('5',this.tiLeBTPDrvDatThongSo);
       //update chart mục 40
       if (this.chart40.length === 0) {// khi không có dữ liệu để hiển thị
         const datasets = [{
@@ -1614,7 +1654,7 @@ export class WelcomeComponent {
       this.branchList = this.branchList.filter((item:any)=>item.groupName !== null);
       this._branchList = this.branchList
       // this.resetListGuideByBranch(this.listBranchNameSearch)
-      console.log("list branch: ",this.branchList);
+      // console.log("list branch: ",this.branchList);
       this.groupList = this.listOfDataDashBoard.workOrderWaitStatusResponseList.reduce((acc:any,item:any)=>{
         let accItem = acc.find((ai:any)=> ai.groupName === item.groupName)
         if(!accItem){
@@ -1623,7 +1663,7 @@ export class WelcomeComponent {
         }
         return acc;
         },[])
-        console.log("list group: ",this.groupList);
+        // console.log("list group: ",this.groupList);
         this.groupList = this.groupList.filter((item:any)=>item.groupName !== null);
         this._groupList = this.groupList
         this.productionCodeList = this.listOfDataDashBoard.workOrderWaitStatusResponseList.reduce((acc:any,item:any)=>{
@@ -1634,7 +1674,7 @@ export class WelcomeComponent {
           }
           return acc;
           },[])
-          console.log("list production code: ",this.productionCodeList);
+          // console.log("list production code: ",this.productionCodeList);
           this.productionCodeList = this.productionCodeList.filter((item:any)=>item.groupName !== null);
           this._productionCodeList = this.productionCodeList
           this.productionNameList = this.listOfDataDashBoard.workOrderWaitStatusResponseList.reduce((acc:any,item:any)=>{
@@ -1645,9 +1685,18 @@ export class WelcomeComponent {
             }
             return acc;
             },[])
-            console.log("list production name: ",this.productionNameList);
+            // console.log("list production name: ",this.productionNameList);
             this.productionNameList = this.productionNameList.filter((item:any)=>item.groupName !== null)
             this._productionNameList = this.productionNameList
+            //Thay đổi màu cho ô chứa tỉ lệ % (chưa cần chạy)
+            // this.getColor(this.tiLeSpDat,'tiLeSpDat');
+            // this.getColor(this.tiLeSpLoiQuaTrinh,'tiLeSpLoiQuaTrinh');
+            // this.getColor(this.tiLeBTPDat,'tiLeBTPDat');
+            // this.getColor(this.tiLeBTPLoiQuaTrinh,'tiLeBTPLoiQuaTrinh');
+            // this.getColor(this.tiLeLoiVatTuQTSX,'tiLeLoiVatTuQTSX');
+            // this.getColor(this.tiLeSPDatThongSo,'tiLeSPDatThongSo');
+            // this.getColor(this.tiLeBTPDrvDatThongSo,'tiLeBTPDrvDatThongSo');
+
     })
   }
   openPopupReport(): void {
@@ -1664,5 +1713,20 @@ export class WelcomeComponent {
 
   closePopupConfig(): void {
     this.popupConfig = false;
+  }
+  // change color
+  getColor(value: number, index: any): void {
+    if (value >= 0 && value < 40) {
+      document.getElementById(index as string)!.style.color = 'red';
+      console.log('red', value, index);
+    } else if (value >= 40 && value < 70) {
+      document.getElementById(index as string)!.style.color = 'yellow';
+      console.log('yellow', value, index);
+    } else if (value > 70) {
+      document.getElementById(index as string)!.style.color = 'green';
+      console.log('green', value, index);
+    } else if(Number.isNaN(value)){
+      document.getElementById(index as string)!.style.color = 'red';
+    }
   }
 }
