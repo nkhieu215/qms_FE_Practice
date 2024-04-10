@@ -7,7 +7,7 @@ export const environment = {
   auth_api:'/api/auth/',
   keycloak: {
     // Url of the Identity Provider
-    issuer: 'http://localhost:8080/auth/',
+    issuer: 'http://192.168.68.90:8080/auth/',
     // Realm
     realm: 'QLSX',
     clientId: 'qms',

@@ -1,3 +1,14 @@
+.header-parent {
+  font-size: 18px;
+  width: 10rem;
+  height: 3rem;
+  /* border: 0.5px solid white; */
+  text-transform: uppercase;
+  text-align: center;
+  color: #066040;
+  vertical-align: top;
+}
+
 .container-table-header-1,
 .container-table-header-2 {
   width: 100%;
@@ -63,7 +74,9 @@
 
 .container-header {
   text-align: center;
-  font-size: 18px
+  height: 3rem;
+  font-size: 30px;
+  vertical-align: top;
 }
 
 .container-table-body-1,
@@ -240,15 +253,6 @@
   background-color: #0056b3;
 }
 
-.header-parent {
-  font-size: 18px;
-  width: 10rem;
-  height: 4rem;
-  /* border: 0.5px solid white; */
-  text-transform: uppercase;
-  text-align: center;
-  color: #066040;
-}
 
 /* css cho khung tìm kiếm theo các trường thông tin */
 .search-item {
