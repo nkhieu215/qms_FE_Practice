@@ -311,7 +311,7 @@ export class WelcomeComponent {
   //Hàm lọc thông tin tìm kiếm theo mã Sản phẩm
   //Hàm tính toán lại dữ liệu
   resetDataAfterFilter():void{
-     //reset dữ liệu 
+     //reset dữ liệu
      this.chart40 = [];
      this.chart40labels = [];
      this.chartSLDat = [];
@@ -437,7 +437,7 @@ export class WelcomeComponent {
        return acc;
      }, [])
      // xây dựng dữ liệu cho  chart mục 40
-     let calculatedChart = this._listOfDataDashBoard.iqcElectCompDashList.reduce((acc: any[], item: any) => {//27         
+     let calculatedChart = this._listOfDataDashBoard.iqcElectCompDashList.reduce((acc: any[], item: any) => {//27
        let accItem = acc.find((ai: any) => ai.conclusion === item.conclusion)
        if (accItem) {
          if (Number(item.poQuantity) > 0) {
@@ -739,23 +739,31 @@ export class WelcomeComponent {
               size:20
             }
           },
+          backgroundColor: [
+            'rgba(24, 35, 227, 1)',
+          ],
           tension: 0.1,
           label: 'Tỉ lệ lỗi',
           barThickness: 30
         },
         {
           type: 'line',
+
           data: [{ key: 'LR LED', value: 30 }, { key: 'Thiết bị chiếu sáng', value: 25 }, { key: 'DTTD', value: 10 }, { key: 'CNPT', value: 25 }, { key: 'SMART', value: 10 }],
           datalabels: {
             align: 'end',
             anchor: 'end',
             formatter: (i: any) => i.value,
             font:{
-              size:20
-            }
-          },
-          label: 'Tỉ lệ lỗi mục tiêu',
+              size:20,
+            },
 
+          },
+          backgroundColor: [
+            'rgba(201, 12, 12, 1)',
+          ],
+          borderColor: 'rgba(201, 12, 12, 1)',
+          label: 'Tỉ lệ lỗi mục tiêu',
         }
         ],
 
@@ -779,7 +787,7 @@ export class WelcomeComponent {
             //   callback: (value:any, index:any, values:any):string => {
             //     console.log('value:',value,index,values)
             //     // Hide every 2nd tick label
-                
+
             //     return 'hello';
             //   },
             // },
@@ -852,9 +860,11 @@ export class WelcomeComponent {
               return `${percenTageValue}%`
             },
             font:{
-              size:20
+              size: 20,
+
             }
           },
+          backgroundColor: ["#7FDBFF", "#3d9970", "#39cccc"],
         }],
         labels: ['Nhóm lỗi thao tác', 'Nhóm lỗi vật tư', 'Nhóm lỗi máy']
       },
@@ -961,7 +971,7 @@ export class WelcomeComponent {
       document.getElementById('myChartSPNhieuLoi') as HTMLCanvasElement,
       configSPNhieuLoi as ChartConfiguration
     )
-    // Tạo chart Mục Tổng hợp chất lượng hàng hóa 
+    // Tạo chart Mục Tổng hợp chất lượng hàng hóa
     const configChatLuongNhap = {
       type: 'pie',
       data: {
@@ -1005,7 +1015,7 @@ export class WelcomeComponent {
             display: true,
             position: "right",
             align: "center",
-            
+
           },
         }
       },
@@ -1165,7 +1175,7 @@ export class WelcomeComponent {
               // For a category axis, the val is the index so the lookup via getLabelForValue is needed
               callback: (value:any, index:any, values:any):string => {
                 // Hide every 2nd tick label
-                
+
                 return this.chartTongSL[value].name.substr(0,6) + '...';
               },
 
@@ -1211,7 +1221,7 @@ export class WelcomeComponent {
   }
 
   getAllDataDashBoard(): void {
-    //reset dữ liệu 
+    //reset dữ liệu
     this.listOfDataDashBoard = [];
     this.chart40 = [];
     this.chart40labels = [];
@@ -1343,7 +1353,7 @@ export class WelcomeComponent {
         return acc;
       }, [])
       // xây dựng dữ liệu cho  chart mục 40
-      let calculatedChart = this.listOfDataDashBoard.iqcElectCompDashList.reduce((acc: any[], item: any) => {//27         
+      let calculatedChart = this.listOfDataDashBoard.iqcElectCompDashList.reduce((acc: any[], item: any) => {//27
         let accItem = acc.find((ai: any) => ai.conclusion === item.conclusion)
         if (accItem) {
           if (Number(item.poQuantity) > 0) {
@@ -1607,7 +1617,7 @@ export class WelcomeComponent {
       let accItem = acc.find((ai:any)=> ai.branchName === item.branchName)
       if(!accItem){
        item.checkBox = true;
-       acc.push(item) 
+       acc.push(item)
       }
       return acc;
       },[])
@@ -1619,7 +1629,7 @@ export class WelcomeComponent {
         let accItem = acc.find((ai:any)=> ai.groupName === item.groupName)
         if(!accItem){
          item.checkBox = true;
-         acc.push(item) 
+         acc.push(item)
         }
         return acc;
         },[])
@@ -1630,7 +1640,7 @@ export class WelcomeComponent {
           let accItem = acc.find((ai:any)=> ai.productionCode === item.productionCode)
           if(!accItem){
            item.checkBox = true;
-           acc.push(item) 
+           acc.push(item)
           }
           return acc;
           },[])
@@ -1641,7 +1651,7 @@ export class WelcomeComponent {
             let accItem = acc.find((ai:any)=> ai.productionName === item.productionName)
             if(!accItem){
              item.checkBox = true;
-             acc.push(item) 
+             acc.push(item)
             }
             return acc;
             },[])

@@ -7,50 +7,58 @@
 
 .table-header-1 {
   width: 32%;
-  background-color: #097D99;
-  color: #fff;
+  /* background-color: #097D99; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-2 {
   width: 32%;
-  background-color: #097D99;
-  color: #fff;
+  /* background-color: #097D99; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-3 {
   width: 15%;
-  background-color: #097D99;
-  color: #fff;
+  /* background-color: #097D99; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-4 {
   width: 20%;
-  background-color: #097D99;
-  color: #fff;
+  /* background-color: #097D99; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-5 {
   width: 32%;
-  background-color: #29A29E;
-  color: #fff;
+  /* background-color: #29A29E; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-6 {
   width: 15%;
-  background-color: #29A29E;
-  color: #fff;
+  /* background-color: #29A29E; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-7 {
   width: 26%;
-  background-color: #29A29E;
-  color: #fff;
+  /* background-color: #29A29E; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .table-header-8 {
   width: 26%;
-  background-color: #29A29E;
-  color: #fff;
+  /* background-color: #29A29E; */
+  color: #61750C;
+  border: solid 2px #bbbbbb;
 }
 
 .container-header {
@@ -64,7 +72,8 @@
   font-weight: 800;
   text-align: center;
   font-size: 16px;
-  color: #0F36E8
+  color: #0F36E8;
+  vertical-align: top;
 }
 
 .chartCard,
@@ -238,7 +247,7 @@
   /* border: 0.5px solid white; */
   text-transform: uppercase;
   text-align: center;
-  color: #0CFAA0;
+  color: #066040;
 }
 
 /* css cho khung tìm kiếm theo các trường thông tin */
