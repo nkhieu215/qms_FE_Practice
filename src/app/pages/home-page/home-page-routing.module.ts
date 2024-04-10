@@ -4,12 +4,13 @@ import { KeycloakAuthGuard } from 'keycloak-angular';
 import { AuthGuard } from 'src/app/_helpers/authGuard';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { HomepageComponent } from '../dashboard/homepage/homepage.component';
+import { WelcomePageComponent } from './welcome-page/welcome-page.component';
 
 
 const routes: Routes = [
   {
     path: '',
-    component: HomepageComponent,
+    component: WelcomePageComponent,
     data: {
       breadcrumb: 'Quản lý chất lượng sản xuất',
     },

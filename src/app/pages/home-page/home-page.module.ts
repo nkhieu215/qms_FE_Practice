@@ -6,11 +6,13 @@ import { FormsModule } from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import { WelcomePageComponent } from './welcome-page/welcome-page.component';
 
 
 @NgModule({
   declarations: [
-    WelcomeComponent
+    WelcomeComponent,
+    WelcomePageComponent
   ],
   imports: [
     FormsModule,
