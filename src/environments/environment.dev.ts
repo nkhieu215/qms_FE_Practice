@@ -17,7 +17,7 @@
 //     clientId: 'qms_local',
 //   },
 // };
-//config cho bản test
+//------------------------------------------config cho bản test
 export const environment = {
   production: false,
   serverUrl: '/api',

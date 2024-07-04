@@ -1,4 +1,5 @@
 <!-- <img src="../assets/img/logo_home.jpg" alt="logo" style="width: 100%;"> -->
+<div id="htmlData">
 <div class="search-time-container">
   <div class="search-time-list">
     <div class="search-time-item">
@@ -35,7 +36,7 @@
         <mat-label>Đơn vị sản xuất</mat-label>
         <mat-select multiple>
           <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
-            [(ngModel)]="branchSearchKey" [ngModelOptions]="{ standalone: true }" (input)="OnBranchNameInputChange()">
+            [(ngModel)]="branchSearchKey" [ngModelOptions]="{ standalone: true }" (input)="OnBranchNameInputChange()" style="border: none;">
           <mat-option *ngFor="let item of _branchList"
             (onSelectionChange)="onBranchNameChange(item.branchName,$event)">{{item.branchName}}</mat-option>
         </mat-select>
@@ -47,7 +48,7 @@
         <mat-select multiple>
           <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
             [(ngModel)]="groupSearchKey" [ngModelOptions]="{ standalone: true }"
-            (input)="OnGroupNameInputChange($event)">
+            (input)="OnGroupNameInputChange($event)" style="border: none;">
           <mat-option *ngFor="let item of _groupList"
             (onSelectionChange)="onGroupNameChange(item.groupName,$event)">{{item.groupName}}</mat-option>
         </mat-select>
@@ -60,7 +61,7 @@
         <mat-select multiple>
           <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
             [(ngModel)]="productCodeSearchKey" [ngModelOptions]="{ standalone: true }"
-            (input)="OnGroupNameInputChange($event)">
+            (input)="OnGroupNameInputChange($event)" style="border: none;">
           <mat-option *ngFor="let item of _productionCodeList"
             (onSelectionChange)="onGroupNameChange(item.productionCode,$event)">{{item.productionCode}}</mat-option>
         </mat-select>
@@ -73,7 +74,7 @@
         <mat-select multiple>
           <input type="text" autocomplete="off" matInput placeholder="Seach by name ..." #multiUserSearch
             [(ngModel)]="productNameSearchKey" [ngModelOptions]="{ standalone: true }"
-            (input)="OnGroupNameInputChange($event)">
+            (input)="OnGroupNameInputChange($event)" style="border: none;">
           <mat-option *ngFor="let item of _productionNameList"
             (onSelectionChange)="onGroupNameChange(item.productionName,$event)">{{item.productionName}}</mat-option>
         </mat-select>
@@ -288,10 +289,14 @@
         <th class="header-parent" colspan="5">chất lượng vật tư</th>
       </tr>
       <tr>
-        <th class="container-header">{{slVatTuNhap | number}}</th>
+        <!-- <th class="container-header">{{slVatTuNhap | number}}</th>
         <th class="container-header">{{slVatTuDat | number}}</th>
         <th class="container-header">{{slVatTuKhongDat | number}}</th>
-        <th class="container-header">{{slVatTuNhanNhuong | number}}</th>
+        <th class="container-header">{{slVatTuNhanNhuong | number}}</th> -->
+        <th class="container-header">{{100 | number}}</th>
+        <th class="container-header">{{95 | number}}</th>
+        <th class="container-header">{{1 | number}}</th>
+        <th class="container-header">{{4 | number}}</th>
         <th class="container-header">{{tiLeLoiVatTuQTSX}}%</th>
       </tr>
     </thead>
@@ -312,8 +317,10 @@
         <th class="header-parent" colspan="2">mua hàng</th>
       </tr>
       <tr>
-        <th class="container-header">{{tongSoNCC | number}}</th>
-        <th class="container-header">{{tongSoBienBanIQC | number}}</th>
+        <!-- <th class="container-header">{{tongSoNCC | number}}</th>
+        <th class="container-header">{{tongSoBienBanIQC | number}}</th> -->
+        <th class="container-header">{{30 | number}}</th>
+        <th class="container-header">{{288 | number}}</th>
       </tr>
     </thead>
     <tbody>
@@ -373,12 +380,15 @@
 <div class="chart-container">
   <!-- column 1 -->
   <!-- Tỉ lệ lỗi các bộ phận SX so với mục tiêu -->
-  <div class="chart-list">
-    <div class="chart-item-one">
-      <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Tỉ lệ lỗi các bộ phận sản xuất/Mục tiêu</b></div>
-      <div class="chart-item-two-list">
-        <div  class="chart-item-two">
+  <div class="chart-list" id="testChart" >
+    <div class="chart-item-one" *ngIf="labelTitle === true">
+        <mat-icon> bar_chart</mat-icon>
+        <b style="margin-top: 3px">Tỉ lệ lỗi các bộ phận sản xuất/Mục tiêu</b>
+        <mat-icon  (click)="viewFullScreen(0)" class="fullScreenBtn">crop_free</mat-icon>
+      </div>
+      <div class="chart-item-two-list"  id="testChart1">
+        <div  class="chart-item-two"  id="testChart2">
+          <mat-icon (click)="viewFullScreen(0)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChart" ></canvas>
         </div>
       </div>
@@ -386,11 +396,14 @@
 
   <!-- Phân tích nhóm lỗi trong sx -->
   <div class="chart-list">
-    <div class="chart-item-one">
-      <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Phân tích nhóm lỗi trong sản xuất</b></div>
-      <div class="chart-item-two-list">
-        <div  class="chart-item-two">
+    <div class="chart-item-one"  *ngIf="labelTitle === true">
+        <mat-icon> bar_chart</mat-icon>
+        <b>Phân tích nhóm lỗi trong sản xuất</b>
+        <mat-icon  (click)="viewFullScreen(1)" class="fullScreenBtn">crop_free</mat-icon>
+    </div>
+    <div class="chart-item-two-list">
+      <div  class="chart-item-two">
+          <mat-icon (click)="viewFullScreen(1)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChartNhomLoi"  class="pie-chart" ></canvas>
         </div>
       </div>
@@ -399,22 +412,28 @@
 <div class="chart-container">
   <!-- Top sản phẩm nhiều lỗi nhất trong sx -->
   <div class="chart-list">
-    <div class="chart-item-one">
+    <div class="chart-item-one"  *ngIf="labelTitle === true">
       <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Top sản phẩm nhiều lỗi nhất trong sản xuất</b></div>
-      <div class="chart-item-two-list">
-        <div  class="chart-item-two">
+      <b style="margin-top: 3px">Top sản phẩm nhiều lỗi nhất trong sản xuất</b>
+      <mat-icon  (click)="viewFullScreen(2)" class="fullScreenBtn">crop_free</mat-icon>
+    </div>
+    <div class="chart-item-two-list">
+      <div id="myChartSPNhieuLoi-style" class="chart-item-two">
+          <mat-icon (click)="viewFullScreen(2)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChartSPNhieuLoi"></canvas>
         </div>
       </div>
   </div>
   <!-- Tổng hợp chất lượng nhập hàng hoá -->
   <div class="chart-list">
-    <div class="chart-item-one">
+    <div class="chart-item-one"  *ngIf="labelTitle === true">
       <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Tổng hợp chất lượng nhập hàng hóa</b></div>
-      <div class="chart-item-two-list">
-        <div  class="chart-item-two">
+      <b style="margin-top: 3px">Tổng hợp chất lượng nhập hàng hóa</b>
+      <mat-icon  (click)="viewFullScreen(3)" class="fullScreenBtn">crop_free</mat-icon>
+    </div>
+    <div class="chart-item-two-list">
+      <div  class="chart-item-two">
+          <mat-icon (click)="viewFullScreen(3)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChartChatLuongNhap" class="pie-chart" style="height: 350px;
           width: 460px;"></canvas>
         </div>
@@ -424,11 +443,14 @@
 <div class="chart-container">
   <!-- Tổng hợp tình trạng vật tư mua hàng -->
   <div class="chart-list" >
-    <div class="chart-item-one">
+    <div class="chart-item-one"  *ngIf="labelTitle === true">
       <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Tổng hợp tình trạng vật tư mua hàng</b></div>
-      <div class="chart-item-two-list">
-        <div id="chartItemTwo" class="chart-item-two">
+      <b style="margin-top: 3px">Tổng hợp tình trạng vật tư mua hàng</b>
+      <mat-icon  (click)="viewFullScreen(4)" class="fullScreenBtn">crop_free</mat-icon>
+    </div>
+    <div class="chart-item-two-list">
+      <div id="chartItemTwo" class="chart-item-two">
+          <mat-icon (click)="viewFullScreen(4)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChartTTVatTu"></canvas>
         </div>
       </div>
@@ -436,11 +458,14 @@
 
 <!-- Thống kê chất lượng hàng mua -->
     <div class="chart-list">
-    <div class="chart-item-one">
+    <div class="chart-item-one"  *ngIf="labelTitle === true">
       <mat-icon> bar_chart</mat-icon>
-      <b style="margin-top: 3px">Thống kê chất lượng hàng mua</b></div>
-      <div class="chart-item-two-list">
-        <div  class="chart-item-two">
+      <b style="margin-top: 3px">Thống kê chất lượng hàng mua</b>
+      <mat-icon  (click)="viewFullScreen(5)" class="fullScreenBtn">crop_free</mat-icon>
+    </div>
+    <div class="chart-item-two-list">
+      <div  class="chart-item-two">
+          <mat-icon (click)="viewFullScreen(5)" *ngIf="closeScreen === true">clear</mat-icon>
           <canvas id="myChartChatLuongHang" class="chart-item-two"></canvas>
         </div>
       </div>
@@ -455,5 +480,6 @@
   <textarea type="text" id="textInput" class="inp-DGCL" maxlength="1000"
     placeholder="Đánh giá tổng thế chất lượng...."></textarea>
 </div>
-
-<button class="btn-export">Export</button>
+</div>
+<button mat-fab extended class="search-time-btn btn-search-header" (click)="openPDF()">Export</button>
+<canvas id="myChart1"></canvas>
