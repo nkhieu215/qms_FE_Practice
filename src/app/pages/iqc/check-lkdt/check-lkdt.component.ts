@@ -6,7 +6,7 @@ import { FormControl } from '@angular/forms';
 import { KeycloakService } from 'keycloak-angular';
 import { NgbModal, NgbModalOptions, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
@@ -27,6 +27,7 @@ import { ExportExcelService } from 'src/app/share/_services/export-excel.service
 import { IqcCheckService } from 'src/app/share/_services/iqcNvl.service';
 import { Constant } from 'src/app/share/_services/constant';
 import Utils from 'src/app/share/_utils/utils';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-check-lkdt',
@@ -34,7 +35,37 @@ import Utils from 'src/app/share/_utils/utils';
   styleUrls: ['./check-lkdt.component.css']
 })
 export class CheckLkdtComponent implements OnInit {
-
+  // ------------------------------------------------ list item ----------------------------------------------
+  // bản test
+  address = 'http://localhost:8449';
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
+  path = 'api/testing-critical';
+  //list item
+  listOfItem: any[] = [];
+  listOfItems: any;
+  @Input() itemResult: any;
+  itemcode: any;
+  iqcElecCompId: any;
+  //----------------------------------------- autocomplete ---------------------------------------
+  testingCriticalGroup: any;
+  listOfCriticalGroup: any;
+  listOfCriticalName: any;
+  //------------------------------------------------- list errors ---------------------------------------------
+  listOfError: any;
+  errorsResult: any;
+  auditResultItemId = 0;
+  @Input() itemCode = '';
+  @Input() errCode = '';
+  @Input() errGroup = '';
+  @Input() errName = '';
+  lstItemCode: any[] = [];
+  lstErrCode: any[] = [];
+  lstErrName: any[] = [];
+  lstErrGroup: any[] = [];
+  listErrorGroup: any;
+  listErrors: any;
+  //-------------------------------------------------------------------------------------------------------------
   page = 1;
   pageSize = 10;
   collectionSize = 0;
@@ -57,6 +88,7 @@ export class CheckLkdtComponent implements OnInit {
   selectedOrigin: any = '';
   strSelect: any = '';
   strSelectElec: any = '';
+  strSelectElecName: any = '';
   strSelectOrigin: any = '';
   lstview = true;
   lstAuditCriteriaParamResponse: Array<AuditCriteriaParam> = [];
@@ -88,7 +120,7 @@ export class CheckLkdtComponent implements OnInit {
   typeAction?: any;
   errorMsg!: string;
   closeResult: string = '';
-  statusStr?:string='';
+  statusStr?: string = '';
   modalOptions: NgbModalOptions = {
     size: 'lg',
   };
@@ -104,14 +136,18 @@ export class CheckLkdtComponent implements OnInit {
     private exportExelService: ExportExcelService,
     private iqcCheckService: IqcCheckService,
     private storeCheckService: StoreCheckService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    protected http: HttpClient
   ) { }
 
   ngOnInit(): void {
 
     this.typeAction = this.actRoute.snapshot.params['type'];
     this.id = this.actRoute.snapshot.params['id'];
+    this.getListError();
+    this.getListErrorGroup();
     if (this.typeAction) {
+      this.iqcElecCompId = this.id;
       this.lstview = false;
       this.initCreate();
     } else {
@@ -207,13 +243,21 @@ export class CheckLkdtComponent implements OnInit {
 
 
     if (this.typeAction == 'add') {
-      this.form.checkDate =  new Date();
+      this.form.checkDate = new Date();
       this.form.importDate = new Date();
-      this.form.reportCode = formatDate(new Date(), 'yyyyMMddhhmmss', 'en_US') + '-RANGDONG-QC'
+      this.form.reportCode = formatDate(new Date(), 'yyyyMMddhhmmss', 'en_US') + '-RANGDONG-QC';
+      this.form.iqcElectType = false;
     } else if (this.typeAction == 'edit' || this.typeAction == 'show') {
-
+      this.http.get<any>(`${this.address}/${this.path}/iqc/get-all/${this.id}`).subscribe(res => {
+        this.listOfItem = res;
+      })
       let data = await this.iqcCheckService.detail(this.id);
       this.form = data.component;
+      if (this.form.iqcElectType == 'false') {
+        this.form.iqcElectType = false;
+      } else {
+        this.form.iqcElectType = true;
+      }
       this.statusStr = Utils.getStatusApproveName(this.form.status)
       // this.selectedEx = this.form.templateCode = data.component.templateCode;
       // this.form.checkDate =  this.form.checkDate ? this.datePipe.transform(Number(this.form.checkDate), 'yyyy-MM-dd') : '';
@@ -222,16 +266,20 @@ export class CheckLkdtComponent implements OnInit {
 
       this.form.importDate = new Date(this.form.importDate);
       this.strSelectElec = data.component.elecCompCode;
+      this.strSelectElecName = data.component.elecCompName;
       this.strSelectOrigin = data.component.origin;
-
+      console.log('check mau bien ban: ', this.form)
       // check status
       if (this.typeAction == 'edit') {
         if (data.component.status == 'WAIT_APPROVE' || data.component.status == 'APPROVE') {
-          Swal.fire(
-            'Lỗi',
-            'Bạn không thể thực hiện chỉnh sửa yêu cầu.',
-            'warning'
-          )
+          Swal.fire({
+            title: 'Lỗi',
+            text: 'Bạn không thể thực hiện chỉnh sửa yêu cầu ! ',
+            icon: 'warning',
+            showCancelButton: false,
+            showConfirmButton: false,
+            timer: 1000
+          })
           this.router.navigate([
             `/iqc/iqc-lkdt-check`,
             {},
@@ -255,7 +303,7 @@ export class CheckLkdtComponent implements OnInit {
       let data = await this.iqcCheckService.detail(id);
       this.form = data.component;
       this.isEdit = true;
-      this.arrErrChild = data.component.resultError;
+      // this.arrErrChild = data.component.resultError;
 
       this.lstAuditCriteriaLKDT = data.component.resultLkdt;
       this.lstAuditCriteriaLKDT.forEach(element => {
@@ -300,64 +348,122 @@ export class CheckLkdtComponent implements OnInit {
   }
 
   report(id?: any, code?: any) {
-    let fileName = this.tokenStorage.getUsername() + "_" + code + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx"
-    this.iqcCheckService.downloadfileBtp(id, fileName);
+    this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${id}`).subscribe(res => {
+      this.listOfError = res;
+      setTimeout(() => {
+        let fileName = this.tokenStorage.getUsername() + "_" + code + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx"
+        this.iqcCheckService.downloadfileBtp(id, fileName, this.listOfError);
+      }, 100)
+    })
   }
   async onSubmit(buttonType: any) {
-    this.form.importDateStr =
-      this.form.importDate != null
-        ? moment(this.form.importDate).format('DD-MM-YYYY')
-        : '';
-    this.form.checkDateStr =
-      this.form.checkDate != null
-        ? moment(this.form.checkDate).format('DD-MM-YYYY')
-        : '';
-    this.form.elecCompCode = this.strSelectElec;
-    this.form.type = 2;
-    let message = '';
-    if (buttonType == 'save') {
-      this.form.status = 'DRAFF';
-      message = 'Bạn đã thực hiện thêm mới thành công'
-    } else if (buttonType == 'send_approve') {
-      this.form.status = 'WAIT_APPROVE';
-      message = 'Bạn đã gửi duyệt thành công.';
+    var checkResult = false;
+    if ((this.form.reportCode === '' || this.form.itemType === '' || this.form.origin === '' ||
+      this.form.grpoNumber === '') ||
+      (this.form.reportCode === null || this.form.itemType === null || this.form.origin === null ||
+        this.form.grpoNumber === null)) {
+      checkResult = true;
     }
-
-    var action = "";
-    if (this.id == 0 || this.id == null) {
-      action = "ADD"
-    } else {
-      action = "EDIT"
-    }
-
-    this.lstAuditCriteriaLKDT.forEach(element => {
-      element.quantity = element.auditQuantity;
-    })
-    let data = await this.iqcCheckService.create(this.form, null, this.lstAuditCriteriaParam, this.lstAuditCriteriaLKDT, this.arrErrChild, action)
-    if (data.result.responseCode == '00') {
-
-      Swal.fire("Thành công", message, "success");
-
-      Swal.fire({
-        title: 'Thành công',
-        text: message,
-        icon: 'success',
-        showCancelButton: false,
-        confirmButtonText: 'Đồng ý'
-      }).then((result) => {
-        if (buttonType == 'send_approve') {
-          window.location.href = `/iqc/iqc-lkdt-check/${data.id}/show`
-        } else {
-          window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
+    setTimeout(async () => {
+      if (checkResult === true) {
+        Swal.fire({
+          title: 'Cảnh báo',
+          text: 'Vui lòng điền đầy đủ thông tin biên bản !',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Đồng ý',
+          timer: 1000
+        })
+      } else {
+        this.form.importDateStr =
+          this.form.importDate != null
+            ? moment(this.form.importDate).format('DD-MM-YYYY')
+            : '';
+        this.form.checkDateStr =
+          this.form.checkDate != null
+            ? moment(this.form.checkDate).format('DD-MM-YYYY')
+            : '';
+        this.form.elecCompCode = this.strSelectElec;
+        this.form.elecCompName = this.strSelectElecName;
+        this.form.type = 2;
+        let message = '';
+        if (buttonType == 'save') {
+          this.form.status = 'DRAFF';
+          message = 'Bạn đã thực hiện thêm mới thành công'
+        } else if (buttonType == 'send_approve') {
+          this.form.status = 'WAIT_APPROVE';
+          message = 'Bạn đã gửi duyệt thành công.';
         }
-      })
+
+        var action = "";
+        if (this.id == 0 || this.id == null) {
+          action = "ADD"
+        } else {
+          action = "EDIT"
+        }
+
+        this.lstAuditCriteriaLKDT.forEach(element => {
+          element.quantity = element.auditQuantity;
+        })
+        let data = await this.iqcCheckService.create(this.form, null, this.lstAuditCriteriaParam, this.lstAuditCriteriaLKDT, action)
+        if (data.result.responseCode == '00') {
+
+          //Swal.fire("Thành công", message, "success");
+
+          Swal.fire({
+            title: 'Thành công',
+            text: message,
+            icon: 'success',
+            showCancelButton: false,
+            confirmButtonText: 'Đồng ý'
+          }).then((result) => {
+            if (buttonType == 'send_approve') {
+              //window.location.href = `/iqc/iqc-lkdt-check/${data.id}/show`;
+              this.router.navigate([
+                `/iqc/iqc-lkdt-check/${data.id}/show`,
+                {},
+              ]).then(() => {
+                this.iqcElecCompId = data.id;
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                setTimeout(() => {
+                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 100);
+                }, 100);
+              });
+            } else {
+              this.router.navigate([
+                `/iqc/iqc-lkdt-check/${data.id}/edit`,
+                {},
+              ]).then(() => {
+                this.iqcElecCompId = data.id;
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                setTimeout(() => {
+                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 100);
+                }, 100);
+              });
+              // window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
+            }
+          })
 
 
-    }
-
+        }
+      }
+    }, 100);
   }
 
   open(content: any) {
+    var data = { type: 'LKDT' }
+    this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
+      console.log("check list: ", res)
+      this.listOfCriticalGroup = res;
+    })
     this.modalService.open(content, this.modalOptions).result.then(
       (result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -379,7 +485,13 @@ export class CheckLkdtComponent implements OnInit {
   }
 
   onSelected() {
-    console.log(this.selectExamination);
+    console.log('hello', this.selectExamination);
+    this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectExamination.id}`).subscribe(res => {
+      this.listOfItem = res;
+    })
+    // this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
+    this.strSelectElec = this.selectExamination.code;
+    this.strSelectElecName = this.selectExamination.name;
     this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
     this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
     this.lstAuditCriteriaParam.forEach(element => {
@@ -400,9 +512,34 @@ export class CheckLkdtComponent implements OnInit {
 
   }
 
-  onSelectedElectronic() {
+  onSelectedElectronic(index: any, itemCode: any) {
+    this.itemResult = itemCode;
+    var check = false;
+    for (let i = 0; i < this.listOfItem.length; i++) {
+      if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
+        check = true;
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Đã tồn tại mã sản phẩm ! ',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+      }
+    }
+    setTimeout(() => {
+      if (check === false) {
+        this.listOfItem[index].itemCode = this.itemResult.itemCode;
+        this.listOfItem[index].itemName = this.itemResult.itemName;
+      } else {
+        this.listOfItem[index].itemCode = '';
+        this.listOfItem[index].itemName = '';
+        this.listOfItems = [];
+      }
+    }, 50);
     console.log(this.selectedElectronic);
-    this.strSelectElec = this.selectedElectronic.itemCode;
+    //this.strSelectElec = this.selectedElectronic.itemCode;
     this.form.electCompName = this.selectedElectronic.itemName;
   }
 
@@ -696,8 +833,468 @@ export class CheckLkdtComponent implements OnInit {
       this.router.navigate([`/iqc/iqc-lkdt-check/${data.id}/edit`, {},]);
     })
   }
-  async exportExcelDetail(){
+  async exportExcelDetail() {
     let data = await this.iqcCheckService.detail(this.id);
-    this.report(data.component.id,data.component.reportCode);
+    this.report(data.component.id, data.component.reportCode);
+  }
+  // -------------------------------------------- Danh sách sản phẩm --------------------------------------------------------
+  deleteById(index: any) {
+    if (this.listOfItem[index].id === null) {
+      this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+    } else {
+      this.http.delete<any>(`${this.address}/${this.path}/iqc/delete/${this.listOfItem[index].id}`).subscribe(() => {
+        this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+        if (this.listOfItem.length > 5) {
+          document.getElementById('table-body')!.style.width = '99.9%';
+        } else {
+          document.getElementById('table-body')!.style.width = '99%';
+        }
+        Swal.fire({
+          title: 'Xóa',
+          text: 'Bạn đã xóa thông tin sản phẩm thành công! ',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+      })
+    }
+  }
+  updateItem(id: any) {
+    if (id === null) {
+      document.getElementById(`null-input-po-quantity`)!.hidden = false;
+      document.getElementById(`null-input-lot-number`)!.hidden = false;
+      document.getElementById(`null-input-bill-number`)!.hidden = false;
+      document.getElementById(`null-input-quantity-check`)!.hidden = false;
+      document.getElementById(`null-input-note`)!.hidden = false;
+      document.getElementById(`null-input`)!.hidden = false;
+      document.getElementById(`null-button`)!.hidden = false;
+      document.getElementById(`null-span-po-quantity`)!.hidden = true;
+      document.getElementById(`null-span-lot-number`)!.hidden = true;
+      document.getElementById(`null-span-bill-number`)!.hidden = true;
+      document.getElementById(`null-span-quantity-check`)!.hidden = true;
+      document.getElementById(`null-span-note`)!.hidden = true;
+      document.getElementById(`null-span`)!.hidden = true;
+
+    } else {
+      if (document.getElementById(`${id.toString()}-input`)!.hidden == true) {
+        document.getElementById(`${id.toString()}-input-po-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-lot-number`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-bill-number`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-quantity-check`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-note`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input`)!.hidden = false;
+        document.getElementById(`${id.toString()}-button`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-po-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-lot-number`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-bill-number`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-quantity-check`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-note`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span`)!.hidden = true;
+      } else {
+        document.getElementById(`${id.toString()}-input-po-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-lot-number`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-bill-number`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-quantity-check`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-note`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input`)!.hidden = true;
+        document.getElementById(`${id.toString()}-button`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-po-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-lot-number`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-bill-number`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-quantity-check`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-note`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span`)!.hidden = false;
+      }
+    }
+  }
+  addNewItem() {
+    var date = new Date
+    var item = {
+      id: null,
+      itemCode: '',
+      itemName: '',
+      billNumber: '',
+      lotNumber: '',
+      poQuantity: 0,
+      quantityCheck: 0,
+      createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+      updateAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+      username: 'admin',
+      note: '',
+      iqcElecCompId: this.iqcElecCompId,
+    }
+    this.listOfItem = [item, ... this.listOfItem];
+
+    setTimeout(() => {
+
+      if (this.listOfItem.length > 5) {
+        document.getElementById('table-body')!.style.width = '99.9%';
+      } else {
+        document.getElementById('table-body')!.style.width = '99%';
+      }
+      this.updateItem(null);
+    }, 50)
+  }
+  getListOfItems(value: any) {
+    if (value.length > 5) {
+      this.oitmService.searchBycode(value).subscribe((data: any) => {
+        this.listOfItems = data.lstOitm;
+        console.log('hello', this.listOfItems);
+      });
+    }
+  }
+  submit(index: any) {
+    if (index === null) {
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, this.listOfItem).subscribe(res => {
+        Swal.fire({
+          title: 'Thêm mới',
+          text: 'Thành công thêm mới thông tin sản phẩm  ! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 5000
+        })
+        this.listOfItem.forEach((item: any) => {
+          var result = res.find((item1: any) => item1.itemCode === item.Code);
+          if (result) {
+            item.id = result.id;
+          }
+        })
+        setTimeout(() => {
+          this.updateItem(null);
+        }, 100);
+      })
+    } else {
+      var data = [this.listOfItem[index]];
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe(res => {
+        Swal.fire({
+          title: 'Thêm mới',
+          text: 'Thành công thêm mới thông tin sản phẩm ! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 5000
+        })
+        this.listOfItem[index].id = res[0].id;
+        setTimeout(() => {
+          this.updateItem(null);
+        }, 100);
+      })
+    }
+  }
+  checkDuplicate() {
+    for (let i = 0; i < this.listOfItem.length; i++) {
+      if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Đã tồn tại mã sản phẩm ! ',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+      }
+    }
+  }
+  submitItem(index: any) {
+    if (this.listOfItem[index].itemCode === '') {
+      Swal.fire({
+        title: 'Lỗi',
+        text: 'Vui lòng điền mã sản phẩm ! ',
+        icon: 'warning',
+        showCancelButton: false,
+        showConfirmButton: false,
+        timer: 5000
+      })
+    } else {
+      var data = [this.listOfItem[index]]
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe((res) => {
+        this.listOfItem[index].id = res[0].id;
+        setTimeout(() => {
+          this.updateItem(this.listOfItem[index].id);
+        }, 50)
+        this.listOfItems = [];
+        Swal.fire({
+          title: 'Cập nhật',
+          text: 'Bạn đã cập nhật thông tin sản phẩm thành công ! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+      })
+    }
+  }
+  // --------------------------------------------------------------------------- Khai báo lỗi -------------------------------------------------------
+  updateError(id: any) {
+    if (id === null) {
+      document.getElementById(`null-input-error-errCode`)!.hidden = false;
+      document.getElementById(`null-input-quantity`)!.hidden = false;
+      document.getElementById(`null-input-error-errGroup`)!.hidden = false;
+      document.getElementById(`null-input-error-note`)!.hidden = false;
+      document.getElementById(`null-button-error`)!.hidden = false;
+      document.getElementById(`null-span-error-errCode`)!.hidden = true;
+      document.getElementById(`null-span-quantity`)!.hidden = true;
+      document.getElementById(`null-span-error-errGroup`)!.hidden = true;
+      document.getElementById(`null-span-error-note`)!.hidden = true;
+    } else {
+      if (document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden == true) {
+        document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-error-errGroup`)!.hidden =
+          document.getElementById(`${id.toString()}-input-error-note`)!.hidden = false;
+        document.getElementById(`${id.toString()}-button-error`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-errCode`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-errGroup`)!.hidden =
+          document.getElementById(`${id.toString()}-span-error-note`)!.hidden = true;
+      } else {
+        document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-error-errGroup`)!.hidden =
+          document.getElementById(`${id.toString()}-input-error-note`)!.hidden = true;
+        document.getElementById(`${id.toString()}-button-error`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-errCode`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-errGroup`)!.hidden =
+          document.getElementById(`${id.toString()}-span-error-note`)!.hidden = false;
+      }
+    }
+  }
+  submitError(index: any) {
+    if (this.listOfError[index].errorCode === '') {
+      Swal.fire({
+        title: 'Lỗi',
+        text: 'Vui lòng điền lỗi ! ',
+        icon: 'warning',
+        showCancelButton: false,
+        showConfirmButton: false,
+        timer: 5000
+      })
+    } else {
+      var item = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[index].itemCode);
+      console.log('submit', item);
+      this.listOfError[index].electCompId = this.id;
+      setTimeout(() => {
+        this.listOfError[index].auditResultItemId = item.id;
+        var data = [this.listOfError[index]]
+        this.http.post<any>(`${this.address}/${this.path}/error/submit`, data).subscribe((res) => {
+          this.listOfError[index].id = res[0].id;
+          setTimeout(() => {
+            this.updateError(this.listOfError[index].id);
+          }, 50)
+          this.listOfItems = [];
+          Swal.fire({
+            title: 'Cập nhật',
+            text: 'Bạn đã cập nhật thông tin lỗi thành công ! ',
+            icon: 'success',
+            showCancelButton: false,
+            showConfirmButton: false,
+            timer: 5000
+          })
+        })
+      }, 100);
+    }
+  }
+  submitErrors() {
+    var item1 = this.listOfError.find((item2: any) => item2.errCode === '');
+    var auditResultItemId = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[0].itemCode);
+    console.log({ code1: item1, code2: this.listOfError[0] })
+    setTimeout(() => {
+      if (item1) {
+        Swal.fire(
+          'Lỗi',
+          'Vui lòng điền lỗi !',
+          'warning'
+        )
+      } else {
+        this.listOfError.forEach((item: any) => {
+          item.electCompId = this.id,
+            item.auditResultItemId = auditResultItemId.id
+        })
+        setTimeout(() => {
+          this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe((res) => {
+            this.listOfError = res;
+            document.getElementById('btn-save-item')!.hidden = true;
+            setTimeout(() => {
+              this.listOfError.forEach((item: any) => {
+                item.itemCode = this.itemCode,
+                  this.updateError(item.id)
+              })
+            }, 50)
+            this.listOfItems = [];
+            Swal.fire(
+              'Cập nhật',
+              'Bạn đã cập nhật thông tin lỗi thành công.',
+              'success'
+            )
+          })
+        }, 100);
+      }
+    }, 10);
+  }
+  deleteErrorById(index: any) {
+    if (this.listOfError[index].id === null) {
+      this.listOfError = this.listOfError.filter((item: any) => item.errCode !== this.listOfError[index].errCode);
+    } else {
+      this.http.delete<any>(`${this.address}/${this.path}/errors/delete/${this.listOfError[index].id}`).subscribe(() => {
+        this.listOfError = this.listOfError.filter((item: any) => item.errCode !== this.listOfError[index].errCode);
+        Swal.fire({
+          title: 'Xóa',
+          text: 'Bạn đã xóa thông tin lỗi thành công ! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+      })
+    }
+  }
+  addNewError() {
+    var date = new Date
+    var item = {
+      id: null,
+      itemCode: this.itemCode,
+      errCode: '',
+      errGroup: '',
+      errName: '',
+      quantity: 0,
+      ratio: 0,
+      electCompId: this.iqcElecCompId,
+      auditResultItemId: this.auditResultItemId,
+      createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+      username: 'admin',
+      note: '',
+    }
+    this.listOfError = [item, ... this.listOfError];
+    setTimeout(() => {
+      document.getElementById('btn-save-item')!.hidden = false;
+      this.updateError(null);
+    }, 50)
+  }
+  openPopupError(content: any, item: any) {
+    this.errCode = '';
+    this.errGroup = '';
+    this.errName = '';
+    if (item === null) {
+      this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
+        this.listOfError = res;
+      })
+    } else {
+      this.itemCode = item.itemCode;
+      this.http.get<any>(`${this.address}/${this.path}/errors/audit-result-item-id/${item.id}`).subscribe(res => {
+        this.listOfError = res;
+        this.getLstItemCode();
+      })
+    }
+
+    this.modalService.open(content, this.modalOptions).result.then(
+      (result) => {
+        this.closeResult = `Closed with: ${result}`;
+      },
+      (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      }
+    );
+  }
+  findInListErrors() {
+    const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode };
+    this.http.post<any>(`${this.address}/${this.path}/errors/search`, data).subscribe(res => {
+      this.listOfError = res;
+      console.log('list errors: ', res, this.id);
+    })
+  }
+  getLstItemCode() {
+    this.lstItemCode = [];
+    var list = this.listOfError.filter((item: any) => item.itemCode.includes(this.itemCode));
+    list.forEach((item: any) => {
+      const data = this.lstItemCode.find((x: any) => x.itemCode === item.itemCode);
+      if (!data) {
+        this.lstItemCode.push(item);
+      }
+    })
+    this.getLstErrGroup();
+    this.getLstErrCode();
+    this.getLstErrName();
+  }
+  getLstErrCode() {
+    this.lstErrCode = [];
+    var list = this.listOfError.filter((item: any) => item.errCode.includes(this.errCode) && item.itemCode.includes(this.itemCode) && item.errGroup.includes(this.errGroup));
+    list.forEach((item: any) => {
+      const data = this.lstErrCode.find((x: any) => x.errCode === item.errCode);
+      if (!data) {
+        this.lstErrCode.push(item);
+      }
+    })
+    this.getLstErrName();
+  }
+  getLstErrName() {
+    this.lstErrName = [];
+    var list = this.listOfError.filter((item: any) => item.errName.includes(this.errName) && item.errCode.includes(this.errCode) && item.itemCode.includes(this.itemCode) && item.errGroup.includes(this.errGroup));
+    list.forEach((item: any) => {
+      const data = this.lstErrName.find((x: any) => x.errName === item.errName);
+      if (!data) {
+        this.lstErrName.push(item);
+      }
+    })
+  }
+  getLstErrGroup() {
+    this.lstErrGroup = [];
+    var list = this.listOfError.filter((item: any) => item.itemCode.includes(this.itemCode) && item.errGroup.includes(this.errGroup));
+    list.forEach((item: any) => {
+      const data = this.lstErrGroup.find((x: any) => x.errGroup === item.errGroup);
+      if (!data) {
+        this.lstErrGroup.push(item);
+      }
+    })
+    this.getLstErrCode();
+    this.getLstErrName();
+  }
+  getListErrorGroup() {
+    this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all`).subscribe(res => {
+      this.listErrorGroup = res;
+    })
+  }
+  getListError() {
+    this.http.get<any>(`${this.address}/${this.path}/errors/get-all`).subscribe(res => {
+      this.listErrors = res;
+    })
+  }
+  getListErrorById(errGroup: any, index: any) {
+    var data = this.listErrorGroup.find((item: any) => item.errGroup === errGroup);
+    this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all/${data.id}`).subscribe(res => {
+      console.log("check result", res)
+      this.listErrors = res;
+      setTimeout(() => {
+        if (this.listErrors.length === 0) {
+          this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all/null`).subscribe(res => {
+            this.listOfError[index].errGroup = '';
+            this.listErrors = res;
+          })
+        }
+      }, 100);
+    })
+  }
+  mappingErrCode(errName: any, index: any) {
+    var data = this.listErrors.find((item: any) => item.errName === errName);
+    this.listOfError[index].errCode = data.errCode;
+  }
+  findByCritiCalGroup() {
+    this.listOfCriticalName = [];
+    var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'LKDT' }
+    this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data).subscribe(res => {
+      this.listOfCriticalName = res;
+      console.log(this.listOfCriticalName)
+
+    })
+    // }else if(this.examinationType === '3'){
+    //   var data = {testingCriticalGroup:this.testingCriticalGroup,type:'Đánh giá CL SP'}
+    //   this.http.post<any>(`${this.address}/${this.path}/get-list-guide`,data).subscribe(res=>{
+    //     this.listOfCriticalName = res;
+    //     console.log(this.listOfCriticalName)
+
+    //   })
+    // }
   }
 }

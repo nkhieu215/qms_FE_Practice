@@ -75,8 +75,8 @@
         </td>
         <td>{{ examination.code}}</td>
         <td>
-          <p *ngIf="examination.status ==1"> Hoạt động </p>
-          <p *ngIf="examination.status ==0"> Tạm dừng </p>
+           <p *ngIf="examination.status ==1" [ngClass]="{greenClass: examination.status ===1}"> Active </p>
+          <p *ngIf="examination.status ==0" [ngClass]="{redClass:examination.status === 0}"> Deactivate </p>
         </td>
         <td>
           <p *ngIf="examination.type ==1"> NVL / BTP/ TP</p>

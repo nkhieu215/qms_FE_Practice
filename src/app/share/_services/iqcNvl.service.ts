@@ -90,8 +90,8 @@ export class IqcCheckService {
   //   return data ;
   // }
 
-  downloadfileNVL(id: any, fileName: any) {
-    let data = this.baseService.reportPostFile(`${URL_REPORT_NVL} ${id}`,{}, '').subscribe(
+  downloadfileNVL(id: any, fileName: any,listError:any) {
+    let data = this.baseService.reportPostFile(`${URL_REPORT_NVL} ${id}`,listError, '').subscribe(
       blob => {
         saveAs(blob, fileName)
       }
@@ -99,8 +99,8 @@ export class IqcCheckService {
     return data;
   }
 
-  downloadfileBtp(id: any, fileName: any) {
-    let data = this.baseService.reportPostFile(`${URL_REPORT_BTP} ${id}`,{}, '').subscribe(
+  downloadfileBtp(id: any, fileName: any,listError:any) {
+    let data = this.baseService.reportPostFile(`${URL_REPORT_BTP} ${id}`,listError, '').subscribe(
       blob => {
         saveAs(blob, fileName)
       }
@@ -109,12 +109,13 @@ export class IqcCheckService {
   }
 
 
-  async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, lstError: any, type: any) {
+  // async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, lstError: any, type: any) {
+    async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, type: any) {
     let data = {
       typeRequest: type,
       component: component,
       lstIqcNvl: lstIqcNvl,
-      lstError: lstError,
+      // lstError: lstError,
       lstIqcParam: lstIqcParam,
       lstIqcLkdt: lstIqcLkdt
     };

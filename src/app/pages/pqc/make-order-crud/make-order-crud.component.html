@@ -153,14 +153,14 @@
 
           <div class="form-group" style="margin-top: 20px;">
             <button class="btn" routerLink="/pqc/make-order-production"><i class="fa fa-list"></i> Danh sách</button>
-            <button class="btn btn-primary" type="submit" (click)="onSubmit('save')" style="margin-left: 30px;">
+            <button *ngIf="action == 'add'" class="btn btn-primary" type="submit" (click)="onSubmit('save')" style="margin-left: 30px;">
               <i class="fa fa-save"></i>
               Thêm mới
             </button>
-            <!-- <button class="btn btn-info" type="submit" style="margin-left: 30px;" (click)="onSubmit('send_approve')">
+            <button *ngIf="action == 'print'" class="btn btn-info" type="submit" style="margin-left: 30px;" (click)="exportInfo()">
               <i class="fa fa-check"></i>
-              Sửa
-            </button> -->
+              In tem
+            </button>
 
           </div>
 

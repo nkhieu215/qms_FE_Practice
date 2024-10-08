@@ -16,6 +16,11 @@ import { ProductionLineListComponent } from './line/production-line-list/product
 import { ProductionLineAddComponent } from './line/production-line-add/production-line-add.component';
 import { ProductionLineEditComponent } from './line/production-line-edit/production-line-edit.component';
 import { ProductionLineDetailComponent } from './line/production-line-detail/production-line-detail.component';
+import { TestingCriticalGroupComponent } from '../iqc/testing-critical-group/testing-critical-group.component';
+import { TestingCriticalComponent } from '../iqc/testing-critical/testing-critical.component';
+import { TemInComponent } from '../pqc/tem-in/tem-in.component';
+import { TemInManagedComponent } from './tem-in-managed/tem-in-managed.component';
+import { TemInLstComponent } from '../pqc/tem-in-lst/tem-in-lst.component';
 
 
 const routes: Routes = [
@@ -33,7 +38,39 @@ const routes: Routes = [
     // canActivate: [AppAuthGuard],
     // data: { roles: ['QMS_MANAGER_SETTING'] },
   },
-
+  {
+    path: 'testing-critical-group',
+    component: TestingCriticalGroupComponent,
+    // canActivate: [AppAuthGuard],
+    // data: { roles: ['QMS_MANAGER_SETTING'] },
+  },
+  {
+    path: 'testing-critical',
+    component: TestingCriticalComponent,
+    // canActivate: [AppAuthGuard],
+    // data: { roles: ['QMS_MANAGER_SETTING'] },
+  },
+  // {
+  //   path: 'tem-in',
+  //   component: TemInComponent,
+  //   // canActivate: [AppAuthGuard],
+  //   // data: { roles: ['QMS_MANAGER_SETTING'] },
+  // },
+  {
+    path: 'pqc/tem-in',
+    component: TemInLstComponent,
+    // canActivate: [AppAuthGuard],
+    // data: { roles: ['QMS_MANAGER_SETTING'] },
+  }
+  ,
+  { path: 'pqc/tem-in/:print/:type/:id', component: TemInComponent },
+  {
+    path: 'tem-in-managed',
+    component: TemInManagedComponent,
+    // canActivate: [AppAuthGuard],
+    // data: { roles: ['QMS_MANAGER_SETTING'] },
+  }
+  ,
   { path: 'examination-add', component: ExaminationAddComponent },
   { path: 'examination-edit/:id', component: ExaminationEditComponent },
   { path: 'error', component: ErrorListComponent },

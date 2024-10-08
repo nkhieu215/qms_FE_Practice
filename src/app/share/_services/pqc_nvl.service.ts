@@ -19,7 +19,7 @@ export class PQCNVlService {
   path: string;
 
   constructor(private http: HttpClient) {
-    this.path =  environment.api_end_point + '/pqc-nvl'
+    this.path = environment.api_end_point + '/pqc-nvl'
   }
 
 
@@ -28,14 +28,14 @@ export class PQCNVlService {
    * @param data
    * @returns
    */
-  addNewProcuction(id: any, note: any, conclude: any,checkPerson:any,workOrderId:any,lstPqcDrawNvl:any): Observable<any> {
+  addNewProcuction(id: any, note: any, conclude: any, checkPerson: any, workOrderId: any, lstPqcDrawNvl: any): Observable<any> {
     return this.http.post(this.path + "/create", {
       id: id,
       note: note,
       conclude: conclude,
-      checkPerson:checkPerson,
-      workOrderId:workOrderId,
-      lstPqcDrawNvl:lstPqcDrawNvl
+      checkPerson: checkPerson,
+      workOrderId: workOrderId,
+      lstPqcDrawNvl: lstPqcDrawNvl
     }, httpOptions);
   }
 
@@ -50,7 +50,7 @@ export class PQCNVlService {
 
 
   removeNvlCheck(id: any): Observable<any> {
-    return this.http.delete(this.path + "/remove/" +   id , {});
+    return this.http.delete(this.path + "/remove/" + id, {});
   }
 
 }

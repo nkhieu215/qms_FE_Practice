@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input ,Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import Utils from 'src/app/share/_utils/utils';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
@@ -13,13 +13,14 @@ import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
 export class PqcShowListComponent implements OnInit {
   @Input() item_type = '';
 
-  constructor(private pqcService: PQCService) {}
+  constructor(private pqcService: PQCService) { }
 
   strNameTitle?: string;
   strUrl?: string;
 
   ngOnInit(): void {
-
+    console.log(this.item_type);
+    console.log(this.strUrl);
     switch (this.item_type) {
       case 'TIN':
         this.strNameTitle = 'Kiểm tra in kem thiếc';
@@ -78,16 +79,18 @@ export class PqcShowListComponent implements OnInit {
         this.strUrl = 'pqc/pqc-tin-check';
         break;
       case 'MAKE_ORDER':
-          this.strNameTitle = 'Danh sách lệnh sản xuất';
-          this.strUrl = 'pqc/make-order-production';
-          break;
+        this.strNameTitle = 'Danh sách lệnh sản xuất';
+        this.strUrl = 'pqc/make-order-production';
+        break;
       case 'SAP_STORE':
-          this.strNameTitle = 'Khai báo nhập kho SAP';
-          this.strUrl = 'pqc/store/approve-store-sap';
-          break;
+        this.strNameTitle = 'Khai báo nhập kho SAP';
+        this.strUrl = 'pqc/store/approve-store-sap';
+        break;
+      case 'PRINT_SERIAL':
+        this.strNameTitle = 'Quản lý tem sản xuất';
+        this.strUrl = 'pqc/tem-in/print';
+        break;
     }
-    console.log(this.item_type);
-    console.log(this.strUrl);
     this.refreshPage();
   }
 
@@ -95,57 +98,57 @@ export class PqcShowListComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   lstWorkOrder: PQCWorkOrder[] = [];
-  show_check =false;
+  show_check = false;
   formSearch: any = {
     name: null,
     code: null,
     lot: null,
-    sap:null
+    sap: null
   };
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status,branchName, groupName  } = this.formSearch;
-    if(this.item_type == 'CHECK_NVL'){
-      let strStatus ='';
-      if(status =='WAIT'){
-        strStatus ='CREATE';
+    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode } = this.formSearch;
+    if (this.item_type == 'CHECK_NVL') {
+      let strStatus = '';
+      if (status == 'WAIT') {
+        strStatus = 'CREATE';
       }
-      else if(status =='SUCCESS'){
-        strStatus ='APPROVE';
-      }else{
+      else if (status == 'SUCCESS') {
+        strStatus = 'APPROVE';
+      } else {
         strStatus = status;
       }
 
       this.show_check = true;
       this.pqcService
-      .getListByStep(this.page, this.pageSize, name, code, lot, "CHECK_NVL", startDate, endDate,sap,woCode, strStatus,branchName,groupName)
-      .subscribe(
-        (data) => {
-          var productionLst = new PQCPEndingOrderResponse();
-          productionLst = data;
-          this.lstWorkOrder = data.lstOrder;
-          this.lstWorkOrder?.forEach((element) => {
-            element.strStatus = Utils.getStatusName(element.status);
-          });
-          this.collectionSize = Number(productionLst?.total) * this.pageSize;
-        },
-        (err) => {}
-      );
-    }else{
+        .getListByStep(this.page, this.pageSize, name, code, lot, "CHECK_NVL", startDate, endDate, sap, woCode, strStatus, branchName, groupName, workOrderCode)
+        .subscribe(
+          (data) => {
+            var productionLst = new PQCPEndingOrderResponse();
+            productionLst = data;
+            this.lstWorkOrder = data.lstOrder;
+            this.lstWorkOrder?.forEach((element) => {
+              element.strStatus = Utils.getStatusName(element.status);
+            });
+            this.collectionSize = Number(productionLst?.total) * this.pageSize;
+          },
+          (err) => { }
+        );
+    } else {
       this.pqcService
-      .getListByStep(this.page, this.pageSize, name, code, lot, this.item_type, startDate, endDate,sap,woCode, status, branchName,groupName)
-      .subscribe(
-        (data) => {
-          var productionLst = new PQCPEndingOrderResponse();
-          productionLst = data;
-          this.lstWorkOrder = data.lstOrder;
-          this.lstWorkOrder?.forEach((element) => {
-            element.strStatus = Utils.getStatusName(element.status);
-          });
-          this.collectionSize = Number(productionLst?.total) * this.pageSize;
-        },
-        (err) => {}
-      );
+        .getListByStep(this.page, this.pageSize, name, code, lot, this.item_type, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode)
+        .subscribe(
+          (data) => {
+            var productionLst = new PQCPEndingOrderResponse();
+            productionLst = data;
+            this.lstWorkOrder = data.lstOrder;
+            this.lstWorkOrder?.forEach((element) => {
+              element.strStatus = Utils.getStatusName(element.status);
+            });
+            this.collectionSize = Number(productionLst?.total) * this.pageSize;
+          },
+          (err) => { }
+        );
     }
 
   }

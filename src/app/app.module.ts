@@ -47,6 +47,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Scale } from 'chart.js';
+import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
 registerLocaleData(en);
 
 @NgModule({

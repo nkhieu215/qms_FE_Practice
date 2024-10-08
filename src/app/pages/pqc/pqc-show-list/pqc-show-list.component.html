@@ -72,15 +72,20 @@
       <div class="col-md-3">
         <div class="form-group">
           <label>Từ ngày</label>
-          <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
-            />
+          <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel" />
         </div>
       </div>
       <div class="col-md-3">
         <div class="form-group">
           <label>Đến ngày</label>
-          <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
-            />
+          <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Mã wo</label>
+          <input type="text" class="form-control" name="workOrderCode" [(ngModel)]="formSearch.workOrderCode"
+            #name="ngModel" placeholder="Mã wo" />
         </div>
       </div>
       <div class="col-md-3">
@@ -103,9 +108,11 @@
         <thead>
           <tr>
             <th nzWidth="60px">STT</th>
-            <th>Tên sản phẩm</th>
-            <th>Mã sản phẩm</th>
-            <th>Số lô</th>
+            <th scope="col">Ngành</th>
+            <th scope="col">Tổ</th>
+            <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Mã sản phẩm</th>
+            <th scope="col">Số lô</th>
             <th>Số lượng</th>
             <th>Mã Wo</th>
             <th>Mã lệnh SAP</th>
@@ -120,6 +127,8 @@
         <tbody>
           <tr *ngFor="let work of lstWorkOrder let i=index;">
             <td>{{i+1}}</td>
+            <td>{{work.branchName}}</td>
+            <td>{{work.groupName}}</td>
             <td>{{work.productionName}}</td>
             <td>{{work.productionCode}}</td>
             <td>{{work.lotNumber}}</td>
@@ -142,10 +151,8 @@
                 <a class="btn btn-sm btn-primary" *ngIf="work.status =='WAIT' || work.status =='REJECT'  "
                   target="_blank" routerLink="/{{strUrl}}/add/{{work.id}}" title="Thực hiện kiểm tra"><i
                     class="fa fa-plus"></i></a>
-
                 <!-- <a class="btn btn-sm btn-primary" *ngIf="show_check" routerLink="/{{strUrl}}/add/{{work.id}}"
                   target="_blank" title="Thực hiện kiểm tra"><i class="fa fa-plus"></i></a> -->
-
               </div>
             </td>
           </tr>

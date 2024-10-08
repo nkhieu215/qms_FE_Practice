@@ -89,15 +89,21 @@
 <ng-template #create let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra</h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
       <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12" style="    display: flex;
+    justify-content: space-between;">
           <input type="text" class="form-control" [(ngModel)]="selectExamination" value="{{ strSelect }}"
             [matAutocomplete]="auto" class="form-control" [formControl]="searchExaminationCtrl"
-            placeholder="Mã mẫu biên bản" />
+            placeholder="Mã mẫu biên bản" style="width: 60%;" />
+          <div style="
+            font-size: 30px;
+            color: red;
+            width: 20%;"><b> Phúc tra </b> <input type="checkbox" style="width: 45px;
+            height: 40px;" [(ngModel)]="checked" [ngModelOptions]="{ standalone: true }"></div>
           <mat-autocomplete style="z-index: 999999" [panelWidth]="400" #auto="matAutocomplete"
             (optionSelected)="onSelected()" [displayWith]="displayWith">
             <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
@@ -139,8 +145,12 @@
                 ">
                 <td>
                   <input type="text" (change)="totalQuantity()" placeholder="Chỉ tiêu kiểm tra" class="form-control"
-                    name="auditContent[{{ i }}]" [(ngModel)]="check.auditContent" />
-
+                    name="auditContent[{{ i }}]" [(ngModel)]="check.auditContent" list="testingCriticalGroup"/>
+                    <datalist  id="testingCriticalGroup">
+                      <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
+                        <span>{{ item.testingCriticalGroup }}</span>
+                      </option>
+                    </datalist>
                 </td>
                 <td>
                   <input type="text" (change)="totalQuantity()" placeholder="Bậc rút nghiệm" class="form-control"
@@ -199,6 +209,7 @@
             <select [(ngModel)]="formEx.conclude" class="form-control" name="conclude">
               <option value="Đạt">Đạt</option>
               <option value="Không đạt">Không đạt</option>
+              <option value="Nhân nhượng">Nhân nhượng</option>
             </select>
           </div>
         </div>
@@ -231,7 +242,7 @@
 <ng-template #myModal let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra</h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <div class="col-sm-12 table-responsive">

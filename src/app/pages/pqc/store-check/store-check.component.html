@@ -71,7 +71,7 @@
                   <tbody>
                     <tr *ngFor="let check of lstStoreCheck; let i = index">
                       <td>{{ check.lot }}</td>
-                      <td>{{ check.createdAt  | date:'dd/MM/YYYY HH:mm'}}</td>
+                      <td>{{ check.createdAt | date:'dd/MM/YYYY HH:mm'}}</td>
                       <td>{{ check.quatity }}</td>
                       <td>{{ check.checkDate }}</td>
                       <td>{{ check.quatityStore }}</td>
@@ -149,8 +149,17 @@
                 </nz-table>
               </div>
             </div>
-
-            <app-button-success item_type="STORE_CHECK" show_work_order="{{show_work_order}}"></app-button-success>
+            <div style="display: flex;">
+              <app-button-success item_type="STORE_CHECK" show_work_order="{{show_work_order}}"></app-button-success>
+              <div> <button (click)="openDetail(myModalEdit,id)" style="    margin-top: 19px;
+                margin-left: 34px;
+                border-radius: 5px;
+                background-color: #0dcaf0;
+                border: #0dcaf0;
+                color: #fff;
+                height: 40px;
+                font-size: 18px;">Hoàn thành các công đoạn</button></div>
+            </div>
           </form>
         </div>
       </div>
@@ -175,14 +184,14 @@
                   #lot="ngModel" name="lot" required placeholder="Số lô" />
               </div>
             </div>
-            <div class="col-sm-6">
+            <!-- <div class="col-sm-6">
               <div class="form-group">
                 <label>Số lượng kiểm</label>
                 <input [(ngModel)]="formEx.quatity" type="number"
                   class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity" required
                   placeholder="Số lượng" />
               </div>
-            </div>
+            </div> -->
           </div>
           <div class="row">
             <div class="col-sm-6">
@@ -379,14 +388,16 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Số lượng kiểm tra</label>
-                <input [(ngModel)]="formEx.quatity" type="text"   class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity" required
+                <input [(ngModel)]="formEx.quatity" type="text"
+                  class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity" required
                   placeholder="Số lượng" />
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Kết luận</label>
-                <select [(ngModel)]="formEx.conclude"   class="form-control {{ !conclude.valid ? 'is-invalid' :''}}" #conclude="ngModel" name="conclude" required >
+                <select [(ngModel)]="formEx.conclude" class="form-control {{ !conclude.valid ? 'is-invalid' :''}}"
+                  #conclude="ngModel" name="conclude" required>
                   <option value="Đạt">Đạt</option>
                   <option value="Không đạt">Không đạt</option>
                   <option value="Nhân nhượng">Nhân nhượng</option>
@@ -398,7 +409,8 @@
             <div class="col-sm-12">
               <div class="form-group">
                 <label>Tiêu chí an toàn</label>
-                <select [(ngModel)]="formEx.standard" class="form-control {{ !standard.valid ? 'is-invalid' :''}}" #standard="ngModel"  name="standard" required>
+                <select [(ngModel)]="formEx.standard" class="form-control {{ !standard.valid ? 'is-invalid' :''}}"
+                  #standard="ngModel" name="standard" required>
                   <option value="Điện trở cách điện">Điện trở cách điện</option>
                   <option value="Độ bền điện">Độ bền điện</option>
                   <option value="Dòng rò/nối đất">Dòng rò/nối đất</option>
@@ -417,13 +429,13 @@
             <div class="col-sm-12">
               <div class="form-group">
                 <label>Ghi chú</label>
-                <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
-                  placeholder="Ghi chú" />
+                <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
               </div>
             </div>
           </div>
           <div class="form-group">
-            <button (click)="onAddError(action, ids)" class="btn btn-success" type="submit" [disabled]="!(fkt.form.valid)">
+            <button (click)="onAddError(action, ids)" class="btn btn-success" type="submit"
+              [disabled]="!(fkt.form.valid)">
               Thêm mới
             </button>
           </div>
@@ -571,67 +583,73 @@
         </div>
 
         <form name="form" *ngIf="show_work_order" (ngSubmit)="(f.form.valid)" #fnq="ngForm">
-        <div class="col-md-12" style="margin-top: 20px;" *ngIf="show_work_order">
-          <h2>Thực hiện đánh giá</h2>
-          <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
-            <thead>
-              <tr>
-                <th scope="col">Bậc rút nghiệm</th>
-                <th scope="col">Số lượng rút nghiệm</th>
-                <th scope="col">Mức chấp nhận</th>
-                <th scope="col">Số lỗi cho phép</th>
-                <th scope="col">Số lỗi thực tế</th>
-                <th scope="col">Kết luận</th>
-                <th scope="col">Ghi chú</th>
-                <th scope="col">Tùy chọn</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let aql of lstAqlCheck ;let i = index;">
-                <th scope="row">
-                  <input type="text" name="testLevel[{{i}}]" class="form-control" placeholder="Bậc rút nghiệm"
-                    [(ngModel)]="aql.testLevel">
-                </th>
-                <td>
-                  <input type="text" name="quantity[{{i}}]" class="form-control {{ !quantity.valid ? 'is-invalid' :''}}" #quantity="ngModel" placeholder="Số lượng rút nghiệm" required
-                    [(ngModel)]="aql.quantity">
-                </td>
-                <td><input type="text" name="acceptanceLevel[{{i}}]" class="form-control" placeholder="Mức chấp nhận"
-                    [(ngModel)]="aql.acceptanceLevel"></td>
-                <td>
-                  <input type="text" name="allowedError[{{i}}]" class="form-control {{ !allowedError.valid ? 'is-invalid' :''}}" #allowedError="ngModel"  placeholder="Số lỗi cho phép" required
-                    [(ngModel)]="aql.allowedError" (ngModelChange)="checkConcludeAql(aql)">
-                </td>
-                <td>
-                  <input type="text" name="reality[{{i}}]"  class="form-control {{ !reality.valid ? 'is-invalid' :''}}" #reality="ngModel"  placeholder="Thực tế" required
-                    [(ngModel)]="aql.reality" (ngModelChange)="checkConcludeAql(aql)">
-                <td>
-                  <select [(ngModel)]="aql.conclude"   class="form-control {{ !aql.valid ? 'is-invalid' :''}}" #aql="ngModel"   name="conclude[{{i}}]" required>
-                    <option value="Đạt">Đạt</option>
-                    <option value="Không đạt">Không đạt</option>
-                    <option value="Nhân nhượng">Nhân nhượng</option>
-                  </select>
-                <td>
-                  <input type="text" name="note[{{i}}]" class="form-control" placeholder="Ghi chú"
-                    [(ngModel)]="aql.note">
-                <td>
-                  <button class="btn btn-danger" (click)="deleteCheckAql(aql)">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </nz-table>
-        </div>
-
-        <div class="row" style="margin-top: 20px; margin-bottom: 10px;" *ngIf="show_work_order">
-          <div class="col-md-12">
-            <button (click)="onAddError('EXTER', ids)" class="btn btn-success" type="submit"  [disabled]="!(fnq.form.valid)">
-              Thêm mới
-            </button>
+          <div class="col-md-12" style="margin-top: 20px;" *ngIf="show_work_order">
+            <h2>Thực hiện đánh giá</h2>
+            <nz-table #borderedTable nzBordered [nzData]="['']" [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th scope="col">Bậc rút nghiệm</th>
+                  <th scope="col">Số lượng rút nghiệm</th>
+                  <th scope="col">Mức chấp nhận</th>
+                  <th scope="col">Số lỗi cho phép</th>
+                  <th scope="col">Số lỗi thực tế</th>
+                  <th scope="col">Kết luận</th>
+                  <th scope="col">Ghi chú</th>
+                  <th scope="col">Tùy chọn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let aql of lstAqlCheck ;let i = index;">
+                  <th scope="row">
+                    <input type="text" name="testLevel[{{i}}]" class="form-control" placeholder="Bậc rút nghiệm"
+                      [(ngModel)]="aql.testLevel">
+                  </th>
+                  <td>
+                    <input type="text" name="quantity[{{i}}]"
+                      class="form-control {{ !quantity.valid ? 'is-invalid' :''}}" #quantity="ngModel"
+                      placeholder="Số lượng rút nghiệm" required [(ngModel)]="aql.quantity">
+                  </td>
+                  <td><input type="text" name="acceptanceLevel[{{i}}]" class="form-control" placeholder="Mức chấp nhận"
+                      [(ngModel)]="aql.acceptanceLevel"></td>
+                  <td>
+                    <input type="text" name="allowedError[{{i}}]"
+                      class="form-control {{ !allowedError.valid ? 'is-invalid' :''}}" #allowedError="ngModel"
+                      placeholder="Số lỗi cho phép" required [(ngModel)]="aql.allowedError"
+                      (ngModelChange)="checkConcludeAql(aql)">
+                  </td>
+                  <td>
+                    <input type="text" name="reality[{{i}}]" class="form-control {{ !reality.valid ? 'is-invalid' :''}}"
+                      #reality="ngModel" placeholder="Thực tế" required [(ngModel)]="aql.reality"
+                      (ngModelChange)="checkConcludeAql(aql)">
+                  <td>
+                    <select [(ngModel)]="aql.conclude" class="form-control {{ !aql.valid ? 'is-invalid' :''}}"
+                      #aql="ngModel" name="conclude[{{i}}]" required>
+                      <option value="Đạt">Đạt</option>
+                      <option value="Không đạt">Không đạt</option>
+                      <option value="Nhân nhượng">Nhân nhượng</option>
+                    </select>
+                  <td>
+                    <input type="text" name="note[{{i}}]" class="form-control" placeholder="Ghi chú"
+                      [(ngModel)]="aql.note">
+                  <td>
+                    <button class="btn btn-danger" (click)="deleteCheckAql(aql)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
           </div>
-        </div>
-      </form>
+
+          <div class="row" style="margin-top: 20px; margin-bottom: 10px;" *ngIf="show_work_order">
+            <div class="col-md-12">
+              <button (click)="onAddError('EXTER', ids)" class="btn btn-success" type="submit"
+                [disabled]="!(fnq.form.valid)">
+                Thêm mới
+              </button>
+            </div>
+          </div>
+        </form>
 
         <!-- <form name="form" *ngIf="show_work_order" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>
           <div class="row">
@@ -739,8 +757,8 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Số lượng</label>
-                <input required="" type="number" class="form-control {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity" [(ngModel)]="formEx.quatity" required
-                   placeholder="Số lượng lỗi" />
+                <input required="" type="number" class="form-control {{ !quatity.valid ? 'is-invalid' :''}}"
+                  #quatity="ngModel" name="quatity" [(ngModel)]="formEx.quatity" required placeholder="Số lượng lỗi" />
               </div>
             </div>
 
@@ -748,7 +766,7 @@
               <div class="form-group">
                 <label>Serial</label>
                 <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formErrorChild.serial"
-                  #level="ngModel" placeholder="Serial"  />
+                  #level="ngModel" placeholder="Serial" />
               </div>
             </div>
           </div>
@@ -785,8 +803,9 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Chọn nhóm lỗi</label>
-                <select  class="form-control {{ !errGroup.valid ? 'is-invalid' :''}}" #errGroup="ngModel" (change)="onChangeErrorGroup(formEx.errGroup)" required
-                  name="errGroup" [(ngModel)]="formEx.errGroup" #type="ngModel">
+                <select class="form-control {{ !errGroup.valid ? 'is-invalid' :''}}" #errGroup="ngModel"
+                  (change)="onChangeErrorGroup(formEx.errGroup)" required name="errGroup" [(ngModel)]="formEx.errGroup"
+                  #type="ngModel">
                   <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">
                     {{ error.name }}
                   </option>
@@ -796,8 +815,8 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Chọn lỗi</label>
-                <select class="form-control {{ !err.valid ? 'is-invalid' :''}}" #err="ngModel"  name="err" [(ngModel)]="formEx.errName" #type="ngModel"
-                  #errName="ngModel">
+                <select class="form-control {{ !err.valid ? 'is-invalid' :''}}" #err="ngModel" name="err"
+                  [(ngModel)]="formEx.errName" #type="ngModel" #errName="ngModel">
                   <option *ngFor="let error of lstError; let idx = index" [value]="error.name">
                     {{ error.name }}
                   </option>
@@ -810,13 +829,13 @@
             <div class="col-sm-12">
               <div class="form-group">
                 <label>Ghi chú</label>
-                <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
-                  placeholder="Ghi chú" />
+                <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
               </div>
             </div>
           </div>
           <div class="form-group">
-            <button (click)="onAddError('ERROR', ids)" class="btn btn-success" type="submit" [disabled]="!(ferr.form.valid)">
+            <button (click)="onAddError('ERROR', ids)" class="btn btn-success" type="submit"
+              [disabled]="!(ferr.form.valid)">
               Thêm mới
             </button>
           </div>
@@ -1039,5 +1058,45 @@
     </nz-table>
 
 
+  </div>
+</ng-template>
+<ng-template #myModalEdit let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">
+      Chi tiết thông tin kiểm tra
+    </h2>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin người thực hiện kiểm tra" [nzData]="lstCheck"
+      [nzFrontPagination]="false">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên tài khoản</th>
+          <th>Công đoạn</th>
+          <th>Trạng thái</th>
+          <th>Hoàn thành</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of lstCheck; let i = index">
+          <td>{{ i+1 }}</td>
+          <td>{{ check.userId }}</td>
+          <td>{{ check.nameStep }}</td>
+          <td>{{ check.status }}</td>
+          <td><input type="checkbox" *ngIf="check.status != 'Hoàn thành'" [ngModelOptions]="{ standalone: true }"
+              [(ngModel)]="check.checked" style="    width: 40px;height: 40px;    margin-left: 30px;"></td>
+        </tr>
+      </tbody>
+    </nz-table>
+    <div><button (click)="updateStatus()" style="border-radius: 5px;
+      background-color: #0b84cb;
+      border: #0b84cb;
+      color: #fff;
+      height: 40px;
+      font-size: 18px;
+      margin-left: 88%;
+      width: 90px;">Lưu</button></div>
   </div>
 </ng-template>

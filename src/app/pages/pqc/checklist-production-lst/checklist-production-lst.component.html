@@ -34,7 +34,13 @@
               placeholder="Ngày thực hiện" />
           </div>
         </div>
-
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã wo</label>
+            <input type="text" class="form-control" name="workOrderCode" [(ngModel)]="formSearch.workOrderCode"
+              #name="ngModel" placeholder="Mã wo" />
+          </div>
+        </div>
         <div class="col-md-3">
           <div class="form-group">
             <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
@@ -78,8 +84,9 @@
                 <button class="btn btn-sm btn-info" routerLink="/checklist-production/show/{{work.id}}"
                   title="Chi tiết thông tin"><i class="fa fa-eye"></i></button>
 
-                <button *ngIf="work.status == 'CREATE'"  class="btn btn-sm btn-primary" routerLink="/checklist-production/add/{{work.id}}"
-                  title="Thực hiện kiểm tra"><i class="fa fa-plus"></i></button>
+                <button *ngIf="work.status == 'CREATE'" class="btn btn-sm btn-primary"
+                  routerLink="/checklist-production/add/{{work.id}}" title="Thực hiện kiểm tra"><i
+                    class="fa fa-plus"></i></button>
 
               </div>
             </td>

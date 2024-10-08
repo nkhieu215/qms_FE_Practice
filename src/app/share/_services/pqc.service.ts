@@ -29,21 +29,23 @@ export class PQCService {
   path: string;
   pathSap: string;
 
-  constructor(private http: HttpClient, private baseService:BaseService) {
-    this.path =  environment.api_end_point + '/production'
+  constructor(private http: HttpClient, private baseService: BaseService) {
+    this.path = environment.api_end_point + '/production'
     this.pathSap = environment.api_end_point + '/sap-db'
   }
 
-  getOrderList(page: number, size: number,name:any , productCode:any,  lot:any, woCode:any): Observable<any> {
+  getOrderList(page: number, size: number, name: any, productCode: any, lot: any, woCode: any): Observable<any> {
     return this.http.post(this.path + "/get-order-planing-list",
-      {typeRequest: "BROWS",
-      page: page,
-      size: size,
-      name: name,
-      productCode: productCode,
-      lot: lot,
-      woCode: woCode}
-    , httpOptions);
+      {
+        typeRequest: "BROWS",
+        page: page,
+        size: size,
+        name: name,
+        productCode: productCode,
+        lot: lot,
+        woCode: woCode
+      }
+      , httpOptions);
   }
 
   getDetailOrder(id: string): Observable<any> {
@@ -82,7 +84,7 @@ export class PQCService {
     let data: any = {
       typeRequest: "ACTION_STEP",
       step: step,
-      workOrderId: workOrderId,action
+      workOrderId: workOrderId, action
     };
 
     switch (step) {
@@ -128,7 +130,7 @@ export class PQCService {
         break;
       case 'STORE_CHECK':
         data.lstPqcStoreStructures = lst;
-          break;
+        break;
       case 'QC_CHECK':
         data.lstPqcQualities = lst;
         break;
@@ -137,7 +139,7 @@ export class PQCService {
 
     }
 
-    data.action =action;
+    data.action = action;
 
     return this.http.post(this.path + "/check-step", data, httpOptions);
   }
@@ -164,7 +166,8 @@ export class PQCService {
     }, httpOptions);
   }
 
-  getListByStep(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate:string,sapcode:string, woCode:string,status:string, branchName:string, groupName:string): Observable<any> {
+  getListByStep(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate: string, sapcode: string, woCode: string, status: string, branchName: string, groupName: string, workOrderCode: string): Observable<any> {
+    console.log("check api: ", this.path + "/check-step");
     return this.http.post(this.path + "/check-step", {
       typeRequest: "ACTION_BROWS_STEP",
       page: page,
@@ -173,17 +176,18 @@ export class PQCService {
       code: code,
       lot: lot,
       step: step,
-      sap:sapcode,
-      woCode:woCode,
+      sap: sapcode,
+      woCode: woCode,
       startDate: startDate,
-      endDate:endDate,
-      status:status,
+      endDate: endDate,
+      status: status,
       groupName: groupName,
-      branchName: branchName
+      branchName: branchName,
+      workOrderCode: workOrderCode
     }, httpOptions);
   }
 
-  getApproveStoreSap(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate:string,sapcode:string, woCode:string,status:string, branchName:string, groupName:string): Observable<any> {
+  getApproveStoreSap(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate: string, sapcode: string, woCode: string, status: string, branchName: string, groupName: string): Observable<any> {
     return this.http.post(this.pathSap + "/get-wait-approve-sap", {
       page: page,
       size: size,
@@ -191,22 +195,22 @@ export class PQCService {
       code: code,
       lot: lot,
       step: step,
-      sap:sapcode,
-      woCode:woCode,
+      sap: sapcode,
+      woCode: woCode,
       startDate: startDate,
-      endDate:endDate,
-      status:status,
+      endDate: endDate,
+      status: status,
       groupName: groupName,
       branchName: branchName
     }, httpOptions);
   }
 
-  reportStoreCheck(data:any,type:string, fileName:string){
-    if(type == 'VIEW'){
-      return  this.baseService.postService(data,URL_REPORT_STORE_CHECK,'')
+  reportStoreCheck(data: any, type: string, fileName: string) {
+    if (type == 'VIEW') {
+      return this.baseService.postService(data, URL_REPORT_STORE_CHECK, '')
     }
-    else if(type =='REPORT'){
-      let dataRest = this.baseService.reportPostFile(`${URL_EXPORT_EXCEL_STORE_CHECK}`,data, '').subscribe(
+    else if (type == 'REPORT') {
+      let dataRest = this.baseService.reportPostFile(`${URL_EXPORT_EXCEL_STORE_CHECK}`, data, '').subscribe(
         blob => {
           saveAs(blob, fileName)
         }
@@ -216,12 +220,12 @@ export class PQCService {
     return null;
 
   }
-  reportErrCheck(data:any,type:string, fileName:string){
-    if(type == 'VIEW'){
-      return  this.baseService.postService(data,URL_REPORT_ERR_CHECK_SHOW,'')
+  reportErrCheck(data: any, type: string, fileName: string) {
+    if (type == 'VIEW') {
+      return this.baseService.postService(data, URL_REPORT_ERR_CHECK_SHOW, '')
     }
-    else if(type =='REPORT'){
-      let dataRest = this.baseService.reportPostFile(`${URL_REPORT_ERR_CHECK_EXPORT}`,data, '').subscribe(
+    else if (type == 'REPORT') {
+      let dataRest = this.baseService.reportPostFile(`${URL_REPORT_ERR_CHECK_EXPORT}`, data, '').subscribe(
         blob => {
           saveAs(blob, fileName)
         }
@@ -246,7 +250,7 @@ export class PQCService {
 
 
   getDetailVersionByProdCode(proCode: string, version: string): Observable<any> {
-    return this.http.post( environment.api_end_point + "/sap-db/get-info-by-bom-product", {
+    return this.http.post(environment.api_end_point + "/sap-db/get-info-by-bom-product", {
       proCode: proCode,
       version: version
     }, httpOptions);
@@ -254,7 +258,7 @@ export class PQCService {
 
 
   getAllWaitApprove(page: number, size: number, name: string, code: string): Observable<any> {
-    return this.http.post( environment.api_end_point + "/electronic-components/crud", {
+    return this.http.post(environment.api_end_point + "/electronic-components/crud", {
       typeRequest: "LST_APPROVE",
       page: page,
       size: size,
@@ -264,7 +268,7 @@ export class PQCService {
   }
 
   updateParam(audit: AuditCriteriaNvl, type: string): Observable<any> {
-    return this.http.post( environment.api_end_point + "/electronic-components/crud", {
+    return this.http.post(environment.api_end_point + "/electronic-components/crud", {
       typeRequest: "EDIT",
       audit: audit,
       type: type
@@ -272,7 +276,7 @@ export class PQCService {
   }
 
   detail(id: number): Observable<any> {
-    return this.http.post( environment.api_end_point + "/electronic-components/crud", {
+    return this.http.post(environment.api_end_point + "/electronic-components/crud", {
       typeRequest: "SHOW",
       id: id
     }, httpOptions);
@@ -280,7 +284,7 @@ export class PQCService {
 
 
   create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, lstError: any, type: any): Observable<any> {
-    return this.http.post<any>( environment.api_end_point + '/electronic-components/crud', {
+    return this.http.post<any>(environment.api_end_point + '/electronic-components/crud', {
       typeRequest: type,
       component: component,
       lstIqcNvl: lstIqcNvl,
@@ -291,7 +295,7 @@ export class PQCService {
   }
 
   approve(data: any): Observable<any> {
-    return this.http.post<any>( environment.api_end_point + '/pqc/approve', {data}, httpOptions);
+    return this.http.post<any>(environment.api_end_point + '/pqc/approve', { data }, httpOptions);
   }
 
   update(id: any, data: any): Observable<any> {
@@ -299,24 +303,24 @@ export class PQCService {
   }
 
   delete(id: any): Observable<any> {
-    return this.http.post<any>( environment.api_end_point + '/electronic-components/crud', {
+    return this.http.post<any>(environment.api_end_point + '/electronic-components/crud', {
       typeRequest: "DELETE",
       id: id
     }, httpOptions);
   }
 
-  cancelProcessCheckWo(id:any){
-    return this.http.post<any>( environment.api_end_point + '/production/cancel-process-check-wo', {
+  cancelProcessCheckWo(id: any) {
+    return this.http.post<any>(environment.api_end_point + '/production/cancel-process-check-wo', {
       id: id
     }, httpOptions);
   }
 
-  getStatusByStepAndWoId(woId:any, step:any){
-    var data ={
-      id:woId,
+  getStatusByStepAndWoId(woId: any, step: any) {
+    var data = {
+      id: woId,
       step: step
     }
-    return this.http.post<any>( environment.api_end_point + '/production/get-status-wo-step-user', data, httpOptions);
+    return this.http.post<any>(environment.api_end_point + '/production/get-status-wo-step-user', data, httpOptions);
   }
 
   deleteAll(): Observable<any> {
@@ -324,23 +328,23 @@ export class PQCService {
   }
 
 
-  report(id: any): Observable<Blob>  {
+  report(id: any): Observable<Blob> {
     const formDataForExport: FormData = new FormData();
     formDataForExport.append('export', 'ALL');
-    let data =  this.http.post(environment.api_end_point + "/report/pqc-report-by-wo/" + id, {},
+    let data = this.http.post(environment.api_end_point + "/report/pqc-report-by-wo/" + id, {},
       {
         responseType: 'blob'
       }
     )
-    return data ;
+    return data;
   }
 
-  reportDashboard(data:any){
-      return  this.baseService.postService(data,URL_DASHBOARD_HOME,'')
+  reportDashboard(data: any) {
+    return this.baseService.postService(data, URL_DASHBOARD_HOME, '')
   }
 
-  reportDashboardChart(data:any){
-    return  this.baseService.postService(data,URL_DASHBOARD_CHART,'')
+  reportDashboardChart(data: any) {
+    return this.baseService.postService(data, URL_DASHBOARD_CHART, '')
   }
 
 

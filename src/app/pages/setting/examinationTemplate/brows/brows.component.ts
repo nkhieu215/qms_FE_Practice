@@ -10,6 +10,16 @@ import Swal from 'sweetalert2';
   selector: 'app-brows',
   templateUrl: './brows.component.html',
   styleUrls: ['./brows.component.css'],
+  styles: [`
+    .greenClass{
+      background-color:#0AE40A;width: 75px;
+      border-radius: 10px;
+    text-align:center;}
+    .redClass{
+      background-color:#FF0000;width: 100px;
+      border-radius: 10px;
+      text-align:center;}
+    `]
 })
 export class ExaminationBrowsComponent implements OnInit {
   page = 1;

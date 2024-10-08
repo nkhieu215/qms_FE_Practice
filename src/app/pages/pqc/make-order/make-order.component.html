@@ -8,14 +8,14 @@
           <div class="form-group">
             <label>Tên sản phẩm</label>
             <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
-              placeholder="Tên  biên bản" />
+              placeholder="Tên  sản phẩm" />
           </div>
         </div>
         <div class="col-md-3">
           <div class="form-group">
             <label>Mã sản phẩm</label>
             <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
-              placeholder="Tên biên bản" />
+              placeholder="Mã sản phẩm" />
           </div>
         </div>
         <div class="col-md-3">
@@ -89,6 +89,13 @@
           </div>
         </div>
         <div class="col-md-3">
+          <div class="form-group">
+            <label>Mã wo</label>
+            <input type="text" class="form-control" name="workOrderCode" [(ngModel)]="formSearch.workOrderCode"
+              #name="ngModel" placeholder="Mã wo" />
+          </div>
+        </div>
+        <div class="col-md-3">
           <div class="form-group" style="line-height: 80px;margin-bottom: 0px;">
             <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
               <i class="fa fa-search"></i> Tìm kiếm
@@ -109,6 +116,8 @@
         <thead>
           <tr>
             <th scope="col">#</th>
+            <th scope="col">Ngành</th>
+            <th scope="col">Tổ</th>
             <th scope="col">Tên sản phẩm</th>
             <th scope="col">Mã sản phẩm</th>
             <th scope="col">Số lô</th>
@@ -126,6 +135,8 @@
         <tbody>
           <tr *ngFor="let work of lstWorkOrder let i=index;">
             <td>{{i+1}}</td>
+            <td>{{work.branchName}}</td>
+            <td>{{work.groupName}}</td>
             <td>{{work.productionName}}</td>
             <td>{{work.productionCode}}</td>
             <td>{{work.lotNumber}}</td>
@@ -165,10 +176,11 @@
     <h2 class="modal-title" id="modal-basic-title">
       Chi tiết thông tin kiểm tra
     </h2>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <nz-table #borderedTable nzBordered nzTitle="Thông tin người thực hiện kiểm tra" [nzData]="lstCheck" [nzFrontPagination]="false">
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin người thực hiện kiểm tra" [nzData]="lstCheck"
+      [nzFrontPagination]="false">
       <thead>
         <tr>
           <th>STT</th>

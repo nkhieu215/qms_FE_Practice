@@ -79,15 +79,21 @@
 
 
   <div class="col-sm-4" style="line-height: 90px;">
-    <a href="{{form.udocURL != '' ? form.udocURL :'#'}}" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Hồ sơ</a>
-    <a href="{{form.udocURL2 != '' ? form.udocURL2 :'#'}}" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Chương trình</a>
+    <a href="{{form.udocURL != '' ? form.udocURL :'#'}}" target="_blank" class="btn btn-primary"
+      style="margin-right: 10px;">Hồ sơ</a>
+    <a href="{{form.udocURL2 != '' ? form.udocURL2 :'#'}}" target="_blank" class="btn btn-primary"
+      style="margin-right: 10px;">Chương trình</a>
     <button class="btn btn-info" (click)="open(myModal)" style="margin-right: 10px;">
       <i class="fa fa-info"> Thông tin Scada</i>
     </button>
     <button class="btn btn-success" (click)="exportExcelDetail()" type="submit">
       <i class="fa fa-download"></i> Xuất excel
     </button>
-
+    <button *ngIf="checkPrint === 'print'&& checkType ==='add'" class="btn btn-info" type="submit"
+      style="margin-left: 30px;" (click)="exportInfo()">
+      <i class="fa fa-check"></i>
+      In tem
+    </button>
   </div>
 
 
@@ -98,36 +104,36 @@
     <h4 class="modal-title" id="modal-basic-title">
       Thông tin máy sản xuất
     </h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
 
-    <div class="col-md-12"  *ngFor="let recipient of scadaMacine | keyvalue">
-        <button class="btn btn-success"   style="margin-right: 10px;"(click)="detailError(machine.ids)">
-          {{recipient.key}}
-        </button>
+    <div class="col-md-12" *ngFor="let recipient of scadaMacine | keyvalue">
+      <button class="btn btn-success" style="margin-right: 10px;" (click)="detailError(machine.ids)">
+        {{recipient.key}}
+      </button>
 
-        <div class="col-md-6">
-         <p>Số lượng đầu ra :  <strong>{{recipient.value.numberOutput}}</strong></p>
+      <div class="col-md-6">
+        <p>Số lượng đầu ra : <strong>{{recipient.value.numberOutput}}</strong></p>
 
-        </div>
-        <div class="col-md-6">
-            <p>Số lượng đầu vào : <strong>{{recipient.value.numberInput}}</strong></p>
-        </div>
+      </div>
+      <div class="col-md-6">
+        <p>Số lượng đầu vào : <strong>{{recipient.value.numberInput}}</strong></p>
+      </div>
 
 
-        <table class="table table-bordered">
-          <thead>
-            <th>Thông tin lỗi</th>
-            <th>Số lỗi</th>
-          </thead>
-          <tbody class="table table-border">
-            <tr  *ngFor="let error of recipient.value.errorLst| keyvalue">
-              <td>{{error.key}}</td>
-              <td>{{error.value}}</td>
-            </tr>
-          </tbody>
-        </table>
+      <table class="table table-bordered">
+        <thead>
+          <th>Thông tin lỗi</th>
+          <th>Số lỗi</th>
+        </thead>
+        <tbody class="table table-border">
+          <tr *ngFor="let error of recipient.value.errorLst| keyvalue">
+            <td>{{error.key}}</td>
+            <td>{{error.value}}</td>
+          </tr>
+        </tbody>
+      </table>
 
     </div>
 

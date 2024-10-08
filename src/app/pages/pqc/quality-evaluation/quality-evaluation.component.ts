@@ -1,5 +1,5 @@
 import { KeycloakService } from 'keycloak-angular';
-import {  formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { filter, distinctUntilChanged, debounceTime, tap, switchMap, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
@@ -17,6 +17,7 @@ import { ExaminationResponse } from 'src/app/share/response/examination/Examinat
 import { AuditCriteriaQuality } from 'src/app/share/_models/auditCriteriaQuality.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { PqcQuality } from 'src/app/share/_models/pqc_quality.model';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-quality-evaluation',
@@ -24,10 +25,17 @@ import { PqcQuality } from 'src/app/share/_models/pqc_quality.model';
   styleUrls: ['./quality-evaluation.component.css']
 })
 export class QualityEvaluationComponent implements OnInit {
+  // bản test
+  address = 'http://localhost:8449';
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
+  path = 'api/testing-critical';
+  listOfCriticalName: any;
   @Input() show_check = '';
-  idWorkOrder?:string;
+  idWorkOrder?: string;
   show_work_order = true;
-
+  // new var
+  checked = false;
   lstview = true;
   crud = false;
   create = false;
@@ -39,8 +47,9 @@ export class QualityEvaluationComponent implements OnInit {
     private tokenStorage: KeycloakService,
     private errorService: ErrorListService,
     private exampleService: ExaminationService,
-    private qcCheckService: PQCQcCheckService
-  ) {}
+    private qcCheckService: PQCQcCheckService,
+    protected http: HttpClient
+  ) { }
 
   page = 1;
   pageSize = 10;
@@ -54,7 +63,7 @@ export class QualityEvaluationComponent implements OnInit {
     name: null,
     code: null,
     lot: null,
-    sap:null
+    sap: null
   };
 
   formEx: any = {
@@ -79,6 +88,12 @@ export class QualityEvaluationComponent implements OnInit {
     return value?.Title;
   }
   ngOnInit(): void {
+    var data = { testingCriticalGroup: '', type: 'Đánh giá CL SP' }
+    this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data).subscribe(res => {
+      this.listOfCriticalName = res;
+      //console.log('heello', this.listOfCriticalName)
+
+    })
     this.searchExaminationCtrl.valueChanges
       .pipe(
         filter((res) => {
@@ -132,19 +147,19 @@ export class QualityEvaluationComponent implements OnInit {
     }
 
     this.idWorkOrder = id;
-    if(this.show_check == 'SHOW'){
+    if (this.show_check == 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       type = 'show';
-      this.show_work_order =  false;
+      this.show_work_order = false;
     }
 
     if (type == 'add' || type == 'show' || type == 'edit') {
       this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
         this.form = data.pqcWorkOrder;
         this.lstCheck = data.pqcWorkOrder.lstPqcQcCheck;
-        this.lstCheck.forEach(element=>{
+        this.lstCheck.forEach(element => {
           element.ids = Utils.randomString(5);
           element.createdAtClient = element.createdAt;
         })
@@ -164,7 +179,7 @@ export class QualityEvaluationComponent implements OnInit {
   error = '';
   onSubmit(action: any) {
     console.log(this.formEx);
-    var data =this.lstCheck;
+    var data = this.lstCheck;
     this.pqcService
       .addStep(
         data,
@@ -180,7 +195,7 @@ export class QualityEvaluationComponent implements OnInit {
           alert('Thêm mới thông tin kiểm tra thành công');
           this.modalService.dismissAll();
         },
-        (err) => {}
+        (err) => { }
       );
   }
 
@@ -188,7 +203,7 @@ export class QualityEvaluationComponent implements OnInit {
     console.log(this.selectExamination);
     this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
     this.lstAuditCriteriaParam = this.selectExamination.lstPqcCriteriaQualities;
-    this.lstAuditCriteriaParam.forEach(element=>{
+    this.lstAuditCriteriaParam.forEach(element => {
       element.qualityId = element.id;
       element.id = '';
       element.conclude = "Đạt";
@@ -200,7 +215,7 @@ export class QualityEvaluationComponent implements OnInit {
     var pqc = new PqcQuality();
     pqc.checkPersion = this.tokenStorage.getUsername();
     pqc.conclude = this.formEx.conclude;
-    pqc.createdAtClient =formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US')
+    pqc.createdAtClient = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US')
     pqc.note = this.formEx.note;
     pqc.quantity = this.formEx.quantity;
     pqc.workOrderId = this.id;
@@ -208,26 +223,26 @@ export class QualityEvaluationComponent implements OnInit {
     pqc.ids = Utils.randomString(5);
     pqc.id = this.formEx.id;
     pqc.createdAt = this.formEx.createdAt
-
+    pqc.checked = `${this, this.checked}`
     console.log
 
     this.qcCheckService.createUpdate(pqc).subscribe(
-      data=>{
-          Swal.fire(
-            'Thành công',
-            'Bạn đã thực hiện thêm mới/sửa thông tin kiểm tra thành công.',
-            'success'
-          )
+      data => {
+        Swal.fire(
+          'Thành công',
+          'Bạn đã thực hiện thêm mới/sửa thông tin kiểm tra thành công.',
+          'success'
+        )
 
-        pqc.id= data.id;
-        pqc.createdAtClient =new Date();
-        if(this.formEx.id == null){
+        pqc.id = data.id;
+        pqc.createdAtClient = new Date();
+        if (this.formEx.id == null) {
           this.lstCheck.push(pqc);
         }
         this.modalService.dismissAll();
         this.getInfo();
       },
-      error =>{}
+      error => { }
     )
     this.check = false;
   }
@@ -246,22 +261,27 @@ export class QualityEvaluationComponent implements OnInit {
 
   check = false;
   openCheck() {
-    this.check=true;
+    this.check = true;
   }
 
   paramCheck: Array<AuditCriteriaQuality> = [];
-  open(content: any, ids:any) {
+  open(content: any, ids: any) {
     console.log(this.formEx)
     this.formEx = {};
     this.lstAuditCriteriaParam = [];
-    if(ids){
-      this.lstCheck.forEach(element=>{
-        if(ids == element.ids){
-          this.qcCheckService.detail(element.id).subscribe(data=>{
+    if (ids) {
+      this.lstCheck.forEach(element => {
+        if (ids == element.ids) {
+          this.qcCheckService.detail(element.id).subscribe(data => {
             this.paramCheck = data.pqcQualityDTO.lstCheck;
 
             this.lstAuditCriteriaParam = data.pqcQualityDTO.lstCheck;
             this.formEx = data.pqcQualityDTO
+            if (this.formEx.checked === "true") {
+              this.checked = true;
+            } else {
+              this.checked = false;
+            }
           })
         }
       })
@@ -288,19 +308,19 @@ export class QualityEvaluationComponent implements OnInit {
     }
   }
 
-  totalQuantity(){
+  totalQuantity() {
     var total = 0;
     this.lstAuditCriteriaParam.forEach(element => {
-      total = total + Number (element.quantity);
+      total = total + Number(element.quantity);
     });
     this.formEx.quantity = total;
   }
 
-  delete(ids:any){
+  delete(ids: any) {
     this.lstCheck?.forEach((element, index) => {
       if (element.id == ids) {
         this.qcCheckService.delete(ids).subscribe(
-          data=>{
+          data => {
             Swal.fire(
               'Xóa',
               'Bạn đã thực hiện xóa thông tin kiểm tra thành công.',
@@ -308,21 +328,21 @@ export class QualityEvaluationComponent implements OnInit {
             )
             this.lstCheck?.splice(index, 1);
           },
-          error=>{}
+          error => { }
         )
       }
     });
   }
 
-  deleteCheckItem(data:any){
+  deleteCheckItem(data: any) {
     const index = this.lstAuditCriteriaParam.indexOf(data);
     console.log(index);
-    if(index > -1){
-      this.lstAuditCriteriaParam.splice(index,1);
+    if (index > -1) {
+      this.lstAuditCriteriaParam.splice(index, 1);
     }
   }
 
-  addItem(){
+  addItem() {
     let item = new AuditCriteriaQuality();
     this.lstAuditCriteriaParam.push(item);
   }

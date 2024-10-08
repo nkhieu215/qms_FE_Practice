@@ -21,4 +21,6 @@ export class IqcComponentNVL{
   public type?:number;
   public itemType?:string;
   public approveNote?:string;
+  public suggestion?:string;
+  public iqcElectType?:any;
 }

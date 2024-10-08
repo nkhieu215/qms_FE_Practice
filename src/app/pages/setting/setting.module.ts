@@ -40,7 +40,9 @@ import { ProductionLineListComponent } from './line/production-line-list/product
 import { ProductionLineAddComponent } from './line/production-line-add/production-line-add.component';
 import { ProductionLineEditComponent } from './line/production-line-edit/production-line-edit.component';
 import { ProductionLineDetailComponent } from './line/production-line-detail/production-line-detail.component';
-
+import { TemInManagedComponent } from './tem-in-managed/tem-in-managed.component';
+import { ResizableModule } from 'angular-resizable-element';
+import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
 
 
 @NgModule({
@@ -61,7 +63,7 @@ import { ProductionLineDetailComponent } from './line/production-line-detail/pro
     ProductionLineListComponent,
     ProductionLineAddComponent,
     ProductionLineEditComponent,
-    ProductionLineDetailComponent
+    ProductionLineDetailComponent,
   ],
   imports: [
     SettingRoutingModule,
@@ -94,7 +96,8 @@ import { ProductionLineDetailComponent } from './line/production-line-detail/pro
     MatDialogModule,
     MatFormFieldModule,
     NzLayoutModule,
-    NzFormModule
+    NzFormModule,
+    ResizableModule, BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule
   ]
 })
 export class SettingModule { }

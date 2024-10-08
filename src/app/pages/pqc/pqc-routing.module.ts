@@ -26,11 +26,13 @@ import { QualityEvaluationComponent } from './quality-evaluation/quality-evaluat
 import { ShowDetailComponent } from './show-detail/show-detail.component';
 import { AproveQualityEvaluationComponent } from './aprove-quality-evaluation/aprove-quality-evaluation.component';
 import { AuthGuard } from 'src/app/_helpers/authGuard';
+import { TemInLstComponent } from './tem-in-lst/tem-in-lst.component';
+import { TemInComponent } from './tem-in/tem-in.component';
 
 
 const routes: Routes = [
 
- // danh sách lenh cho sx từ planing
+  // danh sách lenh cho sx từ planing
   {
     path: 'pending-order-production',
     component: PendingProductOrderComponent,
@@ -66,7 +68,7 @@ const routes: Routes = [
 
   { path: 'check-nvl', component: NvlProductionLstComponent }, // check NVL
   { path: 'check-nvl/:type/:id', component: NvlProductionComponent }, // check list crud
-
+  // { path: 'pqc/tem-in', component: TemInLstComponent },
   { path: 'check-nvl-100', component: Nvl100ProductionLstComponent }, // check NVL 100
   { path: 'check-nvl-100/:type/:id', component: Nvl100ProductionComponent }, // check list crud
 
@@ -102,7 +104,6 @@ const routes: Routes = [
 
   { path: 'pqc-tin-check', component: TinCheckComponent }, // in kiem thiec
   { path: 'pqc-tin-check/:type/:id', component: TinCheckComponent }, // in kiem thiec
-
   {
     path: 'pqc-interchangeability-check',
     component: InterchangeabilityComponent,

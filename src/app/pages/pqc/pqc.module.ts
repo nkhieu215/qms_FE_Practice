@@ -54,7 +54,9 @@ import { WorkOrderViewComponent } from './work-order-view/work-order-view.compon
 import { ShowDetailComponent } from './show-detail/show-detail.component';
 import { ButtonSuccessComponent } from './button-success/button-success.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-
+import { TemInComponent } from './tem-in/tem-in.component';
+import { TemInLstComponent } from './tem-in-lst/tem-in-lst.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 @NgModule({
   declarations: [
     PendingProductOrderComponent,
@@ -85,7 +87,9 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
     ReportProduceComponent,
     ReportPhotoelectricProductComponent,
     ReportErrorComponent,
-    ApproveStoreSapComponent
+    ApproveStoreSapComponent,
+    TemInComponent,
+    TemInLstComponent,
   ],
   imports: [
     CommonModule,
@@ -118,18 +122,19 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
     MatFormFieldModule,
     NzLayoutModule,
     NzFormModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    NgxPaginationModule
   ],
-  exports:[
+  exports: [
 
   ],
-  bootstrap:[
+  bootstrap: [
 
   ],
   providers: [
     PqcShowListComponent
   ],
-  schemas:[
+  schemas: [
 
   ]
 })

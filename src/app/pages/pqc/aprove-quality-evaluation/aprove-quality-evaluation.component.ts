@@ -32,23 +32,23 @@ export class AproveQualityEvaluationComponent implements OnInit {
     private tokenStorage: KeycloakService,
     private _formBuilder: FormBuilder,
     private router: Router
-  ) {}
+  ) { }
 
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   lstWorkOrder?: PQCWorkOrder[] = [];
-  lstCheckStep ?:string[] = []
+  lstCheckStep?: string[] = []
   id?: any;
   formSearch: any = {
   };
 
-  form:any ={
+  form: any = {
   };
-  lstCheck:StepCheck[] = [];
+  lstCheck: StepCheck[] = [];
 
 
-  toppings?:any;
+  toppings?: any;
 
   idWorkOrder = '';
   ngOnInit(): void {
@@ -70,8 +70,8 @@ export class AproveQualityEvaluationComponent implements OnInit {
     if (type == 'approve') {
       this.approve = true;
       this.lstview = false;
-      this.commonService.statusStep( id).toPromise().then(
-        data=>{
+      this.commonService.statusStep(id).toPromise().then(
+        data => {
 
           this.lstCheck = data.lstStep;
 
@@ -81,17 +81,17 @@ export class AproveQualityEvaluationComponent implements OnInit {
             element.checked = element.checked;
           });
         },
-        error=>{}
+        error => { }
       )
     }
   }
 
 
-  changeWo(data:any){
+  changeWo(data: any) {
     console.log(data);
-    if(data.status == 'CREATE' || data.status =='REJECT'|| data.status =='WAIT_APPROVE'){
+    if (data.status == 'CREATE' || data.status == 'REJECT' || data.status == 'WAIT_APPROVE') {
 
-    }else{
+    } else {
       Swal.fire({
         title: 'Lỗi',
         text: 'Bạn đã thực hiện gửi yêu cầu phê duyệt/yêu cầu đã được phê duyệt',
@@ -104,17 +104,17 @@ export class AproveQualityEvaluationComponent implements OnInit {
     }
   }
 
-  refreshPage(){
-    const { name, code , lot,startDate, endDate,sap, woCode, status, branchName,groupName} = this.formSearch;
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code,lot,"",startDate, endDate, sap,woCode, status,branchName,groupName).subscribe(
+  refreshPage() {
+    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode } = this.formSearch;
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode).subscribe(
       data => {
-      var productionLst  = new PQCPEndingOrderResponse();
-      productionLst = data;
+        var productionLst = new PQCPEndingOrderResponse();
+        productionLst = data;
 
-      this.lstWorkOrder = productionLst.lstOrder;
-      this.lstWorkOrder?.forEach(element=>{
-        element.strStatus = Utils.getStatusName(element.status);
-      })
+        this.lstWorkOrder = productionLst.lstOrder;
+        this.lstWorkOrder?.forEach(element => {
+          element.strStatus = Utils.getStatusName(element.status);
+        })
 
         this.collectionSize = Number(productionLst?.total) * this.pageSize;
       },
@@ -125,7 +125,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
   }
 
 
-  note?:any;
+  note?: any;
   onSubmit(action: any) {
     Swal.fire({
       title: 'Xác nhận',
@@ -136,27 +136,27 @@ export class AproveQualityEvaluationComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then((result) => {
       if (result.value) {
-        let data ={
+        let data = {
           checkPerson: this.tokenStorage.getUsername(),
-          workOrderId:this.actRoute.snapshot.params['id'],
-          note:this.note,
-          conclude:action,
-          type:action,
+          workOrderId: this.actRoute.snapshot.params['id'],
+          note: this.note,
+          conclude: action,
+          type: action,
           lstStep: this.lstCheck
         };
-        this.pqcService .approve(data).subscribe(
-            (data) => {
-              Swal.fire(
-                'Thành công',
-                'Bạn đã thực hiện thành công.',
-                'success'
-              )
-              if(action =='approve'){
-                this.approve = false;
-              }
-            },
-            (err) => {}
-          );
+        this.pqcService.approve(data).subscribe(
+          (data) => {
+            Swal.fire(
+              'Thành công',
+              'Bạn đã thực hiện thành công.',
+              'success'
+            )
+            if (action == 'approve') {
+              this.approve = false;
+            }
+          },
+          (err) => { }
+        );
       } else if (result.dismiss === Swal.DismissReason.cancel) {
 
       }
@@ -170,14 +170,14 @@ export class AproveQualityEvaluationComponent implements OnInit {
   };
   open(content: any, id: any) {
 
-    this.commonService.statusStep( id).toPromise().then(
-      data=>{
+    this.commonService.statusStep(id).toPromise().then(
+      data => {
         this.lstCheck = data.lstStep;
-        this.lstCheck.forEach(element=>{
+        this.lstCheck.forEach(element => {
           element.status = Utils.getStatusName(element.status);
         })
       },
-      error=>{}
+      error => { }
     )
 
     this.modalService.open(content, this.modalOptions).result.then(
@@ -200,17 +200,17 @@ export class AproveQualityEvaluationComponent implements OnInit {
     }
   }
 
-  report(id?:any){
+  report(id?: any) {
     this.pqcService.getDetailPqcWorkOrder(id).subscribe(
-      data=>{
+      data => {
         let wo = data.pqcWorkOrder;
-        let user= this.tokenStorage.getUsername();
+        let user = this.tokenStorage.getUsername();
         this.pqcService.report(id).subscribe(
-          blob => saveAs(blob, user +  "_" + wo.workOrderId + "_" + wo.sapWo + "_"+formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx")
+          blob => saveAs(blob, user + "_" + wo.workOrderId + "_" + wo.sapWo + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx")
         )
       },
-      error =>{}
-      )
+      error => { }
+    )
 
   }
 
@@ -218,6 +218,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
 
 
 export interface StepCheck {
+  id: number
   nameStep: string
   pqcWorkOrder: string
   setting: string

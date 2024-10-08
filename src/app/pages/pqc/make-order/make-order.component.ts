@@ -45,13 +45,16 @@ export class MakeProductOrderComponent implements OnInit {
   };
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status, groupName, branchName } = this.formSearch;
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, groupName, branchName).subscribe(
+    const { name, code, lot, startDate, endDate, sap, woCode, status, groupName, branchName, workOrderCode } = this.formSearch;
+    // thay đổi mới 15/7/2024: đảo ngược vị trí biến branchName và groupName
+    console.log('search body', this.formSearch)
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode).subscribe(
       data => {
         var productionLst = new PQCPEndingOrderResponse();
         productionLst = data;
 
         this.lstWorkOrder = data.lstOrder;
+        console.log('list', this.lstWorkOrder)
         this.lstWorkOrder?.forEach(element => {
           element.strStatus = Utils.getStatusName(element.status);
         })

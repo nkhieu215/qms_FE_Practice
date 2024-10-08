@@ -14,7 +14,6 @@ import { FormControl } from '@angular/forms';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { speed } from 'jquery';
 Chart.register(zoomPlugin);
 // import { Chart } from '../../../../../node_modules/chart.js/auto/auto.mjs';
 
@@ -1359,9 +1358,9 @@ export class WelcomeComponent {
     this.soMauBTPDrvKhongDat = 0; //36.
     this.labelsChart41 = []
     //test
-    this.http.post<any>('http://localhost:8449/dashboard/home-default', this.searchBody).subscribe(res => {
+    // this.http.post<any>('http://localhost:8449/dashboard/home-default', this.searchBody).subscribe(res => {
       // chạy trên hệ thống
-      // this.http.post<any>('http://192.168.68.92/qms/dashboard/home-default', this.searchBody).subscribe(res => {
+      this.http.post<any>('http://192.168.68.92/qms/dashboard/home-default', this.searchBody).subscribe(res => {
       this.listOfDataDashBoard = res;
       console.log('result dashboard', res);
       this.choPheDuyetLenhSX = res.countIqcWaitApproveStatus

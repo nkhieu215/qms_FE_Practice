@@ -5,24 +5,36 @@
     <div class="row">
 
       <div class="col-xs-12 col-sm-12">
-        <form name="form" (ngSubmit)="f.form.valid" #f="ngForm">
-          <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order"
-            item_id="{{idWorkOrder}}"></pqc-show-work-order>
-
-          <div class="form-group row" *ngIf="show_work_order">
-            <div class="col-sm-3">
-              <label style="color: blue;"><strong>Thực hiện quét mã linh kiện đầu vào . . .</strong></label>
+        <!-- <form name="form" (ngSubmit)="f.form.valid" #f="ngForm"> -->
+        <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order"
+          item_id="{{idWorkOrder}}"></pqc-show-work-order>
+        <div class="form-group row" *ngIf="show_work_order">
+          <div class="col-sm-3" style="display: flex;justify-content: space-between;width: 100%;">
+            <label style="color: blue;"><strong>Thực hiện quét mã linh kiện đầu vào . . .</strong></label>
+            <div style="width: 33%;">
+              <button class="machine-info-btn"
+                style="background-color: #0080ff; border: #0080ff solid 1px;   width: 23%;" (click)="open(confirm,'')"
+                *ngIf="condition == true">Xác nhận xử lý lỗi scan</button>
+              <button class="machine-info-btn" (click)="open(machine,'machine')" style="width: 15%;">Quản lý
+                feeder</button>
+              <button class="machine-info-btn" (click)="open(myModalAvailable,'available')"
+                style="background-color: #2CB4DA; border: #2CB4DA solid 1px;width: 20%;">Danh sách
+                part hợp lệ</button>
+              <button class="machine-info-btn" (click)="open(myModalScaned,'scan')"
+                style="background-color: #1F39A0; border: #1F39A0 solid 1px;width: 25%;">Danh sách
+                material chưa scan</button>
             </div>
           </div>
+        </div>
 
-          <div class="form-group row" *ngIf="show_work_order">
-            <div class="col-sm-4">
-              <label>Thông tin scan máy </label>
-              <input type="text" class="form-control" placeholder="Thông tin mã máy" name="machineCode"
-                [(ngModel)]="form.machineCode">
-            </div>
+        <div class="form-group row" *ngIf="show_work_order">
+          <div class="col-sm-4">
+            <label>Thông tin scan máy </label>
+            <input id="machine-code" type="text" class="form-control" placeholder="Thông tin mã máy"
+              [ngModelOptions]="{ standalone: true }" [(ngModel)]="form.machineCode" (keyup.enter)="checkScan()">
+          </div>
 
-            <!-- <div class="col-sm-3">
+          <!-- <div class="col-sm-3">
               <label>Chọn mặt trước sau (L/F/R) </label>
               <select [(ngModel)]="form.side" class="form-control" name="conclude">
                 <option value="L">Mặt trái</option>
@@ -32,93 +44,97 @@
               </select>
             </div> -->
 
-            <div class="col-sm-4">
-              <label>Thông tin Feeder </label>
-              <input type="text" class="form-control" placeholder="Thông tin Feeder" name="feeder" readonly
-                [(ngModel)]="form.feeder">
-            </div>
-
-            <div class="col-sm-4">
-              <label>Thông tin Material </label>
-              <input type="text" class="form-control" placeholder="Thông tin Material" name="material" readonly
-                [(ngModel)]="form.material">
-            </div>
+          <div class="col-sm-4">
+            <label>Thông tin Feeder </label>
+            <input id="feeder-code" type="text" class="form-control" placeholder="Thông tin Feeder"
+              [ngModelOptions]="{ standalone: true }" [(ngModel)]="form.feeder" (keyup.enter)="checkScan()">
           </div>
 
-
-
-          <div class="form-group row">
-            <div class="col-sm-12 table-responsive">
-
-              <nz-table #borderedTable nzBordered nzTitle="Danh sách kiểm soát nguyên vật liệu theo lệnh sản xuất"  [nzData]="['']"
-                [nzFrontPagination]="false" >
-                <thead>
-                  <tr>
-                    <th>Mã máy</th>
-                    <!-- <th>Vị trí</th> -->
-                    <th>Mã Feeder</th>
-                    <th>Material</th>
-                    <th>Thông tin chi tiết mã QR </th>
-                    <th>Thời gian thực hiện Scan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let scan of lstScan let i=index;">
-                    <td>{{scan.machine}}</td>
-                    <!-- <td>{{scan.side}}</td> -->
-                    <td>{{scan.feeder}}</td>
-                    <td>{{scan.material}}</td>
-                    <td>{{scan.qr}}</td>
-                    <td>{{scan.date}}</td>
-                  </tr>
-                </tbody>
-              </nz-table>
-            </div>
+          <div class="col-sm-4">
+            <label>Thông tin Material </label>
+            <input id="material-code" type="text" class="form-control" placeholder="Thông tin Material"
+              [ngModelOptions]="{ standalone: true }" [(ngModel)]="form.material" (keyup.enter)="checkScan()">
           </div>
+        </div>
 
 
-          <div class="form-group row">
-            <div class="col-sm-12 table-responsive">
-              <nz-table #borderedTable nzBordered
-                nzTitle="Danh sách nguyên vật liệu không thuộc khuyến nghị theo lệnh sản xuất" [nzData]="['']"
-                [nzFrontPagination]="false">
-                <thead>
-                  <tr>
-                    <th>Mã máy</th>
-                    <!-- <th>Vị trí mặt SX</th> -->
-                    <th>Mã Feeder </th>
-                    <th>Material</th>
-                    <th>Thông tin chi tiết mã QR </th>
-                    <th>Thời gian thực hiện Scan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let scan of lstScanFail">
-                    <td>{{scan.machine}}</td>
-                    <!-- <td>{{scan.side}}</td> -->
-                    <td>{{scan.feeder}}</td>
-                    <td>{{scan.material}}</td>
-                    <td>{{scan.qr}}</td>
-                    <td>{{scan.date}}</td>
-                  </tr>
-                </tbody>
-              </nz-table>
-            </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+
+            <nz-table #borderedTable nzBordered nzTitle="Danh sách kiểm soát nguyên vật liệu theo lệnh sản xuất"
+              [nzData]="['']" [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>Mã máy</th>
+                  <!-- <th>Vị trí</th> -->
+                  <th>Mã Feeder</th>
+                  <th>Material</th>
+                  <th>Partnumber</th>
+                  <th>Thông tin chi tiết mã QR </th>
+                  <th>Thời gian thực hiện Scan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let scan of lstScan let i=index;">
+                  <td>{{scan.machine}}</td>
+                  <!-- <td>{{scan.side}}</td> -->
+                  <td>{{scan.feeder}}</td>
+                  <td>{{scan.material}}</td>
+                  <td>{{scan.pathNumber}}</td>
+                  <td>{{scan.qr}}</td>
+                  <td>{{scan.date}}</td>
+                </tr>
+              </tbody>
+            </nz-table>
           </div>
+        </div>
 
 
-          <app-button-success item_type="CHECK_NVL" show_work_order="{{show_work_order}}"
-            *ngIf="show_work_order"></app-button-success>
-
-          <div class="col-xs-12 col-sm-12">
-            <div *ngIf="error" class="alert alert-danger" role="alert">
-              {{error}}
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+            <nz-table #borderedTable nzBordered
+              nzTitle="Danh sách nguyên vật liệu không thuộc khuyến nghị theo lệnh sản xuất" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>Mã máy</th>
+                  <!-- <th>Vị trí mặt SX</th> -->
+                  <th>Mã Feeder </th>
+                  <th>Material</th>
+                  <th>Partnumber</th>
+                  <th>Thông tin chi tiết mã QR </th>
+                  <th>Thời gian thực hiện Scan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let scan of lstScanFail">
+                  <td>{{scan.machine}}</td>
+                  <!-- <td>{{scan.side}}</td> -->
+                  <td>{{scan.feeder}}</td>
+                  <td>{{scan.material}}</td>
+                  <td>{{scan.pathNumber}}</td>
+                  <td>{{scan.qr}}</td>
+                  <td>{{scan.date}}</td>
+                </tr>
+              </tbody>
+            </nz-table>
           </div>
-        </form>
+        </div>
+
+
+        <app-button-success item_type="CHECK_NVL" show_work_order="{{show_work_order}}"
+          *ngIf="show_work_order"></app-button-success>
+
+        <div class="col-xs-12 col-sm-12">
+          <div *ngIf="error" class="alert alert-danger" role="alert">
+            {{error}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="margin-top: 0;">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+        <!-- </form> -->
 
       </div>
     </div>
@@ -156,5 +172,303 @@
           </tr>
         </tbody>
       </nz-table>
+    </div>
+  </ng-template>
+  <ng-template #template let-modal>
+    <div class="blink_me">
+      <div style="display: flex;flex-direction: column;justify-content: space-between;">
+        <img style="width: 350px;margin: auto;padding-top: 38px;" src="../assets/img/warning-image.jpg"
+          alt="image-warning">
+        <div style="margin: auto;font-size: 60px;padding-top: 40px;">
+          {{alertMessage}}
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #machine let-modal>
+    <div class="lst-machine-popup">
+      <button style="position: relative;
+      left: 97%;
+      width: 35px;
+      height: 35px;
+      margin-top: 12px;
+      background: red;
+      border: red;
+      color: #fff;
+      border-radius: 11px;
+      font-size: 24px;" (click)="modal.dismiss('Cross click')">X</button>
+      <div class="lst-machine-container">
+        <div class="lst-machine-container-item1">
+          <div class="lst-machine-container-item1-1">
+            <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Thông tin máy và feeder
+            </div>
+            <div style="display: flex;margin-top: 12px;margin-left: 9px;">
+              <div style="margin-right: 40px;"><label>Mã máy</label><input type="text"
+                  style="border-radius: 5px;margin-left: 15px;" (change)="lstMachineSearch()"
+                  [(ngModel)]="machineSearchKey" [ngModelOptions]="{ standalone: true }"></div>
+              <div><label>Feeder</label><input type="text" style="border-radius: 5px;margin-left: 15px;"
+                  (change)="lstMachineSearch()" [(ngModel)]="feederSearchKey" [ngModelOptions]="{ standalone: true }">
+              </div>
+            </div>
+            <div style="overflow: auto;height: 390px;">
+              <table class="table">
+                <thead style="position: sticky;top: -1px;">
+                  <tr style="position: sticky;">
+                    <th>Mã máy</th>
+                    <th>Feeder</th>
+                    <th>Trạng thái</th>
+                    <th>Feeder thay thế</th>
+                    <th>
+                      <div>Slot</div>
+                    </th>
+                    <th>
+                      <div>Size</div>
+                    </th>
+                    <th style="width: 218px;">Ngày cập nhật</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lstMachine;let i = index;">
+                    <td>{{item.machineName}}</td>
+                    <td>{{item.qrFeederCode}}</td>
+                    <td> <button
+                        [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}"
+                        (click)="changeStatus(i)">{{item.status}}
+                      </button></td>
+                    <td><button style=" border: none;background-color: #fff;text-decoration: underline;color: blue;"
+                        (click)="searchByQrFeeder(item.machineName,item.replaceQrFeeder)">{{item.replaceQrFeeder}}</button>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>{{item.timeUpdate|date:'dd/MM/yyyy HH:mm:ss'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="lst-machine-container-item1-2">
+            <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Thông tin sub feeder</div>
+            <div style="display: flex;margin-top: 12px;margin-left: 9px;">
+              <div style="margin-right: 40px;"><label>Sub feeder</label><input type="text"
+                  style="border-radius: 5px;margin-left: 15px;" [(ngModel)]="subFeederSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="filterBySubFeeder()"></div>
+            </div>
+            <div style="overflow: auto;height: 390px;">
+              <table class="table">
+                <thead style="position: sticky;top: -1px;">
+                  <tr style="position: sticky;">
+                    <th>Sub Feeder</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày cập nhật</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lstSubFeeder;let i =index;">
+                    <td>
+                      <div style="margin-top: 10px;">{{item.qrFeederCode}}</div>
+                    </td>
+                    <td>
+                      <div [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}"
+                        style="margin-top: 10px;">{{item.status}}
+                      </div>
+                    </td>
+                    <td>{{item.timeUpdate|date:'dd/MM/yyyy HH:mm:ss'}}</td>
+                    <td><input type="checkbox" style="width: 30px;height: 30px;margin-top: 5px;"
+                        [(ngModel)]="item.checkType" [ngModelOptions]="{ standalone: true }" (change)="checkBox(i)">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="lst-machine-history">
+          <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Lịch sử thay đổi feeder</div>
+          <div style="overflow: auto;height: 390px;">
+            <table class="table">
+              <thead style="position: sticky;top: -1px;">
+                <tr style="position: sticky;">
+                  <th>Mã máy</th>
+                  <th>Feeder</th>
+                  <th>Feeder thay thế</th>
+                  <th>Thời gian cập nhật</th>
+                  <th>Người cập nhật</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of lstFeederHistory">
+                  <td>{{item.machineCode}}</td>
+                  <td>{{item.mainQrFeeder}}</td>
+                  <td>{{item.replaceQrFeeder}}</td>
+                  <td>{{item.timeUpdate|date:'dd/MM/yyyy HH:mm:ss'}}</td>
+                  <td>{{item.user}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <button style="position: relative;
+      left: 93%;
+      width: 90px;
+      height: 40px;
+      margin-top: 12px;
+      background: #0dcaf0;
+      border: #0dcaf0;
+      color: #fff;
+      border-radius: 11px;font-size: 21px;" (click)="saveFeederHistory()">Lưu</button>
+    </div>
+  </ng-template>
+  <ng-template #confirm let-modal>
+    <div class="lst-machine-popup" style="height: 720px;">
+      <button style="position: relative;
+      left: 97%;
+      width: 35px;
+      height: 35px;
+      margin-top: 12px;
+      background: red;
+      border: red;
+      color: #fff;
+      border-radius: 11px;
+      font-size: 24px;" (click)="modal.dismiss('Cross click')">X</button>
+      <div class="lst-machine-history" style="height: 648px;">
+        <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Lịch sử lỗi scan</div>
+        <div style="overflow: auto;height: 600px;">
+          <table class="table">
+            <thead style="position: sticky;top: -1px;">
+              <tr style="position: sticky;">
+                <th>Mã máy</th>
+                <th>Feeder</th>
+                <th>Material</th>
+                <th>PartNumber</th>
+                <th>Trạng thái</th>
+                <th>Nguyên nhân</th>
+                <th>Thời gian phát sinh</th>
+                <th>Thời gian xử lý</th>
+                <th>Xác nhận xử lý</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lstScanFail;let i=index;">
+                <td>
+                  <div style="margin-top: 8px;">{{item.machine}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.feeder}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.material}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.pathNumber}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">Lỗi</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.reason}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.date}}</div>
+                </td>
+                <td>
+                  <div style="margin-top: 8px;">{{item.timeConfirmed}}</div>
+                </td>
+                <td>
+                  <div><input type="checkbox" [(ngModel)]="item.confirm" [ngModelOptions]="{ standalone: true }"
+                      style="width: 30px;height: 30px;" (change)="updateConfirm(i)" readonly="{{item.confirm}}"
+                      [disabled]="item.confirm">
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #myModalAvailable let-modal>
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-basic-title">
+        Danh sách part number hợp lệ
+      </h2>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="modal-body">
+      <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstPartNumberAvailable">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>PartNumber <br> <input type="text" [(ngModel)]="partNumberSearchKey"
+                [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
+            <th>Feeder hợp lệ <br> <input type="text" [(ngModel)]="feederSearchKey"
+                [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
+            <th>Material hợp lệ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let check of lstPartNumberAvailable| paginate: {id: 'paginate', itemsPerPage: 15, currentPage: page }; let i = index">
+            <td>{{ i+1 }}</td>
+            <td>{{ check.partNumber }}</td>
+            <td>{{ check.feeder }}</td>
+            <!-- <td>
+              <div *ngFor="let item of check.lstFeeder;">{{item}}</div>
+            </td> -->
+            <td><button><i class="fa fa-eye"></i></button></td>
+          </tr>
+        </tbody>
+      </nz-table>
+      <pagination-controls id="paginate" (pageChange)="page = $event" style="float: right"></pagination-controls>
+    </div>
+  </ng-template>
+  <ng-template #myModalScaned let-modal>
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-basic-title">
+        Danh sách material
+      </h2>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="modal-body">
+      <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstMaterialScan">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Material <br> <input type="text" [(ngModel)]="materialSearchKey" [ngModelOptions]="{ standalone: true }"
+                (change)="searchByMaterial()"></th>
+            <th>Part number <br> <input type="text" [(ngModel)]="partNumberSearchKey"
+                [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
+            <th>Trạng thái <br> <select [(ngModel)]="statusSearchKey" [ngModelOptions]="{ standalone: true }"
+                (change)="searchByMaterial()">
+                <option value=""></option>
+                <option value="Đã scan">Đã scan</option>
+                <option value="Chưa scan">Chưa scan</option>
+              </select>
+              <!-- <input type="text" [(ngModel)]="statusSearchKey" [ngModelOptions]="{ standalone: true }"
+                (change)="searchByMaterial()"> -->
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let check of lstMaterialScan| paginate: {id: 'paginate1', itemsPerPage: 15, currentPage: page1 }; let i = index">
+            <td>{{ i+1 }}</td>
+            <td>{{ check.material }}</td>
+            <td>{{ check.partNumber }}</td>
+            <td>
+              <div [ngClass]="{greenClass: check.status === 'Đã scan',redClass:check.status === 'Chưa scan'}">{{
+                check.status }}</div>
+            </td>
+            <!-- <td>
+              <div *ngFor="let item of check.lstFeeder;">{{item}}</div>
+            </td> -->
+            <!-- <td><button><i class="fa fa-eye"></i></button></td> -->
+          </tr>
+        </tbody>
+      </nz-table>
+      <pagination-controls id="paginate1" (pageChange)="page1 = $event" style="float: right"></pagination-controls>
     </div>
   </ng-template>

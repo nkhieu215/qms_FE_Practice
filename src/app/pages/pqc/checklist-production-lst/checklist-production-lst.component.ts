@@ -29,8 +29,8 @@ export class ChecklistProductionLstComponent implements OnInit {
   };
 
   refreshPage() {
-    const { name, code, lot,startDate, endDate,sap, woCode, status } = this.formSearch;
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code,lot,"CREATE",startDate, endDate,sap,woCode,status,'','').subscribe(
+    const { name, code, lot, startDate, endDate, sap, woCode, status, workOrderCode } = this.formSearch;
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "CREATE", startDate, endDate, sap, woCode, status, '', '', workOrderCode).subscribe(
       data => {
         var productionLst = new PQCPEndingOrderResponse();
         productionLst = data;

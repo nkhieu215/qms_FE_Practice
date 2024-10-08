@@ -36,6 +36,8 @@ import { StoreCheckSize } from 'src/app/share/_models/storeCheckSize.model';
 import { StoreCheckSafe } from 'src/app/share/_models/storeCheckSafe.model';
 import { StoreCheckConfused } from 'src/app/share/_models/storeCheckConfused.model';
 import { StoreCheck } from 'src/app/share/_models/storeCheck.model';
+import { HttpClient } from '@angular/common/http';
+import { data } from 'jquery';
 
 
 
@@ -45,11 +47,17 @@ import { StoreCheck } from 'src/app/share/_models/storeCheck.model';
   styleUrls: ['./store-check.component.css'],
 })
 export class StoreCheckComponent implements OnInit {
+  // bản test
+  address = 'http://localhost:8449';
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
+  //Điều kiện triển khai hiện tại
+  path = 'store-check';
   packing = '';
   tray = '';
   serial: string[] = [];
   text = '';
-  lstCheckStep ?:string[] = []
+  lstCheckStep?: string[] = []
   @HostListener('document:keydown', ['$event'])
   clickout(event: any) {
     if (event.code == 'Enter' || event.code == 'Tab') {
@@ -96,6 +104,7 @@ export class StoreCheckComponent implements OnInit {
     private aqlService: AqlTemplateService,
     private exportExelService: ExportExcelService,
     private commonService: CommonService,
+    protected http: HttpClient
   ) { }
   page = 1;
   pageSize = 10;
@@ -109,7 +118,7 @@ export class StoreCheckComponent implements OnInit {
   options: string[] = [];
   lstProductionLine?: any[] = [];
   filteredOptions?: Observable<string[]>;
-  lstColor?:any[] = [];
+  lstColor?: any[] = [];
   formSearch: any = {
     name: null,
     code: null,
@@ -138,20 +147,20 @@ export class StoreCheckComponent implements OnInit {
 
 
   id?: any;
-  lstCheck:StepCheck[] = []
+  lstCheck: StepCheck[] = []
   async getInfo() {
     const id = this.actRoute.snapshot.params['id'];
     this.id = id;
 
     this.commonService.statusStep(id).toPromise().then(
-      data=>{
-       this.lstCheck  = data.lstStep;
-       this.lstCheck.forEach(element=>{
-        this.lstCheckStep?.push(element.step);
-        element.checked = true;
-       });
+      data => {
+        this.lstCheck = data.lstStep;
+        this.lstCheck.forEach(element => {
+          this.lstCheckStep?.push(element.step);
+          element.checked = true;
+        });
       },
-      error=>{}
+      error => { }
     )
 
     var type = this.actRoute.snapshot.params['type'];
@@ -193,7 +202,7 @@ export class StoreCheckComponent implements OnInit {
     }
     console.log(this.lstview);
 
-    this.storeCheckService.getColorSap().subscribe(data=>{
+    this.storeCheckService.getColorSap().subscribe(data => {
       this.lstColor = data.lstColor;
     });
 
@@ -212,7 +221,7 @@ export class StoreCheckComponent implements OnInit {
         .then(
           (data) => {
             this.lstStoreCheck = data.lstCheck;
-
+            console.log('load check store', data.lstCheck);
             this.lstStoreCheck.forEach((element) => {
               element.ids = Utils.randomString(5);
               element.statusApproveSapStr = Utils.getStatusName(element.statusApproveSap);
@@ -232,7 +241,12 @@ export class StoreCheckComponent implements OnInit {
     backdrop: 'static',
     keyboard: false,
   };
-
+  modalOptionss: NgbModalOptions = {
+    size: 'lg',
+    // windowClass: 'modal-xxl',
+    backdrop: 'static',
+    keyboard: false,
+  };
   error = '';
   onSubmit(action: any) {
     console.log(this.formEx);
@@ -319,6 +333,7 @@ export class StoreCheckComponent implements OnInit {
             case 'ELEC':
               element.lstElectronic.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quantityCheck));
                   element.lstElectronic?.splice(index, 1);
                 }
               });
@@ -327,6 +342,7 @@ export class StoreCheckComponent implements OnInit {
             case 'EXTER':
               element.lstExternal.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quantity));
                   element.lstExternal?.splice(index, 1);
                 }
               });
@@ -335,6 +351,7 @@ export class StoreCheckComponent implements OnInit {
             case 'SIZE':
               element.lstSize.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
                   element.lstSize?.splice(index, 1);
                 }
               });
@@ -342,6 +359,7 @@ export class StoreCheckComponent implements OnInit {
             case 'SAFE':
               element.lstSafe.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
                   element.lstSafe?.splice(index, 1);
                 }
               });
@@ -350,6 +368,7 @@ export class StoreCheckComponent implements OnInit {
             case 'CONFUSED':
               element.lstConfused.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
                   element.lstConfused?.splice(index, 1);
                 }
               });
@@ -357,6 +376,7 @@ export class StoreCheckComponent implements OnInit {
             case 'STRUCTURE':
               element.lstStructure.forEach((ele, index) => {
                 if (ele.id == id) {
+                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
                   element.lstStructure?.splice(index, 1);
                 }
               });
@@ -378,13 +398,25 @@ export class StoreCheckComponent implements OnInit {
 
   lstStoreCheck: StoreCheck[] = [];
   storeCheck?: any;
+  updateStoreCheck(ids: any, quantity: any) {
+    var check = new StoreCheck();
+    this.lstStoreCheck.forEach((x: StoreCheck) => {
+      if (x.id == ids) {
+        console.log('check: ', ids, this.lstStoreCheck);
+        x.quatity = Number(x.quatity) + Number(quantity);
+        check = x;
+      }
+    });
+    this.http.post<any>(`${this.address}/${this.path}/update`, check).subscribe();
+  }
   onAddError(action: any, ids: any) {
+    console.log("save store check : ", this.formEx, action)
     if (action == 'CHECK' || action == 'CHECK_EDIT') {
       var check = new StoreCheck();
       check.checkDate = this.formEx.checkDate;
       check.quatityStore = this.formEx.quatityStore;
       check.lot = this.formEx.lot;
-      check.quatity = this.formEx.quatity;
+      check.quatity = 0;
       check.totalErr = this.formEx.totalErr;
       check.checkPerson = this.tokenStorage.getUsername();
       check.ids = Utils.randomString(5);
@@ -456,6 +488,7 @@ export class StoreCheckComponent implements OnInit {
               checkelec.note = this.formEx.note;
               checkelec.quantityCheck = this.formEx.quantityCheck;
               checkelec.storeCheckId = store_check_id;
+              this.updateStoreCheck(store_check_id, this.formEx.quantityCheck);
               this.storeCheckService
                 .createCheck(checkelec, 'ELEC')
                 .toPromise()
@@ -475,13 +508,15 @@ export class StoreCheckComponent implements OnInit {
               break;
 
             case 'EXTER':
-              this.lstAqlCheck?.forEach(element=>{
+              var quatity = 0;
+              this.lstAqlCheck?.forEach(element => {
                 element.id = '',
-                element.workOrderId = this.id;
+                  element.workOrderId = this.id;
                 element.storeCheckId = store_check_id;
-                element.allow = element.allowedError
+                element.allow = element.allowedError;
+                quatity += Number(element.quantity);
               })
-
+              this.updateStoreCheck(store_check_id, quatity);
               this.storeCheckService
                 .createCheck(this.lstAqlCheck, 'EXTER')
                 .toPromise()
@@ -494,7 +529,7 @@ export class StoreCheckComponent implements OnInit {
                     )
                     this.formEx = {}
                     // this.modalService.dismissAll();
-                    this.storeCheckService.getLstCheckByStoreId("EXTER",this.openId).subscribe(
+                    this.storeCheckService.getLstCheckByStoreId("EXTER", this.openId).subscribe(
                       (data2) => {
                         this.storeCheck.lstExternal = data2.lsCheckExternalInspections
                       }
@@ -520,6 +555,7 @@ export class StoreCheckComponent implements OnInit {
               size.quatity = this.formEx.quatity;
               size.storeCheckId = store_check_id;
               size.workOrderId = this.id;
+              this.updateStoreCheck(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(size, 'SIZE')
                 .toPromise()
@@ -549,6 +585,7 @@ export class StoreCheckComponent implements OnInit {
               safe.storeCheckId = store_check_id;
               safe.workOrderId = this.id;
               safe.standard = this.formEx.standard
+              this.updateStoreCheck(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(safe, 'SAFE')
                 .toPromise()
@@ -576,6 +613,7 @@ export class StoreCheckComponent implements OnInit {
               confu.quatity = this.formEx.quatity;
               confu.storeCheckId = store_check_id;
               confu.workOrderId = this.id;
+              this.updateStoreCheck(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(confu, 'CONFUSED')
                 .toPromise()
@@ -604,6 +642,7 @@ export class StoreCheckComponent implements OnInit {
               struct.quatity = this.formEx.quatity;
               struct.storeCheckId = store_check_id;
               struct.workOrderId = this.id;
+              this.updateStoreCheck(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(struct, 'STRUCTURE')
                 .toPromise()
@@ -670,7 +709,7 @@ export class StoreCheckComponent implements OnInit {
   titlemodal = '';
   action = '';
   ids = '';
-  openId ='';
+  openId = '';
   idStoreCheck = '';
   open(content: any, title: any, action: any, ids: any, id: any) {
 
@@ -683,6 +722,7 @@ export class StoreCheckComponent implements OnInit {
           this.storeCheck = element;
           this.openId = element.id;
           this.getInfoByAction(action, element.id, element);
+          console.log("id:: ", this.openId);
         }
       });
     } else {
@@ -729,7 +769,7 @@ export class StoreCheckComponent implements OnInit {
       });
     }
 
-    if(action =='EXTER'){
+    if (action == 'EXTER') {
       this.lstAqlCheck = [];
       this.refreshAqlTemplate();
     }
@@ -814,9 +854,9 @@ export class StoreCheckComponent implements OnInit {
       );
   }
 
-  wo:any;
-  exportInfo(){
-  let dataForExcel = [
+  wo: any;
+  exportInfo() {
+    let dataForExcel = [
       this.wo.branchName,
       this.wo.lotNumber,
       this.wo.planingWorkOrderCode,
@@ -824,7 +864,7 @@ export class StoreCheckComponent implements OnInit {
       this.wo.quantityPlan,
       this.wo.productionCode,
       this.wo.productionName,
-      this.wo.sapWo ,
+      this.wo.sapWo,
       this.wo.bomVersion,
       '',
       '',
@@ -837,19 +877,19 @@ export class StoreCheckComponent implements OnInit {
       '',
     ]
     let reportData = {
-      fileName:'export_genQrCode_'+this.wo.lotNumber,
+      fileName: 'export_genQrCode_' + this.wo.lotNumber,
       title: 'Thông tin kiểm tra',
       data: dataForExcel,
       headers: [
-        "ProductionLine",	"Lot",	"PoCode",	"PlanningCode"	,"NumberOfPlanning",	"ItemCode"	,"ProductName",	"SapWo"	,"Version",
-        "TimeRecieved",	"ReelID",	"PartNumber",	"Vendor",	"QuantityOfPackage",	"MFGDate",	"ProductionShilt", 	"OpName",	"Comments"
+        "ProductionLine", "Lot", "PoCode", "PlanningCode", "NumberOfPlanning", "ItemCode", "ProductName", "SapWo", "Version",
+        "TimeRecieved", "ReelID", "PartNumber", "Vendor", "QuantityOfPackage", "MFGDate", "ProductionShilt", "OpName", "Comments"
       ],
     };
 
     this.exportExelService.exportPrint(reportData);
 
   }
-  changeWo(dataWo:any){
+  changeWo(dataWo: any) {
     this.wo = dataWo;
   }
 
@@ -858,12 +898,12 @@ export class StoreCheckComponent implements OnInit {
   aql_page = 1;
   aql_pageSize = 10000;
   aql_collectionSize = 0;
-  lstAql?:any[] =[]
-  lstAqlCheck?:any [] =[]
+  lstAql?: any[] = []
+  lstAqlCheck?: any[] = []
   refreshAqlTemplate() {
-    this.aqlService.getList(this.formSearch.testLevel,this.formSearch.acceptanceLevel,this.formSearch.allowedError,this.aql_page, this.aql_pageSize).subscribe(
+    this.aqlService.getList(this.formSearch.testLevel, this.formSearch.acceptanceLevel, this.formSearch.allowedError, this.aql_page, this.aql_pageSize).subscribe(
       data => {
-        this.lstAql  = data.lstTemplate;
+        this.lstAql = data.lstTemplate;
         this.aql_collectionSize = Number(data.total) * this.aql_pageSize;
         console.log(this.aql_collectionSize);
       },
@@ -873,34 +913,34 @@ export class StoreCheckComponent implements OnInit {
     );
   }
 
-  selectCheck(data:any){
+  selectCheck(data: any) {
     this.lstAqlCheck?.push(data);
-    const index = Number(this.lstAql?.indexOf(data,0));
+    const index = Number(this.lstAql?.indexOf(data, 0));
     console.log(index);
     if (Number(index) > -1) {
       this.lstAql?.splice(index, 1);
-   }
+    }
   }
 
-  deleteCheckAql(data:any){
+  deleteCheckAql(data: any) {
     this.lstAql?.push(data);
-    const index = Number(this.lstAqlCheck?.indexOf(data,0));
+    const index = Number(this.lstAqlCheck?.indexOf(data, 0));
     console.log(index);
     if (Number(index) > -1) {
       this.lstAqlCheck?.splice(index, 1);
-   }
+    }
   }
 
-  checkConcludeAql(data:any){
+  checkConcludeAql(data: any) {
 
-    if(Number(data.reality) > Number(data.allowedError)){
+    if (Number(data.reality) > Number(data.allowedError)) {
       data.conclude = "Không đạt";
-    }else{
+    } else {
       data.conclude = "Đạt";
     }
   }
 
-  sendApprove(ids:string, id:string){
+  sendApprove(ids: string, id: string) {
     Swal.fire({
       title: 'Xác nhận',
       text: 'Bạn có muốn tiếp tục thực hiện gửi phê duyệt nhập kho?',
@@ -910,14 +950,14 @@ export class StoreCheckComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then((result) => {
       if (result.value) {
-        this.storeCheckService.sendRequestApproveStore({id:id}).subscribe( data => {
-          if(data.result.ok ){
-            Swal.fire("Thành công",'Bạn đã thực hiện gửi yêu cầu thành công','success')
-          }else{
-            Swal.fire("Thành công",data.result.message,'warning')
+        this.storeCheckService.sendRequestApproveStore({ id: id }).subscribe(data => {
+          if (data.result.ok) {
+            Swal.fire("Thành công", 'Bạn đã thực hiện gửi yêu cầu thành công', 'success')
+          } else {
+            Swal.fire("Thành công", data.result.message, 'warning')
           }
 
-          this.storeCheckService .loadStoreCheckByWoId(this.id) .subscribe(
+          this.storeCheckService.loadStoreCheckByWoId(this.id).subscribe(
             (data) => {
               this.lstStoreCheck = data.lstCheck;
 
@@ -935,17 +975,38 @@ export class StoreCheckComponent implements OnInit {
       }
     })
   }
+  openDetail(content: any, id: any) {
 
-  openShowDetailStore(content: any,  id: any) {
+    this.commonService.statusStep(id).toPromise().then(
+      data => {
+        this.lstCheck = data.lstStep.filter((x: any) => x.step != 'QC_CHECK' && x.step != 'PHOTOELECTRIC_PRODUCT' && x.step != 'PHOTOELECTRIC' && x.step != 'APPROVE_STORE' && x.step != 'SAP_STORE');
+        this.lstCheck?.forEach(el => {
+          el.status = Utils.getStatusName(el.status);
+          el.checked = true;
+        })
+        console.log(data.lstStep)
+      },
+      error => { }
+    )
+    this.modalService.open(content, this.modalOptionss).result.then(
+      (result) => {
+        this.closeResult = `Closed with: ${result}`;
+      },
+      (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      }
+    );
+  }
+  openShowDetailStore(content: any, id: any) {
     this.lstStoreCheck.forEach((element) => {
       if (element.id == id) {
-        element.lstElectronic =[];
-        element.lstErrorCheck=[];
-        element.lstStructure=[];
-        element.lstConfused=[];
-        element.lstSafe=[];
-        element.lstSize=[];
-        element.lstExternal=[];
+        element.lstElectronic = [];
+        element.lstErrorCheck = [];
+        element.lstStructure = [];
+        element.lstConfused = [];
+        element.lstSafe = [];
+        element.lstSize = [];
+        element.lstExternal = [];
 
         this.storeCheckService.getLstCheckByStoreId('ELEC', id).toPromise().then((data) => {
           element.lstElectronic = data.lstElectric;
@@ -960,7 +1021,7 @@ export class StoreCheckComponent implements OnInit {
         })
 
         this.storeCheckService.getLstCheckByStoreId('CONFUSED', id).toPromise().then((data) => {
-            element.lstConfused = data.lstConfuseds;
+          element.lstConfused = data.lstConfuseds;
         })
 
         this.storeCheckService.getLstCheckByStoreId('SAFE', id).toPromise().then((data) => {
@@ -990,10 +1051,32 @@ export class StoreCheckComponent implements OnInit {
     );
   }
 
-  colorSelect?:any;
-  selectColor(color:any){
+  colorSelect?: any;
+  selectColor(color: any) {
     this.formEx.colorName = color.name;
     this.formEx.colorCode = color.code;
     console.log(this.formEx);
+  }
+  updateStatus() {
+    var body = this.lstCheck.filter(x => x.status != 'Hoàn thành' && x.checked == true);
+    console.log(body)
+    this.http.post(`${this.address}/pqc/approves`, body).subscribe(() => {
+      Swal.fire({
+        title: 'Thành công',
+        text: 'Cập nhật trạng thái các công đoạn',
+        icon: 'success',
+        showCancelButton: false,
+        showConfirmButton: false,
+        confirmButtonText: 'Đồng ý',
+        timer: 1000
+      })
+      this.lstCheck.forEach(x => {
+        body.forEach(y => {
+          if (y.id == x.id) {
+            x.status = 'Hoàn thành';
+          }
+        })
+      })
+    })
   }
 }

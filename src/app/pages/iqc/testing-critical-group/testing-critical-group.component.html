@@ -1,0 +1,118 @@
+<h2>Danh sách nhóm tiêu chí</h2>
+<div style="display: flex;justify-content: space-between;font-size: 19px;">
+  <div style="display: flex;">
+    <div style="margin-right: 150px;">Nhóm tiêu chí <br> <input type="text" [(ngModel)]="testingCriticalGroup"
+        [ngModelOptions]="{ standalone: true }" style=" width: 350px;height: 30px;border-radius: 4px;"
+        list="nhomTieuChi">
+      <datalist id="nhomTieuChi">
+        <option *ngFor="let item of listOfCriticalGroupOrigin" value="{{ item.testingCriticalGroup}}"></option>
+      </datalist>
+    </div>
+    <div style="margin-right: 150px;">Người tạo <br> <input type="text" [(ngModel)]="username"
+        [ngModelOptions]="{ standalone: true }" style=" width: 350px;height: 30px;border-radius: 4px;"></div>
+    <div style="margin-right: 150px;">Trạng thái <br><select [(ngModel)]="status"
+        [ngModelOptions]="{ standalone: true }" style=" width: 110px;height: 30px;border-radius: 4px;">
+        <option value=""></option>
+        <option value="Active">Active</option>
+        <option value="Deactivate">Deactivate</option>
+      </select></div>
+  </div>
+  <div style="    display: inline-flex;justify-content: space-between;width: 13%;">
+    <div> <button class="create-btn" (click)=" findFucntion()" style="background-color: #0d6efd;"><i
+          class="fa fa-search"></i> Tìm kiếm</button></div>
+    <div> <button class="create-btn" (click)="update(0,'insert',listError)"
+        style="background-color: rgb(138, 214, 23);"><i class="fa fa-plus"></i> Thêm mới</button></div>
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>STT</th>
+      <th>Nhóm tiêu chí</th>
+      <th>Ngày tạo</th>
+      <th>Ngày cập nhật</th>
+      <th>Người tạo</th>
+      <th>Trạng thái</th>
+      <th>Ghi chú</th>
+      <th>Tùy chọn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of listOfCriticalGroup; let i = index;">
+      <td style="width: 1px;"> {{i+1}}</td>
+      <td style="text-align: left;width: 400px;"><input [id]="item.id+'-input'" type="text"
+          [(ngModel)]="item.testingCriticalGroup" [ngModelOptions]="{ standalone: true }" [hidden]="true"> <span
+          [id]="item.id+'-span'" [hidden]="false">{{item.testingCriticalGroup}}</span></td>
+      <td>{{item.createdAt| date:'dd/MM/yyyy'}}</td>
+      <td>{{item.updateAt | date:'dd/MM/yyyy'}}</td>
+      <td>{{item.username}}</td>
+      <td>
+        <div [id]="item.id+'-div'" [hidden]="false"
+          [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}">{{item.status}}</div>
+        <select [id]="item.id+'-select'" [(ngModel)]="item.status" [ngModelOptions]="{ standalone: true }"
+          style=" width: 110px;height: 24px;" [hidden]="true">
+          <option value=""></option>
+          <option value="Active">Active</option>
+          <option value="Deactivate">Deactivate</option>
+        </select>
+      </td>
+      <td style="text-align: left;width: 400px;">{{item.note}}</td>
+      <td style="width: 125px;">
+        <button class="btn btn-sm btn-primary" title="Sửa" (click)="update(i,'update',listError)"><i
+            class="fa fa-edit"></i></button>
+        <button class="btn btn-sm btn-primary" style="background-color: #35b0dc;border: #35b0dc solid 1px;"
+          title="Active / Deactivate" (click)="changeStatus(i)"><i class="fa fa-refresh"></i></button>
+        <!-- <button class="btn btn-sm btn-success" title="Xuất file báo cáo"><i class="fa fa-download"></i></button> -->
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="paginate">
+  <div style="display: flex; justify-content: space-between">
+    <div>
+      <select class="form-selects" aria-label="Default select example" [(ngModel)]="itemPerPage"
+        (change)="findFucntion()">
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+
+    <div style="display: flex">
+      <button class="pagination" (click)="firstPage()" [disabled]="firstPageBtn">Trang đầu</button>
+      <button class="pagination" (click)="backPage()" [disabled]="backPageBtn">Trang trước</button>
+      <button class="pagenumber">{{ pageNumber }}</button>
+      <button class="pagination" (click)="nextPage()" [disabled]="nextPageBtn">Trang sau</button>
+      <button class="pagination" (click)="lastPage()" [disabled]="lastPageBtn">Trang cuối</button>
+    </div>
+  </div>
+</div>
+<!-- pop up insert info -->
+<ng-template #listError let-modal>
+
+  <!-- <div
+    style="top: 0;width: 100%;height: 200%;left: 0;z-index: 2;background: rgb(25 26 26 / 0%);transition: background 0.15s;"
+    id="background"> -->
+  <div id="update-popup" [hidden]="!insertPopup" class="popup">
+    <div> <button class="close-popup" (click)="close()" (click)="modal.dismiss('Cross click')">X</button></div>
+    <div style="margin-left: 10px; font-size: 19px;"><b>{{popupTitle}}</b></div>
+    <div>
+      <div style="margin-top: 42px;   margin-left: 40px;">
+        <div style="margin-right: 150px;" class="input-tag">Nhóm tiêu chí <i style="color: red;">(*)</i> <br> <input
+            type="text" [(ngModel)]="bodyInsert.testingCriticalGroup" [ngModelOptions]="{ standalone: true }"
+            style=" width: 98%;font-size: 19px;height: 30px;border-radius: 4px;"></div>
+        <div style="margin-right: 50px; font-size: 19px;  margin-top: 10px;">Trạng thái <br><select
+            [(ngModel)]="bodyInsert.status" [ngModelOptions]="{ standalone: true }"
+            style=" width: 110px;height: 24px;font-size: 19px;height: 30px;border-radius: 4px;">
+            <option value=""></option>
+            <option value="Active">Active</option>
+            <option value="Deactivate">Deactivate</option>
+          </select></div>
+        <div style="font-size: 19px;margin-top:14px">Ghi chú <br> <textarea nput [(ngModel)]="bodyInsert.note"
+            [ngModelOptions]="{ standalone: true }" type="search"
+            style="width: 98%;font-size: 19px;height: 70px;border-radius: 4px;"></textarea></div>
+      </div>
+      <div> <button class="btn-save" (click)="submit()"><i class="fa fa-save"></i> Hoàn thành</button></div>
+    </div>
+  </div>
+</ng-template>

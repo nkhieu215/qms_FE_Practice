@@ -47,16 +47,16 @@
           <div class="col-md-3">
             <div class="form-group">
               <label>Ngành</label>
-              <input type="text" class="form-control" name="branchName" [(ngModel)]="formSearch.branchName" #name="ngModel"
-                placeholder="Ngành" />
+              <input type="text" class="form-control" name="branchName" [(ngModel)]="formSearch.branchName"
+                #name="ngModel" placeholder="Ngành" />
             </div>
           </div>
 
           <div class="col-md-3">
             <div class="form-group">
               <label>Tổ</label>
-              <input type="text" class="form-control" name="groupName" [(ngModel)]="formSearch.groupName" #name="ngModel"
-                placeholder="Tổ" />
+              <input type="text" class="form-control" name="groupName" [(ngModel)]="formSearch.groupName"
+                #name="ngModel" placeholder="Tổ" />
             </div>
           </div>
 
@@ -75,16 +75,23 @@
                 placeholder="Ngày thực hiện" />
             </div>
           </div>
-
+          <div class="col-md-3">
+            <div class="form-group">
+              <label>Mã wo</label>
+              <input type="text" class="form-control" name="workOrderCode" [(ngModel)]="formSearch.workOrderCode"
+                #name="ngModel" placeholder="Mã wo" />
+            </div>
+          </div>
           <div class="col-md-3">
             <div class="form-group">
               <label>Trạng thái</label>
               <select class="form-control" name="status" [(ngModel)]="formSearch.status">
-                  <option value="">Tất cả</option>
-                  <option  value="WAIT_APPROVE">Chờ phê duyệt</option>
-                  <option  value="CREATE">Đang sản xuất</option>
-                  <option  value="APPROVE">Hoàn thành</option>
-                  <option  value="REJECT">Từ chối</option>
+                <option value="">Tất cả</option>
+                <option value="WAIT_APPROVE">Chờ phê duyệt</option>
+                <option value="CREATE">Đang sản xuất</option>
+                <option value="APPROVE">Hoàn thành</option>
+                <option value="REJECT">Từ chối</option>
+                <option value="CONCESSIONS">Nhân nhượng</option>
               </select>
             </div>
           </div>
@@ -108,6 +115,8 @@
           <thead>
             <tr>
               <th scope="col">#</th>
+              <th scope="col">Ngành</th>
+              <th scope="col">Tổ</th>
               <th scope="col">Tên sản phẩm</th>
               <th scope="col">Mã sản phẩm</th>
               <th scope="col">Số lô</th>
@@ -123,6 +132,8 @@
           <tbody>
             <tr *ngFor="let work of lstWorkOrder let i=index;">
               <td>{{i+1}}</td>
+              <td>{{work.branchName}}</td>
+              <td>{{work.groupName}}</td>
               <td>{{work.productionName}}</td>
               <td>{{work.productionCode}}</td>
               <td>{{work.lotNumber}}</td>
@@ -134,10 +145,11 @@
               <td>{{work.strStatus}}</td>
               <td>{{work.createdAt| date:'dd/MM/YYYY'}}</td>
               <td>
-                <a class="btn btn-sm btn-info" target="_blank"  routerLink="/pqc/pqc-show-detail/{{work.id}}" style="margin-right: 5px;"
-                  title="Chi tiết thông tin"><i class="fa fa-eye"></i></a>
+                <a class="btn btn-sm btn-info" target="_blank" routerLink="/pqc/pqc-show-detail/{{work.id}}"
+                  style="margin-right: 5px;" title="Chi tiết thông tin"><i class="fa fa-eye"></i></a>
 
-                <a class="btn btn-sm btn-primary" target="_blank" routerLink="/pqc/approve/approve/{{work.id}}" *ngIf="work.status =='CREATE' || work.status=='REJECT' || work.status=='WAIT_APPROVE'"
+                <a class="btn btn-sm btn-primary" target="_blank" routerLink="/pqc/approve/approve/{{work.id}}"
+                  *ngIf="work.status =='CREATE' || work.status=='REJECT' || work.status=='WAIT_APPROVE'|| work.status=='NOT_APPROVE'"
                   style="margin-right: 5px;" title="Phê duyệt biên bản"><i class="fa fa-check"></i></a>
 
                 <button class="btn btn-sm btn-success" style="margin-right: 5px;" (click)="open(myModalEdit,work.id)"
@@ -179,25 +191,27 @@
       <h2>Thông tin mã yêu cầu</h2>
     </div>
     <div class="card-body">
-      <pqc-show-work-order item_id="{{idWorkOrder}}"  (eventData)="changeWo($event)"></pqc-show-work-order>
+      <pqc-show-work-order item_id="{{idWorkOrder}}" (eventData)="changeWo($event)"></pqc-show-work-order>
     </div>
   </div>
 
-  <app-nvl-production show_check="SHOW"  *ngIf="lstCheckStep?.includes('NVL')"></app-nvl-production>
-  <app-nvl100-production show_check="SHOW"  *ngIf="lstCheckStep?.includes('CHECK_NVL')"></app-nvl100-production>
+  <app-nvl-production show_check="SHOW" *ngIf="lstCheckStep?.includes('NVL')"></app-nvl-production>
+  <app-nvl100-production show_check="SHOW" *ngIf="lstCheckStep?.includes('CHECK_NVL')"></app-nvl100-production>
 
 
   <app-tin-check show_check="SHOW" *ngIf="lstCheckStep?.includes('TIN')"></app-tin-check>
   <app-mount-comp-check show_check="SHOW" *ngIf="lstCheckStep?.includes('MOUNT_COMPONENTS')"> </app-mount-comp-check>
   <app-solder-check show_check="SHOW" *ngIf="lstCheckStep?.includes('SOLDER')"></app-solder-check>
-  <app-interchangeability show_check="SHOW"  *ngIf="lstCheckStep?.includes('INTERCHANGEABILITY')"></app-interchangeability>
-  <app-assembles show_check="SHOW"  *ngIf="lstCheckStep?.includes('ASSEMBLES')"></app-assembles>
-  <app-photoelectric show_check="SHOW"  *ngIf="lstCheckStep?.includes('PHOTOELECTRIC')"></app-photoelectric>
-  <app-photoelectric-product show_check="SHOW"  *ngIf="lstCheckStep?.includes('PHOTOELECTRIC_PRODUCT')"></app-photoelectric-product>
-  <app-fix-error show_check="SHOW"  *ngIf="lstCheckStep?.includes('FIX_ERR')"></app-fix-error>
+  <app-interchangeability show_check="SHOW"
+    *ngIf="lstCheckStep?.includes('INTERCHANGEABILITY')"></app-interchangeability>
+  <app-assembles show_check="SHOW" *ngIf="lstCheckStep?.includes('ASSEMBLES')"></app-assembles>
+  <app-photoelectric show_check="SHOW" *ngIf="lstCheckStep?.includes('PHOTOELECTRIC')"></app-photoelectric>
+  <app-photoelectric-product show_check="SHOW"
+    *ngIf="lstCheckStep?.includes('PHOTOELECTRIC_PRODUCT')"></app-photoelectric-product>
+  <app-fix-error show_check="SHOW" *ngIf="lstCheckStep?.includes('FIX_ERR')"></app-fix-error>
   <!-- <app-store-check show_check="SHOW"  *ngIf="lstCheckStep?.includes('STORE_CHECK')"></app-store-check> -->
   <app-store-check show_check="SHOW"></app-store-check>
-  <app-quality-evaluation show_check="SHOW"  *ngIf="lstCheckStep?.includes('QC_CHECK')"></app-quality-evaluation>
+  <app-quality-evaluation show_check="SHOW" *ngIf="lstCheckStep?.includes('QC_CHECK')"></app-quality-evaluation>
 
 
   <div>
@@ -211,7 +225,7 @@
           <h2 class="example-h2">Phê duyệt kiểm tra</h2>
 
           <section *ngFor="let check of lstCheck; let i = index" class="example-section">
-            <mat-checkbox [(ngModel)]="check.checked" >
+            <mat-checkbox [(ngModel)]="check.checked">
               <label> {{check.nameStep }} </label> -- <label style="font-weight: normal">{{check.userId}} -
                 {{(check.status =='SUCCESS' ?'Đã thực hiện': 'Đang thực hiện')}}</label>
             </mat-checkbox>
@@ -245,7 +259,11 @@
             <i class="fa fa-check"></i>
             Từ chối yêu cầu
           </button>
-
+          <button *ngIf="approve" class="btn btn-danger" type="submit" (click)="onSubmit('not_approve')"
+            style="margin-left: 30px; background-color:#F86E51 ;border: #F86E51;">
+            <i class="fa fa-check"></i>
+            Không đạt nhập kho
+          </button>
         </div>
       </div>
     </div>
@@ -257,16 +275,16 @@
     <h4 class="modal-title" id="modal-basic-title">
       Chi tiết thông tin kiểm tra
     </h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
       <thead>
         <tr>
-        <th>STT</th>
-        <th>Tên tài khoản</th>
-        <th>Công đoạn</th>
-        <th>Trạng thái</th>
+          <th>STT</th>
+          <th>Tên tài khoản</th>
+          <th>Công đoạn</th>
+          <th>Trạng thái</th>
         </tr>
       </thead>
       <tbody>

@@ -19,6 +19,7 @@ export interface Dnlnvl {
 }
 
 export interface PartNumber {
+  lstFeeder: any
   id: string
   partNumberCode: string
   name: string
@@ -69,8 +70,8 @@ export interface Machine {
   lane: any
   workCenterId: any
   machineDetails: MachineDetail[]
-  partNumber:any[]
-  feeders:any[]
+  partNumber: any[]
+  feeders: any[]
 }
 
 export interface MachineDetail {
@@ -83,7 +84,7 @@ export interface FeedersPrograming {
   entryDate: any
   serial: string
   status: string
-  qrFeederCode:string
+  qrFeederCode: string
   dnlnvlDetailOfMaterial: DnlnvlDetailOfMaterialList[]
   slotMachine: any
 }

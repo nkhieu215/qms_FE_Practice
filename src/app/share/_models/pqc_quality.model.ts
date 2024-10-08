@@ -10,5 +10,5 @@ export class PqcQuality {
   id?: string;
   ids?:string;
   quantity?: number;
-
+  checked?:string;
 }

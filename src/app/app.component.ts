@@ -27,6 +27,7 @@ export class AppComponent {
         data => {
           this.menuResponse =  JSON.parse(data);
           this.lstMenuRes = this.menuResponse?.lstmenu;
+          console.log('list menu: ', this.lstMenuRes)
         },
         err => {
           this.content = JSON.parse(err.error).message;

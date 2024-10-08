@@ -1,0 +1,89 @@
+.tables {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+  
+    thead {
+      tr {
+        background-color: #f2f2f2;
+        border-bottom: 2px solid #ddd;
+      }
+  
+      th {
+        padding: 12px 15px;
+        cursor: pointer;
+        position: relative;
+        background-color: #fafafa;
+        border: 0.5px solid #dee2e6;
+        text-align: center;
+        /* &:hover {
+          background-color: #6fbfe7;
+        } */
+  
+        span {
+          font-weight: bold;
+          display: block;
+        }
+  
+        input {
+          width: 100%;
+          padding: 8px 10px;
+          margin-top: 5px;
+          box-sizing: border-box;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+  
+          &:focus {
+            outline: none;
+            border-color: #aaa;
+          }
+        }
+      }
+    }
+  
+    tbody {
+      tr {
+        &:nth-child(even) {
+          background-color: #d3eefc;
+        }
+  
+        &:hover {
+          background-color: #f1f1f1;
+        }
+      }
+  
+      td {
+        background-color: #fff;
+        width: 175px;
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        border: 0.8px solid #dee2e6;
+        font-size: 16px;
+        font-weight: 400;
+        text-align: center;
+        &:last-child {
+          text-align: center;
+        }
+      }
+    }
+  }
+  .close-popup{
+    margin-left: 1037px;
+    margin-top: 7px;
+    background-color: red;
+    color: #fff;
+    text-align: center;
+    width: 24px;
+    height: 26px;
+    border-radius: 7px;
+    border: none;
+    font-size: 19px;
+  }
+  /* search in list error */
+  .input-errors{
+    margin-right: 40px;
+    border: 0.5px solid #dee2e6;
+    border-radius: 4px;
+  }

@@ -67,6 +67,8 @@
               <option selected value="DRAFF">Nháp</option>
               <option value="WAIT_APPROVE">Chờ duyệt</option>
               <option value="APPROVE">Đã duyệt</option>
+              <option value="CONCESSIONS">Nhân nhượng</option>
+              <option value="REJECT">Từ chối</option>
             </select>
           </div>
         </div>
@@ -108,6 +110,7 @@
         <th>Mã biên bản</th>
         <th>Mã linh kiện</th>
         <th>Tên linh kiện</th>
+        <th>Loại</th>
         <th>Ngày thực hiện</th>
         <th>Trạng thái</th>
         <th>Số lô</th>
@@ -120,12 +123,16 @@
         <td>{{ audit.reportCode}}</td>
         <td>{{ audit.elecCompCode}}</td>
         <td> {{ audit.electCompName }} </td>
+        <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span *ngIf="audit.iqcElectType == 'true'">Phiếu
+            SPKPH</span> </td>
         <td> {{ audit.createdAt| date:'dd/MM/YYYY HH:mm:ss'}}
         </td>
         <td>
           <p *ngIf="audit.status =='DRAFF'"> Nháp</p>
           <p *ngIf="audit.status =='WAIT_APPROVE'"> Chờ duyệt </p>
           <p *ngIf="audit.status =='APPROVE'"> Đã duyệt </p>
+          <p *ngIf="audit.status =='CONCESSIONS'"> Nhân nhượng</p>
+          <p *ngIf="audit.status =='REJECT'"> Từ chối</p>
         </td>
 
         <td>{{ audit.batchNumber}}</td>
@@ -167,9 +174,10 @@
 
 
       <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm">
+        <!-- Row 1 -->
         <div class="form-group row">
           <div class="col-sm-4">
-            <label>Mẫu biên bản</label>
+            <label>Mẫu biên bản <i style="color: red;">(*)</i></label>
             <input *ngIf="typeAction =='add'" type="text" class="form-control" [(ngModel)]="selectedEx"
               value="{{ strSelect }}" name="templateName" [matAutocomplete]="auto" class="form-control"
               [formControl]="searchExaminationCtrl" placeholder="Mã mẫu biên bản" />
@@ -194,12 +202,12 @@
 
           </div>
           <div class="col-sm-4">
-            <label>Số biên bản</label>
+            <label>Số biên bản <i style="color: red;">(*)</i></label>
             <input type="text" class="form-control" placeholder="Số biên bản" name="reportCode"
               [(ngModel)]="form.reportCode" />
           </div>
           <div class="col-sm-4">
-            <label>Loại hàng</label>
+            <label>Loại hàng <i style="color: red;">(*)</i></label>
             <select class="form-control" name="itemType" [(ngModel)]="form.itemType" #type="ngModel">
               <option value="Hàng nhập">Hàng nhập</option>
               <option value="Hàng mẫu">Hàng mẫu</option>
@@ -207,9 +215,9 @@
           </div>
         </div>
 
-        <div class="form-group row">
+        <!-- <div class="form-group row">
           <div class="col-sm-4">
-            <label>Mã linh kiện</label>
+            <label>Mã linh kiệnnnnnn</label>
 
             <input *ngIf="typeAction =='add'" type="text" class="form-control" [(ngModel)]="selectedElectronic"
               value="{{ strSelectElec }}" [matAutocomplete]="auto33" [formControl]="searchELectronicCtrl"
@@ -238,18 +246,18 @@
             <input type="text" class="form-control" placeholder="Số lượng theo PO" name="poQuantity"
               [(ngModel)]="form.poQuantity" />
           </div>
-        </div>
-
+        </div> -->
+        <!-- Row 2 -->
         <div class="form-group row">
-          <div class="col-sm-4">
+          <!-- <div class="col-sm-4">
             <label>Số lô (cách nhau bởi dấu phẩy)</label>
             <input type="text" class="form-control" placeholder="Số lô" name="batchNumber"
               [(ngModel)]="form.batchNumber" />
-          </div>
+          </div> -->
 
           <div class="col-sm-4">
             <mat-form-field appearance="fill" style="margin-top: 10px; width: 100%">
-              <mat-label>Ngày nhận hàng</mat-label>
+              <mat-label>Ngày nhận hàng <i style="color: red;">(*)</i></mat-label>
               <!-- #docregion toggle -->
               <input matInput [matDatepicker]="importDate" class="form-control" name="importDate"
                 [(ngModel)]="form.importDate" />
@@ -261,7 +269,7 @@
 
           <div class="col-sm-4">
             <mat-form-field appearance="fill" style="margin-top: 10px; width: 100%">
-              <mat-label>Ngày kiểm</mat-label>
+              <mat-label>Ngày kiểm <i style="color: red;">(*)</i></mat-label>
               <!-- #docregion toggle -->
               <input matInput [matDatepicker]="checkDate" class="form-control" name="checkDate"
                 [(ngModel)]="form.checkDate" />
@@ -270,9 +278,13 @@
               <!-- #enddocregion toggle -->
             </mat-form-field>
           </div>
+          <div class="col-sm-4">
+            <label>Xuất xứ <i style="color: red;">(*)</i></label>
+            <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" />
+          </div>
         </div>
 
-        <div class="form-group row">
+        <!-- <div class="form-group row">
           <div class="col-sm-4">
             <label>Số hóa đơn</label>
             <input type="text" class="form-control" placeholder="Số hóa đơn" name="invoiceNumber"
@@ -283,61 +295,164 @@
             <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" />
           </div>
           <div class="col-sm-4">
-            <label>GRPO</label>
+            <label>PO</label>
             <input type="text" class="form-control" placeholder="GRPO" name="grpoNumber"
               [(ngModel)]="form.grpoNumber" />
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group row">
-          <div class="col-sm-4">
+          <!-- <div class="col-sm-4">
             <label>Số lượng kiểm tra</label>
             <input type="number" (change)="onChangeQuantity()" class="form-control" placeholder="Số lượng"
               name="checkingQuantity" [(ngModel)]="form.checkingQuantity" />
+          </div> -->
+          <div class="col-sm-4">
+            <label>Mã PO <i style="color: red;">(*)</i></label>
+            <input type="text" class="form-control" placeholder="GRPO" name="grpoNumber"
+              [(ngModel)]="form.grpoNumber" />
           </div>
           <div class="col-sm-4">
-            <label>Lập phiếu SPKPH</label>
+            <label>Lập phiếu SPKPH </label>
             <input type="text" class="form-control" placeholder="SPKPH" name="spkphNumber"
               [(ngModel)]="form.spkphNumber" />
           </div>
           <div class="col-sm-4">
-            <label>Kết luận</label>
+            <label>Đề nghị <i style="color: red;">(*)</i></label>
+
+            <select class="form-control" name="suggestion" [(ngModel)]="form.suggestion" #type="ngModel">
+              <option value="Trả lại nhà cung cấp">Trả lại nhà cung cấp</option>
+              <option value="Nhập kho bình thường">Nhập kho bình thường</option>
+              <option value="Nhập kho có điều kiện">Nhập kho có điều kiện</option>
+            </select>
+          </div>
+          <div class="col-sm-4">
+            <label>Kết luận <i style="color: red;">(*)</i></label>
 
             <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
-              <option value="Đạt nhập kho">Đạt nhập kho</option>
-              <option value="Không đạt trả về">Không đạt trả về</option>
-              <option value="Nhập kho nhân nhượng">Nhập kho nhân nhượng</option>
+              <option value="Đạt">Đạt</option>
+              <option value="Không đạt">Không đạt</option>
             </select>
+          </div>
+          <div class="col-sm-4" style="display: flex;flex-direction: column;">
+            <label>Phiếu SPKPH : <i style="color: red;">(*)</i></label>
+            <input type="checkbox" name="iqcElectType" [(ngModel)]="form.iqcElectType"
+              style="width: 30px;height: 28px;">
           </div>
         </div>
 
         <div class="row pb-3">
           <div class="col-sm-12">
             <label>Ghi chú</label>
-            <input type="text" class="form-control" placeholder="Ghi chú"
-              name="note" [(ngModel)]="form.note">
+            <input type="text" class="form-control" placeholder="Ghi chú" name="note" [(ngModel)]="form.note">
           </div>
 
         </div>
+        <!-- Danh sách item được áp dụng -->
+        <div class="table-responsive">
+          <div style="display: flex;flex-direction: column;">
+            <!-- Danh sách mã sản phẩm -->
 
-
+            <div class="float-right" style="margin-bottom: 10px;">
+              <button class="btn  btn-success" (click)="addNewItem()"
+                *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm sản phẩm</button>
+              <!-- <button id="btn-save-item" class="btn  btn-success" style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;"  [hidden]="true"><i class="fa fa-save" ></i> Lưu</button> -->
+            </div>
+            <div style="margin-left: 7px;">
+              <div style="margin-bottom: 0px;width: 99%;">
+                <table class="tables" style="margin-bottom: 0px;">
+                  <thead>
+                    <tr>
+                      <th style="width: 4%;">STT</th>
+                      <th style="width: 7%;">Mã sản phẩm</th>
+                      <th style="width: 29%;">Tên sản phẩm</th>
+                      <th style="width: 7%;">Số lượng lô hàng</th>
+                      <th style="width: 7%;">Số lô</th>
+                      <th style="width: 7%;">Số hóa đơn</th>
+                      <th style="width: 7%;">Số lượng kiểm tra</th>
+                      <th style="width: 6%;">Thông tin lỗi</th>
+                      <th style="width: 20%;">Ghi chú</th>
+                      <th style="width: 6%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">Tùy chọn</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+              <div id="table-body" style="overflow: auto;height: 324px;width: 99%;margin-bottom: 10px;">
+                <table class="tables" style="margin-top: 0px;">
+                  <tbody>
+                    <tr *ngFor="let item of listOfItem;let i = index;">
+                      <td style="width: 4%;"> {{i+1}}</td>
+                      <td style="text-align: left;width: 7%;"><input [id]="item.id+'-input'" type="text"
+                          [(ngModel)]="item.itemCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          (ngModelChange)="getListOfItems(item.itemCode)" [matAutocomplete]="auto33"
+                          style="width: 90%;">
+                        <mat-autocomplete [panelWidth]="800" #auto33="matAutocomplete"
+                          (optionSelected)="onSelectedElectronic(i,item.itemCode)">
+                          <mat-option *ngFor="let oitm of listOfItems" [value]="oitm">
+                            <span><b>{{ oitm.itemName }}</b> ({{ oitm.itemCode }})</span>
+                          </mat-option>
+                        </mat-autocomplete>
+                        <span [id]="item.id+'-span'" [hidden]="false">{{item.itemCode}}</span>
+                      </td>
+                      <td style="text-align: left;width: 29%;"><input [id]="item.id+'-input'" type="text"
+                          [(ngModel)]="item.itemName" [ngModelOptions]="{ standalone: true }" [hidden]="true"> <span
+                          [id]="item.id+'-span'" [hidden]="false">{{item.itemName}}</span></td>
+                      <td style="text-align: left;width: 7%;"> <input [id]="item.id+'-input-po-quantity'" type="text"
+                          [(ngModel)]="item.poQuantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          style="width: 90%;"> <span [id]="item.id+'-span-po-quantity'"
+                          [hidden]="false">{{item.poQuantity}}</span></td>
+                      <td style="text-align: left;width: 7%;"> <input [id]="item.id+'-input-lot-number'" type="text"
+                          [(ngModel)]="item.lotNumber" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          style="width: 90%;"> <span [id]="item.id+'-span-lot-number'"
+                          [hidden]="false">{{item.lotNumber}}</span></td>
+                      <td style="text-align: left;width: 7%;"> <input [id]="item.id+'-input-bill-number'" type="text"
+                          [(ngModel)]="item.billNumber" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          style="width: 90%;"> <span [id]="item.id+'-span-bill-number'"
+                          [hidden]="false">{{item.billNumber}}</span></td>
+                      <td style="text-align: left;width: 7%;"> <input [id]="item.id+'-input-quantity-check'" type="text"
+                          [(ngModel)]="item.quantityCheck" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          style="width: 90%;"> <span [id]="item.id+'-span-quantity-check'"
+                          [hidden]="false">{{item.quantityCheck}}</span></td>
+                      <td style="width: 6%;"> <button class="btn btn-sm btn-primary" title="Chi tiết lỗi"
+                          style="background-color: #0dcaf0;border:#0dcaf0" (click)="openPopupError(listError,item)"><i
+                            class="fa fa-eye"></i></button></td>
+                      <td style="text-align: left;width: 20%;"> <input [id]="item.id+'-input-note'" type="text"
+                          [(ngModel)]="item.note" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                          style="width: 90%;"> <span [id]="item.id+'-span-note'" [hidden]="false">{{item.note}}</span>
+                      </td>
+                      <td style="width: 6%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
+                        <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateItem(item.id)"><i
+                            class="fa fa-edit"></i></button>
+                        <button [id]="item.id+'-button'" class="btn btn-sm btn-info" title="Xác nhận" [hidden]="true"
+                          (click)="submitItem(i)"><i class="fa fa-check"></i></button>
+                        <button class="btn btn-sm btn-danger" title="Xóa" (click)="deleteById(i)"><i
+                            class="fa fa-trash"></i></button>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- thong tin kiem tra nvl -->
 
         <div class="table-responsive">
           <div class="row">
             <div class="col-md-12">
-              <button class="btn  btn-success" *ngIf=" typeAction == 'edit'||  typeAction == 'add'" style="margin-right: 10px;"
-              (click)="open(mymodal)"><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
-              tra</button>
+              <button class="btn  btn-success" *ngIf=" typeAction == 'edit'||  typeAction == 'add'"
+                style="margin-right: 10px;" (click)="open(mymodal)"><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
+                tra</button>
 
-            <button class="btn btn-danger" (click)="open(myModalError)" style="margin-right: 10px;">
-              <i class="fa fa-plus"></i> Thông tin lỗi
-            </button>
-
-            <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()" type="submit">
-              <i class="fa fa-download"></i> Xuất excel
-            </button>
+              <button class="btn btn-danger" (click)="open(myModalError)" style="margin-right: 10px;" [hidden]="true">
+                <i class="fa fa-plus"></i> Thông tin lỗi
+              </button>
+              <button class="btn  btn-danger"
+                *ngIf=" typeAction == 'edit'||  typeAction == 'add'||  typeAction == 'show'" style="margin-right: 10px;"
+                (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
+              <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()" type="submit">
+                <i class="fa fa-download"></i> Xuất excel
+              </button>
             </div>
           </div>
 
@@ -445,7 +560,7 @@
 <ng-template #myModalError let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Khai báo lỗi</h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <form name="form" (ngSubmit)="f.form.valid && onAddErrorChild()" #f="ngForm" novalidate
@@ -565,16 +680,37 @@
 <ng-template #mymodal let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Khai báo thông tin kiểm tra</h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <form name="form" (ngSubmit)="f.form.valid && onAddCheck()" #f="ngForm" novalidate>
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
+            <label>Nhóm tiêu chí</label>
+            <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
+              [ngModelOptions]="{ standalone: true }" #criteriaName="ngModel" placeholder="Tiêu chí"
+              list="testingCriticalGroup" (change)="findByCritiCalGroup()" />
+            <datalist id="testingCriticalGroup">
+              <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+                <span>{{ oitm.testingCriticalGroup }}</span>
+              </option>
+            </datalist>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
             <label>Tiêu chí</label>
-            <input type="text" class="form-control" name="criteriaName" [(ngModel)]="formAddCheck.criteriaName"
-              #criteriaName="ngModel" placeholder="Tiêu chí" />
+            <input type="text" class="form-control" [(ngModel)]="formAddCheck.criteriaName"
+              [ngModelOptions]="{ standalone: true }" #criteriaName="ngModel" placeholder="Tiêu chí"
+              list="criteriaName1" />
+            <datalist id="criteriaName1">
+              <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
+                <span>{{ item.testingName }}</span>
+              </option>
+            </datalist>
           </div>
         </div>
       </div>
@@ -681,5 +817,178 @@
         </button>
       </div>
     </form>
+  </div>
+</ng-template>
+<!-- Khai báo lỗi biên bản nvl -->
+<ng-template #listError let-modal>
+  <div style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
+    <div> <button class="close-popup" style="margin-left: 97%;" (click)="modal.dismiss('Cross click')">X</button></div>
+    <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
+    <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
+      <div style="display: flex;">
+        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+          <datalist id="lstItemCode">
+            <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
+          </datalist>
+        </div>
+        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
+          <datalist id="lstErrGroup">
+            <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
+          </datalist>
+        </div>
+        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
+          <datalist id="lstErrCode">
+            <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
+          </datalist>
+        </div>
+        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
+          <datalist id="lstErrName">
+            <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
+          </datalist>
+        </div>
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+          (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
+      </div>
+      <div class="float-right">
+        <button id="btn-save-item" class="btn  btn-success"
+          style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;" (click)="submitErrors()"
+          [hidden]="true"><i class="fa fa-save"></i> Lưu</button>
+        <button class="btn  btn-success" style="height: 40px;" *ngIf="typeAction == 'edit' || typeAction == 'add'"
+          (click)="addNewError()"><i class="fa fa-plus"></i> Thêm Lỗi</button>
+      </div>
+    </div>
+    <div style="margin-left: 7px;">
+      <div style="margin-bottom: 0px;width: 99%;">
+        <table class="tables" style="margin-bottom: 0px;">
+          <thead>
+            <tr>
+              <th style="width: 5%;">STT</th>
+              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Nhóm lỗi </th>
+              <th style="width: 9%;">Mã lỗi </th>
+              <th style="width: 21%;">Tên lỗi </th>
+              <th style="width: 9%;">Số lượng</th>
+              <th style="width: 9%;">Ngày thêm</th>
+              <th style="width: 19%;">Ghi chú</th>
+              <th style="width: 9%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">Tùy chọn</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div id="table-errors" style="width: 99%;margin-bottom: 10px;">
+        <table class="tables" style="margin-top: 0px;">
+          <tbody>
+            <tr *ngFor="let item of listOfError;let i = index;">
+              <td style="width: 5%;"> {{i+1}}</td>
+              <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
+              <td style="text-align: left;width: 9%;"><input [id]="item.id+'-input-error-errGroup'" type="text"
+                  [(ngModel)]="item.errGroup" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                  style="width: 90%;" list="error-group" (change)="getListErrorById(item.errGroup,i)">
+                <datalist id="error-group">
+                  <option *ngFor="let item of listErrorGroup" value="{{item.errGroup}}"></option>
+                </datalist>
+                <span [id]="item.id+'-span-error-errGroup'" [hidden]="false">{{item.errGroup}}</span>
+              </td>
+              <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
+              <td style="text-align: left;width: 21%;"><input [id]="item.id+'-input-error-errCode'" type="text"
+                  [(ngModel)]="item.errName" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;"
+                  list="error-name" (change)="mappingErrCode(item.errName,i)">
+                <datalist id="error-name">
+                  <option *ngFor="let item of listErrors" value="{{item.errName}}"></option>
+                </datalist>
+                <span [id]="item.id+'-span-error-errCode'" [hidden]="false">{{item.errName}}</span>
+              </td>
+              <td style="width: 9%;"><input [id]="item.id+'-input-quantity'" type="text" style="width: 90%;"
+                  [(ngModel)]="item.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"> <span
+                  [id]="item.id+'-span-quantity'" [hidden]="false">{{item.quantity}}</span></td>
+              <td style="width: 9%;">{{item.createdAt| date:'dd/MM/yyyy'}}</td>
+              <td style="text-align: left;width: 19%;"> <input [id]="item.id+'-input-error-note'" type="text"
+                  [(ngModel)]="item.note" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;">
+                <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span></td>
+              <td style="width: 9%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
+                <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateError(item.id)"><i
+                    class="fa fa-edit"></i></button>
+                <button [id]="item.id+'-button-error'" class="btn btn-sm btn-info" title="Xác nhận" [hidden]="true"
+                  (click)="submitError(i)"><i class="fa fa-check"></i></button>
+                <button class="btn btn-sm btn-danger" title="Xóa" (click)="deleteErrorById(i)"><i
+                    class="fa fa-trash"></i></button>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<!-- View lỗi biên bản nvl -->
+<ng-template #listErrorView let-modal>
+  <div style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
+    <div> <button class="close-popup" style="margin-left: 97%;" (click)="modal.dismiss('Cross click')">X</button></div>
+    <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
+    <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
+      <div style="display: flex;">
+        <div hidden>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+          <datalist id="lstItemCode">
+            <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
+          </datalist>
+        </div>
+        <div hidden>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
+          <datalist id="lstErrGroup">
+            <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
+          </datalist>
+        </div>
+        <div hidden>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
+          <datalist id="lstErrCode">
+            <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
+          </datalist>
+        </div>
+        <div hidden>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
+          <datalist id="lstErrName">
+            <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
+          </datalist>
+        </div>
+        <button hidden class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+          (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
+      </div>
+      <div class="float-right">
+      </div>
+    </div>
+    <div style="margin-left: 7px;">
+      <div style="margin-bottom: 0px;width: 99%;">
+        <table class="tables" style="margin-bottom: 0px;">
+          <thead>
+            <tr>
+              <th style="width: 5%;">STT</th>
+              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Nhóm lỗi </th>
+              <th style="width: 9%;">Mã lỗi </th>
+              <th style="width: 21%;">Tên lỗi </th>
+              <th style="width: 9%;">Số lượng</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div id="table-errors" style="width: 99%;margin-bottom: 10px;">
+        <table class="tables" style="margin-top: 0px;">
+          <tbody>
+            <tr *ngFor="let item of listOfError;let i = index;">
+              <td style="width: 5%;"> {{i+1}}</td>
+              <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
+              <td style="text-align: left;width: 9%;"><span>{{item.errGroup}}</span></td>
+              <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
+              <td style="text-align: left;width: 21%;"><span>{{item.errName}}</span></td>
+              <td style="width: 9%;"><span>{{item.quantity}}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </ng-template>
