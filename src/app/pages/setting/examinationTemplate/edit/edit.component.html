@@ -143,14 +143,15 @@
             <thead>
               <tr>
                 <th rowspan="2">#</th>
-                <th colspan="2">Chỉ tiêu kiểm tra</th>
+                <th colspan="3">Chỉ tiêu kiểm tra</th>
                 <th colspan="3">Yêu cầu</th>
-                <th rowspan="2" style="line-height: 65px;">Nội dung lưu ý</th>
+                <th rowspan="2" style="line-height: 65px;">Yêu cầu chi tiết/Lưu ý</th>
                 <th rowspan="2">Tùy chọn</th>
               </tr>
               <tr>
-                <th>Tiêu chí</th>
-                <th>Mức quy định</th>
+                <th>Chỉ tiêu kiểm tra</th>
+                <th>Bậc rút nghiệm</th>
+                <th>Mức chấp nhận</th>
                 <th>Min</th>
                 <th>Max</th>
                 <th>Đơn vị</th>
@@ -161,6 +162,7 @@
                 <td>{{ i+1}}</td>
                 <td>{{ audit.criteriaName }}</td>
                 <td>{{ audit.regulationLevel }}</td>
+                <td>{{ audit.acceptanceLevel }}</td>
                 <td>{{ audit.min | number }}</td>
                 <td>{{ audit.max | number }}</td>
                 <td>{{ audit.unit }}</td>
@@ -185,18 +187,23 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
           <div class="table-responsive">
             <div class="float-right">
-              <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','',null)"><i class="fa fa-plus"></i> Thông
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','',null)"><i class="fa fa-plus"></i>
+                Thông
                 tin kiểm tra</button>
             </div>
             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditLKDT2"
               [nzFrontPagination]="false">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
+                  <th rowspan="2">#</th>
+                  <th colspan="3">Chỉ tiêu kiểm tra</th>
+                  <th rowspan="2" style="line-height: 65px;">Yêu cầu chi tiết/Lưu ý</th>
+                  <th rowspan="2">Tùy chọn</th>
+                </tr>
+                <tr>
                   <th>Chỉ tiêu kiểm tra</th>
-                  <th>Mức quy định</th>
-                  <th>Yêu cầu kỹ thuật</th>
-                  <th>Tùy chọn</th>
+                  <th>Bậc rút nghiệm</th>
+                  <th>Mức chấp nhận</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,6 +211,7 @@
                   <td>{{++i}}</td>
                   <td>{{ audit.auditContent }}</td>
                   <td>{{ audit.regulationLevel }}</td>
+                  <td>{{ audit.acceptanceLevel }}</td>
                   <td>{{ audit.technicalRequirement }}</td>
 
                   <td class="text-center">
@@ -220,7 +228,8 @@
 
           <div class="table-responsive" style="width: 100%;">
             <div class="float-right">
-              <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','',null)"><i class="fa fa-plus"></i>
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','',null)"><i
+                  class="fa fa-plus"></i>
                 Thông tin kiểm tra</button>
             </div>
             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditParam"
@@ -228,9 +237,9 @@
               <thead>
                 <tr>
                   <th rowspan="2">#</th>
-                  <th rowspan="2">Thông số</th>
-                  <th rowspan="2">Điều kiện</th>
-                  <th colspan="3">Tiêu chuẩn</th>
+                  <th rowspan="2">Thông số kiểm tra</th>
+                  <th rowspan="2">Điều kiện kiểm tra</th>
+                  <th colspan="3">Tiêu chuẩn kiểm tra</th>
                   <th rowspan="2">Tùy chọn</th>
                 </tr>
                 <tr>
@@ -314,35 +323,40 @@
       <div class="form-group">
         <label>Nhóm tiêu chí</label>
         <input type="text" class="form-control" name="testingCriticalGroup" [(ngModel)]="testingCriticalGroup" required
-        placeholder="Nhóm tiêu chí" list="auto34" (change)="findByCritiCalGroup()"/>
-        <datalist  id="auto34">
-                     <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-                       <span>{{ oitm.testingCriticalGroup }}</span>
-                     </option>
-                   </datalist>
+          placeholder="Nhóm tiêu chí" list="auto34" (change)="findByCritiCalGroup()" />
+        <datalist id="auto34">
+          <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+            <span>{{ oitm.testingCriticalGroup }}</span>
+          </option>
+        </datalist>
       </div>
       <div class="form-group">
-        <label>Tên tiêu chí</label>
+        <label>Tiêu chí kiểm tra</label>
         <!-- <input type="text" class="form-control" name="criteriaName" [(ngModel)]="formAudit.criteriaName" required
           #criteriaName="ngModel" placeholder="Tên tiêu chí" /> -->
-          <input type="text" list="auto355" class="form-control"  [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }" required
-            #criteriaName="ngModel" placeholder="Tên tiêu chí" list="auto355"/>
-            <datalist  id="auto355">
-              <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
-                <span>{{ item.testingName }}</span>
-              </option>
-            </datalist>
+        <input type="text" list="auto355" class="form-control" [(ngModel)]="testingName"
+          [ngModelOptions]="{ standalone: true }" required #criteriaName="ngModel" placeholder="Tên tiêu chí"
+          list="auto355" />
+        <datalist id="auto355">
+          <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
+            <span>{{ item.testingName }}</span>
+          </option>
+        </datalist>
         <div class="alert-danger" *ngIf="criteriaName.errors && f.submitted">
           <div *ngIf="criteriaName.errors['required']">Tên biên tiêu chí không được để trống</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Định mức quy định</label>
+        <label>Bậc rút nghiệm</label>
         <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formAudit.regulationLevel" required
           #level="ngModel" placeholder="Định mức quy định" />
       </div>
-
+      <div class="form-group">
+        <label>Mức chấp nhận</label>
+        <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAudit.acceptanceLevel" required
+          #level="ngModel" placeholder="Định mức quy định" />
+      </div>
       <div class="form-group">
         <label>Thông số min</label>
         <input type="text" class="form-control" name="min" [(ngModel)]="formAudit.min" #min="ngModel"
@@ -383,35 +397,39 @@
       <div class="form-group pb-3">
         <label>Nhóm tiêu chí</label>
         <input type="text" class="form-control" name="testingCriticalGroup" [(ngModel)]="testingCriticalGroup" required
-          placeholder="Nhóm tiêu chí" list="auto36" (change)="findByCritiCalGroup()"/>
-          <datalist  id="auto36">
-            <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-              <span>{{ oitm.testingCriticalGroup }}</span>
-            </option>
-          </datalist>
+          placeholder="Nhóm tiêu chí" list="auto36" (change)="findByCritiCalGroup()" />
+        <datalist id="auto36">
+          <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+            <span>{{ oitm.testingCriticalGroup }}</span>
+          </option>
+        </datalist>
       </div>
       <div class="form-group">
-        <label>Chỉ tiêu</label>
+        <label>Chỉ tiêu kiểm tra</label>
         <!-- <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent"
           #content="ngModel" placeholder="Chỉ tiêu kiểm tra" /> -->
-          <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
-            #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto37" />
-            <datalist  id="auto37">
-              <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
-                <span>{{ oitm.testingName }}</span>
-              </option>
-            </datalist>
+        <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
+          #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto37" />
+        <datalist id="auto37">
+          <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
+            <span>{{ oitm.testingName }}</span>
+          </option>
+        </datalist>
         <div class="alert-danger" *ngIf="content.errors && f.submitted">
           <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Định mức quy định</label>
+        <label>Bậc rút nghiệm</label>
         <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAuditLKDT2.regulationLevel"
           #level="ngModel" placeholder="Định mức quy định" />
       </div>
-
+      <div class="form-group">
+        <label>Mức chấp nhận</label>
+        <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAuditLKDT2.acceptanceLevel"
+          #level="ngModel" placeholder="Định mức quy định" />
+      </div>
       <div class="form-group">
         <label>Yêu cầu kỹ thuật</label>
         <input type="text" class="form-control" name="technicalRequirement"
@@ -436,13 +454,13 @@
   <div class="modal-body">
     <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
       <div class="form-group">
-        <label>Thông số</label>
+        <label>Thông số kiểm tra</label>
         <input type="text" class="form-control" name="parameterName" [(ngModel)]="formAuditParam.parameterName" required
           minlength="1" #name="ngModel" placeholder="Tên tiêu chí" />
       </div>
 
       <div class="form-group">
-        <label>Điều kiện</label>
+        <label>Điều kiện kiểm tra</label>
         <input type="text" class="form-control" name="conditions" [(ngModel)]="formAuditParam.conditions"
           #conditions="ngModel" placeholder="Định mức quy định" />
       </div>
@@ -484,24 +502,24 @@
       <div class="form-group pb-3">
         <label>Nhóm tiêu chí</label>
         <input type="text" class="form-control" name="testingCriticalGroup" [(ngModel)]="testingCriticalGroup" required
-          placeholder="Nhóm tiêu chí" list="auto38" (change)="findByCritiCalGroup()"/>
-          <datalist  id="auto38">
-            <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-              <span>{{ oitm.testingCriticalGroup }}</span>
-            </option>
-          </datalist>
+          placeholder="Nhóm tiêu chí" list="auto38" (change)="findByCritiCalGroup()" />
+        <datalist id="auto38">
+          <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+            <span>{{ oitm.testingCriticalGroup }}</span>
+          </option>
+        </datalist>
       </div>
       <div class="form-group">
         <label>Chỉ tiêu</label>
         <!-- <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
           #content="ngModel" placeholder="Chỉ tiêu kiểm tra" /> -->
-          <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
-            #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto39"/>
-            <datalist  id="auto39">
-              <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
-                <span>{{ oitm.testingName }}</span>
-              </option>
-            </datalist>
+        <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent" required
+          #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto39" />
+        <datalist id="auto39">
+          <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
+            <span>{{ oitm.testingName }}</span>
+          </option>
+        </datalist>
         <div class="alert-danger" *ngIf="content.errors && f.submitted">
           <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
         </div>

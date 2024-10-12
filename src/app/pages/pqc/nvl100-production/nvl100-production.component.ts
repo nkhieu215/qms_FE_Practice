@@ -14,6 +14,7 @@ import { PQCNVlService } from 'src/app/share/_services/pqc_nvl.service';
 import { PQCScan100Service } from 'src/app/share/_services/pqcScan100.service';
 import { HttpClient } from '@angular/common/http';
 import { ShowComponent } from '../show/show.component';
+import { async } from 'rxjs/internal/scheduler/async';
 @Component({
   selector: 'app-nvl100-production',
   templateUrl: './nvl100-production.component.html',
@@ -50,6 +51,8 @@ export class Nvl100ProductionComponent implements OnInit {
   lstPartNumberAvailableOrigin: any[] = [];
   lstMaterialScan: any[] = [];
   lstMaterialScanOrigin: any[] = [];
+  totalScaned = 0;
+  totalNotScan = 0;
   partNumberSearchKey = '';
   materialSearchKey = '';
   statusSearchKey = '';
@@ -1044,7 +1047,18 @@ export class Nvl100ProductionComponent implements OnInit {
           })
         })
       })
-      this.lstMaterialScan = this.lstMaterialScanOrigin;
+      setTimeout(() => {
+        this.lstMaterialScan = this.lstMaterialScanOrigin;
+        this.totalNotScan = 0;
+        this.totalScaned = 0;
+        this.lstMaterialScanOrigin.forEach(x => {
+          if (x.status == 'Đã scan') {
+            this.totalScaned++;
+          } else {
+            this.totalNotScan++;
+          }
+        })
+      }, 100);
       console.log(this.lstMaterialScan)
     }
   }

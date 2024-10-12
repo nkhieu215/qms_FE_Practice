@@ -979,7 +979,7 @@ export class StoreCheckComponent implements OnInit {
 
     this.commonService.statusStep(id).toPromise().then(
       data => {
-        this.lstCheck = data.lstStep.filter((x: any) => x.step != 'QC_CHECK' && x.step != 'PHOTOELECTRIC_PRODUCT' && x.step != 'PHOTOELECTRIC' && x.step != 'APPROVE_STORE' && x.step != 'SAP_STORE');
+        this.lstCheck = data.lstStep.filter((x: any) => x.step != 'QC_CHECK' && x.step != 'PHOTOELECTRIC_PRODUCT' && x.step != 'PHOTOELECTRIC' && x.step != 'APPROVE_STORE' && x.step != 'SAP_STORE' && x.step != 'PRINT_SERIAL');
         this.lstCheck?.forEach(el => {
           el.status = Utils.getStatusName(el.status);
           el.checked = true;

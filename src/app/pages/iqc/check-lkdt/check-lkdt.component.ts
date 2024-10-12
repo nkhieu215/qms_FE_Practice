@@ -93,7 +93,7 @@ export class CheckLkdtComponent implements OnInit {
   lstview = true;
   lstAuditCriteriaParamResponse: Array<AuditCriteriaParam> = [];
   lstAuditCriteriaParam: Array<AuditCriteriaParam> = [];
-
+  listOfParameters: any;
   lstAuditCriteriaLKDTResponse: Array<AuditCriteriaLKDT2> = [];
   lstAuditCriteriaLKDT: Array<AuditCriteriaLKDT2> = [];
 
@@ -144,6 +144,11 @@ export class CheckLkdtComponent implements OnInit {
 
     this.typeAction = this.actRoute.snapshot.params['type'];
     this.id = this.actRoute.snapshot.params['id'];
+    var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
+    this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
+      this.listOfParameters = res;
+      console.log(this.listOfParameters)
+    })
     this.getListError();
     this.getListErrorGroup();
     if (this.typeAction) {
@@ -774,7 +779,7 @@ export class CheckLkdtComponent implements OnInit {
       this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
     }
     else if (this.typeAction == 'edit') {
-
+      this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
     }
 
     this.formAuditCriteriaLKDT = {};

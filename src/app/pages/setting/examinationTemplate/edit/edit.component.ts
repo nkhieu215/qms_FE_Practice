@@ -305,12 +305,13 @@ export class ExaminationEditComponent implements OnInit {
   onAddAudit(type: any, even: any) {
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement, id } =
+      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel } =
         this.formAuditLKDT2;
       var lkdt = new AuditCriteriaLKDT2();
       lkdt.auditContent = auditContent;
       lkdt.regulationLevel = regulationLevel;
       lkdt.technicalRequirement = technicalRequirement;
+      lkdt.acceptanceLevel = acceptanceLevel;
       lkdt.ids = Utils.randomString(5);
       lkdt.templateId = this.id;
       if (even == 'EDIT') {
@@ -384,7 +385,7 @@ export class ExaminationEditComponent implements OnInit {
         (err) => { }
       );
     } else if (type == 'NVL') {
-      const { criteriaName, regulationLevel, min, max, unit, note, id } =
+      const { criteriaName, regulationLevel, min, max, unit, note, id, acceptanceLevel } =
         this.formAudit;
       const audit: AuditCriteriaNvl = new AuditCriteriaNvl();
       audit.criteriaName = this.testingName;
@@ -393,6 +394,7 @@ export class ExaminationEditComponent implements OnInit {
       audit.max = max;
       audit.unit = unit;
       audit.note = note;
+      audit.acceptanceLevel = acceptanceLevel;
       audit.ids = Utils.randomString(5);
       audit.templateId = this.actRoute.snapshot.params['id'];
       audit.id = id;
@@ -425,11 +427,12 @@ export class ExaminationEditComponent implements OnInit {
       );
     }
     else if (type == 'CLSP') {
-      const { auditContent, regulationLevel, technicalRequirement, id } = this.formAuditLKDT2;
+      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel } = this.formAuditLKDT2;
       var lkdt1 = new AuditCriteriaLKDT2();
       lkdt1.auditContent = auditContent;
       lkdt1.regulationLevel = regulationLevel;
       lkdt1.technicalRequirement = technicalRequirement;
+      lkdt1.acceptanceLevel = acceptanceLevel;
       lkdt1.ids = Utils.randomString(5);
       lkdt1.templateId = this.id;
       lkdt1.id = id;
@@ -620,6 +623,7 @@ export class ExaminationEditComponent implements OnInit {
     this.id = id;
     this.examinationService.detail(id).subscribe(
       (data) => {
+        console.log(data)
         this.name = data.examinationType.name;
         this.code = data.examinationType.code;
         this.examiantionRes = data;

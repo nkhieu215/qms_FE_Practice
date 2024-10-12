@@ -8,14 +8,16 @@
         <!-- <form name="form" (ngSubmit)="f.form.valid" #f="ngForm"> -->
         <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order"
           item_id="{{idWorkOrder}}"></pqc-show-work-order>
-        <div class="form-group row" *ngIf="show_work_order">
+        <div class="form-group row">
           <div class="col-sm-3" style="display: flex;justify-content: space-between;width: 100%;">
-            <label style="color: blue;"><strong>Thực hiện quét mã linh kiện đầu vào . . .</strong></label>
+            <label style="color: blue;" *ngIf="show_work_order"><strong>Thực hiện quét mã linh kiện đầu vào . .
+                .</strong></label>
             <div style="width: 33%;">
               <button class="machine-info-btn"
                 style="background-color: #0080ff; border: #0080ff solid 1px;   width: 23%;" (click)="open(confirm,'')"
                 *ngIf="condition == true">Xác nhận xử lý lỗi scan</button>
-              <button class="machine-info-btn" (click)="open(machine,'machine')" style="width: 15%;">Quản lý
+              <button class="machine-info-btn" (click)="open(machine,'machine')" style="width: 15%;"
+                *ngIf="show_work_order">Quản lý
                 feeder</button>
               <button class="machine-info-btn" (click)="open(myModalAvailable,'available')"
                 style="background-color: #2CB4DA; border: #2CB4DA solid 1px;width: 20%;">Danh sách
@@ -427,7 +429,8 @@
   <ng-template #myModalScaned let-modal>
     <div class="modal-header">
       <h2 class="modal-title" id="modal-basic-title">
-        Danh sách material
+        Danh sách material <br> Tổng số cuộn: {{lstMaterialScanOrigin.length}} - Đã scan: {{totalScaned}} - Chưa scan:
+        {{totalNotScan}}
       </h2>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>

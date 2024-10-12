@@ -459,7 +459,7 @@
           <nz-table #basicTable nzBordered [nzPageSize]="100" [nzData]="lstAuditCriteriaNvl">
             <thead>
               <tr>
-                <th colspan="2">Chỉ tiêu kiểm tra</th>
+                <th colspan="3">Chỉ tiêu kiểm tra</th>
                 <th colspan="3">Yêu cầu</th>
                 <th rowspan="2" style="line-height: 65px">Nội dung lưu ý</th>
                 <th rowspan="2" style="line-height: 65px">Yêu cầu khác</th>
@@ -470,8 +470,9 @@
                 <th rowspan="2" style="line-height: 65px">Tùy chọn</th>
               </tr>
               <tr>
-                <th>Tiêu chí</th>
-                <th>Mức quy định</th>
+                <th>Tiêu chí kiểm tra</th>
+                <th>Bậc rút nghiệm</th>
+                <th>Mức chấp nhận</th>
                 <th>Min</th>
                 <th>Max</th>
                 <th>Đơn vị</th>
@@ -487,6 +488,7 @@
                   <input type="hidden" name="auditCriteriaId" [(ngModel)]="audit.auditCriteriaId" />
                 </td>
                 <td>{{ audit.regulationLevel }}</td>
+                <td>{{ audit.acceptanceLevel }}</td>
                 <td>{{ audit.minAudit | number }}</td>
                 <td>{{ audit.maxAudit | number }}</td>
                 <td>{{ audit.unitAudit }}</td>
@@ -702,7 +704,7 @@
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label>Tiêu chí</label>
+            <label>Tiêu chí kiểm tra</label>
             <input type="text" class="form-control" [(ngModel)]="formAddCheck.criteriaName"
               [ngModelOptions]="{ standalone: true }" #criteriaName="ngModel" placeholder="Tiêu chí"
               list="criteriaName1" />
@@ -717,13 +719,21 @@
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label>Mức quy định</label>
+            <label>Bậc rút nghiệm</label>
             <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAddCheck.regulationLevel"
               #level="ngModel" placeholder="Mức quy định" />
           </div>
         </div>
       </div>
-
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Mức chấp nhận</label>
+            <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAddCheck.acceptanceLevel"
+              #level="ngModel" placeholder="Mức quy định" />
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-4">
           <div class="form-group">
@@ -908,7 +918,8 @@
               <td style="width: 9%;">{{item.createdAt| date:'dd/MM/yyyy'}}</td>
               <td style="text-align: left;width: 19%;"> <input [id]="item.id+'-input-error-note'" type="text"
                   [(ngModel)]="item.note" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;">
-                <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span></td>
+                <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span>
+              </td>
               <td style="width: 9%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
                 <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateError(item.id)"><i
                     class="fa fa-edit"></i></button>

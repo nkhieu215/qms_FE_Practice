@@ -255,7 +255,7 @@ export class CheckNvlComponent implements OnInit {
   }
 
   async onAddCheck() {
-    const { criteriaName, regulationLevel, minAudit, maxAudit, unitAudit, noteAudit, ortherRequerement, quantityAudit, min, max, checkResult, note } = this.formAddCheck;
+    const { criteriaName, regulationLevel, minAudit, maxAudit, unitAudit, noteAudit, ortherRequerement, quantityAudit, min, max, checkResult, note, acceptanceLevel } = this.formAddCheck;
     this.formAddCheck.ids = Utils.randomString(5);
     let audit = new AuditCriteriaNvl();
     audit.criteriaName = criteriaName;
@@ -270,6 +270,7 @@ export class CheckNvlComponent implements OnInit {
     audit.max = max;
     audit.note = note;
     audit.checkResult = checkResult;
+    audit.acceptanceLevel = acceptanceLevel;
 
 
     if (this.typeAction == 'edit') {

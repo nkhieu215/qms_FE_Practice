@@ -30,6 +30,7 @@ export class ExaminationAddComponent implements OnInit {
   listOfItems: any;
   //list tieu chi
   listOfCriticalName: any;
+  listOfParameters: any;
   listOfCriticalGroup: any;
   //Biến hiển thị cho NVL
   @Input() testingName = '';
@@ -349,6 +350,7 @@ export class ExaminationAddComponent implements OnInit {
             const examinationType = this.examinationType === '1' ? 1 : 0;
             const { name, status, description, code } = this.form;
             const auditForm = new AuditCriteria(name, this.examinationType, code, description, status, 0);
+            console.log("thêm mới: ", this.arrayAudit)
             this.examinationService.create(auditForm, this.arrayAudit, this.arrayAuditLKDT2, this.arrayAuditParam, this.arrayAuditCLSP, "ADD").subscribe(
               data => {
                 console.log("result", name, this.examinationType);
@@ -393,11 +395,12 @@ export class ExaminationAddComponent implements OnInit {
 
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement } = this.formAuditLKDT2;
+      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel } = this.formAuditLKDT2;
       var lkdt1 = new AuditCriteriaLKDT2();
       lkdt1.auditContent = this.testingName;
       lkdt1.regulationLevel = regulationLevel;
       lkdt1.technicalRequirement = technicalRequirement;
+      lkdt1.acceptanceLevel = acceptanceLevel;
       lkdt1.ids = Utils.randomString(5);
       if (action == 'ADD') {
         this.arrayAuditLKDT2.push(lkdt1);
@@ -416,11 +419,12 @@ export class ExaminationAddComponent implements OnInit {
       }
     }
     else if (type == 'CLSP') {
-      const { auditContent, regulationLevel, technicalRequirement } = this.formAuditLKDT2;
+      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel } = this.formAuditLKDT2;
       var lkdt1 = new AuditCriteriaLKDT2();
       lkdt1.auditContent = this.testingName;
       lkdt1.regulationLevel = regulationLevel;
       lkdt1.technicalRequirement = technicalRequirement;
+      lkdt1.acceptanceLevel = acceptanceLevel;
       lkdt1.ids = Utils.randomString(5);
       if (action == 'ADD') {
         this.arrayAuditCLSP.push(lkdt1);
@@ -429,7 +433,7 @@ export class ExaminationAddComponent implements OnInit {
 
     else if (type == 'NVL') {
       //const testingName = this.testingName;
-      const { regulationLevel, min, max, unit, note } = this.formAudit;
+      const { regulationLevel, min, max, unit, note, acceptanceLevel } = this.formAudit;
       const criteriaName = this.testingName
       const audit: AuditCriteriaNvl = new AuditCriteriaNvl();
       audit.criteriaName = criteriaName;
@@ -438,6 +442,7 @@ export class ExaminationAddComponent implements OnInit {
       audit.max = max;
       audit.unit = unit;
       audit.note = note;
+      audit.acceptanceLevel = acceptanceLevel;
       audit.ids = Utils.randomString(5);
       if (action == 'ADD') {
         this.arrayAudit.push(audit);
@@ -486,6 +491,13 @@ export class ExaminationAddComponent implements OnInit {
       this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
         this.testingCriticalGroup = res.testingCriticalGroup;
         console.log("group name: ", res)
+      })
+    }
+    if (!this.listOfParameters) {
+      var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
+      this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
+        this.listOfParameters = res;
+        console.log(this.listOfParameters)
       })
     }
     this.formAudit = {};

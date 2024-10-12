@@ -31,8 +31,8 @@
           <div class="col-md-12 p-2">
             <div class="form-group pb-3">
               <label>Tên biên bản</label>
-              <input type="text" class="form-control" name="name" [(ngModel)]="form.name" required #name="ngModel" (change)="checkDublicateByName(form.name)"
-                placeholder="Tên biên bản" />
+              <input type="text" class="form-control" name="name" [(ngModel)]="form.name" required #name="ngModel"
+                (change)="checkDublicateByName(form.name)" placeholder="Tên biên bản" />
               <div class="alert-danger" *ngIf="name.errors && f.submitted">
                 <div *ngIf="name.errors['required']">Tên biên bản không được để trống</div>
                 <div *ngIf="name.errors['minlength']">
@@ -45,8 +45,8 @@
           <div class="col-md-12 p-2">
             <div class="form-group pb-3">
               <label>Mã biên bản</label>
-              <input type="text" class="form-control" name="code" [(ngModel)]="form.code" #code="ngModel"  (change)="checkDublicateByCode(form.code)"
-                placeholder="Mã biên bản" />
+              <input type="text" class="form-control" name="code" [(ngModel)]="form.code" #code="ngModel"
+                (change)="checkDublicateByCode(form.code)" placeholder="Mã biên bản" />
             </div>
           </div>
           <div class="col-md-12 p-2">
@@ -82,223 +82,242 @@
 
       <div style="display: flex;flex-direction: column;width: 75%;">
         <div style="display: flex;flex-direction: column;">
-           <!-- Danh sách mã sản phẩm -->
-  
-           <div class="float-right" style="margin-bottom: 10px;">
-             <button class="btn  btn-success" (click)="addNewItem()"><i class="fa fa-plus"></i> Thêm sản phẩm</button>
-             <button id="btn-save-item" class="btn  btn-success" style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;" (click)="submitItems()" [hidden]="true"><i class="fa fa-save" ></i> Lưu</button>
-           </div>
-           <div style="width: 99%;margin-left: 7px;">
-             <div style="margin-bottom: 0px;width: 98%;">
-               <table class="tables" style="margin-bottom: 0px;">
-                 <thead>
-                   <tr>
-                     <th style="width: 62px;">STT</th>
-                     <th style="width: 150px;">Mã sản phẩm</th>
-                     <th style="width: 830px;">Tên sản phẩm</th>
-                     <th style="width: 100px;">Tùy chọn</th>
-                   </tr>
-                 </thead>
-               </table>
-             </div>
-             <div id="table-body" style="overflow: auto;height: 324px;width: 98%;">
-               <table class="tables" style="margin-top: 0px;">
-                 <tbody>
-                   <tr *ngFor="let item of listOfItem;let i = index;">
-                     <td style="width: 62px;"> {{i+1}}</td>
-                     <td style="text-align: left;width: 150px;"><input [id]="item.id+'-input'" type="text" 
-                         [(ngModel)]="item.itemCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"
-                         (ngModelChange)="getListOfItems(item.itemCode)" [matAutocomplete]="auto33" style="width: 119px;">
-                       <mat-autocomplete [panelWidth]="800" #auto33="matAutocomplete"
-                         (optionSelected)="onSelectedElectronic(i,item.itemCode)">
-                         <mat-option *ngFor="let oitm of listOfItems" [value]="oitm">
-                           <span><b>{{ oitm.itemName }}</b> ({{ oitm.itemCode }})</span>
-                         </mat-option>
-                       </mat-autocomplete>
-                       <span [id]="item.id+'-span'" [hidden]="false">{{item.itemCode}}</span>
-                     </td>
-                     <td style="text-align: left;width: 830px;"><input [id]="item.id+'-input'" type="text"
-                         [(ngModel)]="item.itemName" [ngModelOptions]="{ standalone: true }" [hidden]="true"> <span
-                         [id]="item.id+'-span'" [hidden]="false">{{item.itemName}}</span></td>
-                     <td style="width: 100px;">
-                       <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateItem(item.id)"><i
-                           class="fa fa-edit"></i></button>
-                       <button [id]="item.id+'-button'" class="btn btn-sm btn-info" title="Xác nhận" [hidden]="true"
-                         (click)="submitItem(i)"><i class="fa fa-check"></i></button>
-                       <button class="btn btn-sm btn-danger" title="Xóa" (click)="deleteById(i)"><i
-                           class="fa fa-trash"></i></button>
-                   </tr>
-                 </tbody>
-               </table>
-             </div>
-           </div>
-         </div>
-         <!-- thong tin kiem tra nvl -->
-         <div *ngIf="examinationType == '1'" class="col-xs-12 col-sm-12 col-md-9" style="width: 100%;">
-           <div class="table-responsive">
-             <div class="float-right  pb-3">
-   
-               <button class="btn  btn-success" (click)="open(mymodal,'','NVL',null)"><i class="fa fa-plus"></i> Thêm tiêu
-                 chí</button>
-             </div>
-             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí"  [nzData]="['']"
-               [nzFrontPagination]="false">
-               <thead>
-                 <tr>
-                   <th colspan="2">Chỉ tiêu kiểm tra</th>
-                   <th colspan="3">Yêu cầu</th>
-                   <th rowspan="2" style="line-height: 65px;">Nội dung lưu ý</th>
-                   <th rowspan="2">Tùy chọn</th>
-                 </tr>
-                 <tr>
-                   <th>Tiêu chí</th>
-                   <th>Mức quy định</th>
-                   <th>Min</th>
-                   <th>Max</th>
-                   <th>Đơn vị</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 <tr *ngFor="let audit of arrayAudit">
-                   <td>{{ audit.criteriaName }}</td>
-                   <td>{{ audit.regulationLevel }}</td>
-                   <td>{{ audit.min | number }}</td>
-                   <td>{{ audit.max | number }}</td>
-                   <td>{{ audit.unit }}</td>
-                   <td>{{ audit.note }}</td>
-                   <td class="text-center">
-                     <div class="btn-group">
-                       <button class="btn btn-sm btn-primary" (click)="open(mymodal,audit.ids,'NVL',audit.criteriaName)">
-                         <i class="fa fa-edit"></i>
-                       </button>
-                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'NVL')">
-                         <i class="fa fa-trash"></i>
-                       </button>
-                     </div>
-                   </td>
-                 </tr>
-               </tbody>
-             </nz-table>
-           </div>
-         </div>
-   
-         <!-- thông tin kiểm tra LKDT -->
-         <div class="col-xs-12 col-sm-12 col-md-9" *ngIf="examinationType == '2'" style="width: 100%;">
-           <div class="table-responsive">
-             <div class="float-right  pb-3">
-               <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','LKDT1',null)"><i class="fa fa-plus"></i>
-                 Thông tin kiểm tra</button>
-             </div>
-             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí"  [nzData]="['']"
-               [nzFrontPagination]="false">
-               <thead>
-                 <tr>
-                   <th>Chỉ tiêu kiểm tra</th>
-                   <th>Mức quy định</th>
-                   <th>Yêu cầu kỹ thuật</th>
-                   <th>Tùy chọn</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 <tr *ngFor="let audit of arrayAuditLKDT2">
-                   <td>{{ audit.auditContent }}</td>
-                   <td>{{ audit.regulationLevel }}</td>
-                   <td>{{ audit.technicalRequirement }}</td>
-   
-                   <td class="text-center">
-                     <div class="btn-group">
-                       <button class="btn btn-sm btn-info" (click)="open(mymodal_lkdt,audit.ids,'LKDT1',audit.auditContent)"><i
-                           class="fa fa-edit"></i></button>
-                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT1')">
-                         <i class="fa fa-trash"></i>
-                       </button>
-                     </div>
-                   </td>
-                 </tr>
-               </tbody>
-             </nz-table>
-           </div>
-   
-           <div class="table-responsive" style="width: 100%;">
-             <div class="float-right">
-               <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','LKDT2',null)"><i
-                   class="fa fa-plus"></i> Thông
-                 tin kiểm tra</button>
-             </div>
-             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí"  [nzData]="['']"
-               [nzFrontPagination]="false">
-               <thead>
-                 <tr>
-                   <th rowspan="2">Thông số</th>
-                   <th rowspan="2">Điều kiện</th>
-                   <th colspan="3">Tiêu chuẩn</th>
-                   <th rowspan="2">Tùy chọn</th>
-                 </tr>
-                 <tr>
-                   <th>Min</th>
-                   <th>Max</th>
-                   <th>Đơn vị</th>
-                 </tr>
-               </thead>
-               <tbody>
-   
-                 <tr *ngFor="let audit of arrayAuditParam">
-                   <td>{{ audit.parameterName }}</td>
-                   <td>{{ audit.conditions }}</td>
-                   <td>{{ audit.min | number }}</td>
-                   <td>{{ audit.max | number }}</td>
-                   <td>{{ audit.unit }}</td>
-                   <td class="text-center">
-                     <div class="btn-group">
-                       <button class="btn btn-sm btn-info" (click)="open(mymodal_parameter,audit.ids,'LKDT2',null)"><i
-                           class="fa fa-edit"></i></button>
-                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT2')"><i
-                           class="fa fa-trash"></i></button>
-                     </div>
-                   </td>
-                 </tr>
-               </tbody>
-             </nz-table>
-           </div>
-         </div>
-   
-         <div class="col-xs-12 col-sm-12 col-md-9" *ngIf="examinationType == '3'" style="width: 100%;">
-           <div class="table-responsive">
-             <div class="float-right  pb-3">
-               <button class="btn btn-success" (click)="open(mymodal_clsp,'','CLSP',null)"><i class="fa fa-plus"></i> Thông
-                 tin
-                 kiểm tra</button>
-             </div>
-             <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
-               [nzFrontPagination]="false">
-               <thead>
-                 <tr>
-                   <th>Chỉ tiêu kiểm tra</th>
-                   <th>Bậc rút nghiệm</th>
-                   <th>Yêu cầu kỹ thuật</th>
-                   <th>Tùy chọn</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 <tr *ngFor="let audit of arrayAuditCLSP">
-                   <td>{{ audit.auditContent }}</td>
-                   <td>{{ audit.regulationLevel }}</td>
-                   <td>{{ audit.technicalRequirement }}</td>
-   
-                   <td class="text-center">
-                     <div class="btn-group">
-                       <button class="btn btn-sm btn-info" (click)="open(mymodal_clsp,audit.ids,'CLSP',audit.auditContent)"><i
-                           class="fa fa-edit"></i></button>
-                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'CLSP')"><i
-                           class="fa fa-trash"></i></button>
-                     </div>
-                   </td>
-                 </tr>
-               </tbody>
-             </nz-table>
-           </div>
-         </div>
-       </div>
+          <!-- Danh sách mã sản phẩm -->
+
+          <div class="float-right" style="margin-bottom: 10px;">
+            <button class="btn  btn-success" (click)="addNewItem()"><i class="fa fa-plus"></i> Thêm sản phẩm</button>
+            <button id="btn-save-item" class="btn  btn-success"
+              style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;" (click)="submitItems()"
+              [hidden]="true"><i class="fa fa-save"></i> Lưu</button>
+          </div>
+          <div style="width: 99%;margin-left: 7px;">
+            <div style="margin-bottom: 0px;width: 98%;">
+              <table class="tables" style="margin-bottom: 0px;">
+                <thead>
+                  <tr>
+                    <th style="width: 62px;">STT</th>
+                    <th style="width: 150px;">Mã sản phẩm</th>
+                    <th style="width: 830px;">Tên sản phẩm</th>
+                    <th style="width: 100px;">Tùy chọn</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div id="table-body" style="overflow: auto;height: 324px;width: 98%;">
+              <table class="tables" style="margin-top: 0px;">
+                <tbody>
+                  <tr *ngFor="let item of listOfItem;let i = index;">
+                    <td style="width: 62px;"> {{i+1}}</td>
+                    <td style="text-align: left;width: 150px;"><input [id]="item.id+'-input'" type="text"
+                        [(ngModel)]="item.itemCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                        (ngModelChange)="getListOfItems(item.itemCode)" [matAutocomplete]="auto33"
+                        style="width: 119px;">
+                      <mat-autocomplete [panelWidth]="800" #auto33="matAutocomplete"
+                        (optionSelected)="onSelectedElectronic(i,item.itemCode)">
+                        <mat-option *ngFor="let oitm of listOfItems" [value]="oitm">
+                          <span><b>{{ oitm.itemName }}</b> ({{ oitm.itemCode }})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                      <span [id]="item.id+'-span'" [hidden]="false">{{item.itemCode}}</span>
+                    </td>
+                    <td style="text-align: left;width: 830px;"><input [id]="item.id+'-input'" type="text"
+                        [(ngModel)]="item.itemName" [ngModelOptions]="{ standalone: true }" [hidden]="true"> <span
+                        [id]="item.id+'-span'" [hidden]="false">{{item.itemName}}</span></td>
+                    <td style="width: 100px;">
+                      <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateItem(item.id)"><i
+                          class="fa fa-edit"></i></button>
+                      <button [id]="item.id+'-button'" class="btn btn-sm btn-info" title="Xác nhận" [hidden]="true"
+                        (click)="submitItem(i)"><i class="fa fa-check"></i></button>
+                      <button class="btn btn-sm btn-danger" title="Xóa" (click)="deleteById(i)"><i
+                          class="fa fa-trash"></i></button>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- thong tin kiem tra nvl -->
+        <div *ngIf="examinationType == '1'" class="col-xs-12 col-sm-12 col-md-9" style="width: 100%;">
+          <div class="table-responsive">
+            <div class="float-right  pb-3">
+
+              <button class="btn  btn-success" (click)="open(mymodal,'','NVL',null)"><i class="fa fa-plus"></i> Thêm
+                tiêu
+                chí</button>
+            </div>
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th rowspan="2">#</th>
+                  <th colspan="3">Chỉ tiêu kiểm tra</th>
+                  <th colspan="3">Yêu cầu</th>
+                  <th rowspan="2" style="line-height: 65px;">Yêu cầu chi tiết/Lưu ý</th>
+                  <th rowspan="2">Tùy chọn</th>
+                </tr>
+                <tr>
+                  <th>Chỉ tiêu kiểm tra</th>
+                  <th>Bậc rút nghiệm</th>
+                  <th>Mức chấp nhận</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>Đơn vị</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let audit of arrayAudit;let i=index">
+                  <td>{{ i+1 }}</td>
+                  <td>{{ audit.criteriaName }}</td>
+                  <td>{{ audit.regulationLevel }}</td>
+                  <td>{{ audit.acceptanceLevel }}</td>
+                  <td>{{ audit.min | number }}</td>
+                  <td>{{ audit.max | number }}</td>
+                  <td>{{ audit.unit }}</td>
+                  <td>{{ audit.note }}</td>
+                  <td class="text-center">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-primary" (click)="open(mymodal,audit.ids,'NVL',audit.criteriaName)">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'NVL')">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+
+        <!-- thông tin kiểm tra LKDT -->
+        <div class="col-xs-12 col-sm-12 col-md-9" *ngIf="examinationType == '2'" style="width: 100%;">
+          <div class="table-responsive">
+            <div class="float-right  pb-3">
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','LKDT1',null)"><i
+                  class="fa fa-plus"></i>
+                Thông tin kiểm tra</button>
+            </div>
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th rowspan="2">#</th>
+                  <th colspan="3">Chỉ tiêu kiểm tra</th>
+                  <th rowspan="2" style="line-height: 65px;">Yêu cầu chi tiết/Lưu ý</th>
+                  <th rowspan="2">Tùy chọn</th>
+                </tr>
+                <tr>
+                  <th>Chỉ tiêu kiểm tra</th>
+                  <th>Bậc rút nghiệm</th>
+                  <th>Mức chấp nhận</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let audit of arrayAuditLKDT2;let i = index">
+                  <td>{{ i+1 }}</td>
+                  <td>{{ audit.auditContent }}</td>
+                  <td>{{ audit.regulationLevel }}</td>
+                  <td>{{ audit.acceptanceLevel }}</td>
+                  <td>{{ audit.technicalRequirement }}</td>
+
+                  <td class="text-center">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-info"
+                        (click)="open(mymodal_lkdt,audit.ids,'LKDT1',audit.auditContent)"><i
+                          class="fa fa-edit"></i></button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT1')">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+
+          <div class="table-responsive" style="width: 100%;">
+            <div class="float-right">
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','LKDT2',null)"><i
+                  class="fa fa-plus"></i> Thông
+                tin kiểm tra</button>
+            </div>
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th rowspan="2">Thông số kiểm tra</th>
+                  <th rowspan="2">Điều kiện kiểm tra</th>
+                  <th colspan="3">Tiêu chuẩn kiểm tra</th>
+                  <th rowspan="2">Tùy chọn</th>
+                </tr>
+                <tr>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>Đơn vị</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <tr *ngFor="let audit of arrayAuditParam">
+                  <td>{{ audit.parameterName }}</td>
+                  <td>{{ audit.conditions }}</td>
+                  <td>{{ audit.min | number }}</td>
+                  <td>{{ audit.max | number }}</td>
+                  <td>{{ audit.unit }}</td>
+                  <td class="text-center">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-info" (click)="open(mymodal_parameter,audit.ids,'LKDT2',null)"><i
+                          class="fa fa-edit"></i></button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT2')"><i
+                          class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-9" *ngIf="examinationType == '3'" style="width: 100%;">
+          <div class="table-responsive">
+            <div class="float-right  pb-3">
+              <button class="btn btn-success" (click)="open(mymodal_clsp,'','CLSP',null)"><i class="fa fa-plus"></i>
+                Thông
+                tin
+                kiểm tra</button>
+            </div>
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
+              [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>Chỉ tiêu kiểm tra</th>
+                  <th>Bậc rút nghiệm</th>
+                  <th>Yêu cầu kỹ thuật</th>
+                  <th>Tùy chọn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let audit of arrayAuditCLSP">
+                  <td>{{ audit.auditContent }}</td>
+                  <td>{{ audit.regulationLevel }}</td>
+                  <td>{{ audit.technicalRequirement }}</td>
+
+                  <td class="text-center">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-info"
+                        (click)="open(mymodal_clsp,audit.ids,'CLSP',audit.auditContent)"><i
+                          class="fa fa-edit"></i></button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'CLSP')"><i
+                          class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -308,38 +327,46 @@
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">Thêm mới thông tin kiểm tra</h4>
 
-        <i class="fa fa-window-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></i>
+      <i class="fa fa-window-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></i>
 
     </div>
     <div class="modal-body">
       <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
         <div class="form-group pb-3">
           <label>Nhóm tiêu chí</label>
-          <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup" [ngModelOptions]="{ standalone: true }" required
-            placeholder="Nhóm tiêu chí" list="auto34" (change)="findByCritiCalGroup()"/>
-            <datalist  id="auto34">
-                         <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-                           <span>{{ oitm.testingCriticalGroup }}</span>
-                         </option>
-                       </datalist>
+          <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
+            [ngModelOptions]="{ standalone: true }" required placeholder="Nhóm tiêu chí" list="auto34"
+            (change)="findByCritiCalGroup()" />
+          <datalist id="auto34">
+            <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+              <span>{{ oitm.testingCriticalGroup }}</span>
+            </option>
+          </datalist>
         </div>
         <div class="form-group pb-3">
-          <label>Tên tiêu chí</label>
-          <input type="text" list="auto355" class="form-control"  [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }" required
-            #criteriaName="ngModel" placeholder="Tên tiêu chí" list="auto355"/>
-            <datalist  id="auto355">
-              <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
-                <span>{{ item.testingName }}</span>
-              </option>
-            </datalist>
+          <label>Chỉ tiêu kiểm tra</label>
+          <input type="text" list="auto355" class="form-control" [(ngModel)]="testingName"
+            [ngModelOptions]="{ standalone: true }" required #criteriaName="ngModel" placeholder="Tên tiêu chí"
+            list="auto355" />
+          <datalist id="auto355">
+            <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
+              <span>{{ item.testingName }}</span>
+            </option>
+          </datalist>
           <div class="alert-danger" *ngIf="criteriaName.errors && f.submitted">
             <div *ngIf="criteriaName.errors['required']">Tên biên tiêu chí không được để trống</div>
           </div>
         </div>
 
         <div class="form-group pb-3">
-          <label>Định mức quy định</label>
+          <label>Bậc rút nghiệm</label>
           <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAudit.regulationLevel"
+            required #level="ngModel" placeholder="Định mức quy định" />
+        </div>
+
+        <div class="form-group pb-3">
+          <label>Mức chấp nhận</label>
+          <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAudit.acceptanceLevel"
             required #level="ngModel" placeholder="Định mức quy định" />
         </div>
 
@@ -382,31 +409,38 @@
       <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
         <div class="form-group pb-3">
           <label>Nhóm tiêu chí</label>
-          <input type="text" class="form-control"  [(ngModel)]="testingCriticalGroup"[ngModelOptions]="{ standalone: true }" required
-            placeholder="Nhóm tiêu chí" list="auto36" (change)="findByCritiCalGroup()"/>
-            <datalist  id="auto36">
-              <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-                <span>{{ oitm.testingCriticalGroup }}</span>
-              </option>
-            </datalist>
+          <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
+            [ngModelOptions]="{ standalone: true }" required placeholder="Nhóm tiêu chí" list="auto36"
+            (change)="findByCritiCalGroup()" />
+          <datalist id="auto36">
+            <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+              <span>{{ oitm.testingCriticalGroup }}</span>
+            </option>
+          </datalist>
         </div>
         <div class="form-group pb-3">
-          <label>Chỉ tiêu</label>
-          <input type="text" class="form-control" [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }" required
-            #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto37" />
-            <datalist  id="auto37">
-              <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
-                <span>{{ oitm.testingName }}</span>
-              </option>
-            </datalist>
+          <label>Chỉ tiêu kiểm tra</label>
+          <input type="text" class="form-control" [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }"
+            required #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto37" />
+          <datalist id="auto37">
+            <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
+              <span>{{ oitm.testingName }}</span>
+            </option>
+          </datalist>
           <div class="alert-danger" *ngIf="content.errors && f.submitted">
             <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
           </div>
         </div>
 
         <div class="form-group pb-3">
-          <label>Định mức quy định</label>
+          <label>Bậc rút nghiệm</label>
           <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAuditLKDT2.regulationLevel"
+            #level="ngModel" placeholder="Định mức quy định" />
+        </div>
+
+        <div class="form-group pb-3">
+          <label>Mức chấp nhận</label>
+          <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAuditLKDT2.acceptanceLevel"
             #level="ngModel" placeholder="Định mức quy định" />
         </div>
 
@@ -434,13 +468,18 @@
     <div class="modal-body">
       <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
         <div class="form-group pb-3">
-          <label>Thông số</label>
+          <label>Thông số kiểm tra</label>
           <input type="text" class="form-control" name="parameterName" [(ngModel)]="formAuditParam.parameterName"
-            #name="ngModel" placeholder="Tên tiêu chí" />
+            #name="ngModel" placeholder="Tên tiêu chí" list="parameter" />
+          <datalist id="parameter">
+            <option *ngFor="let oitm of listOfParameters" [value]="oitm.testingName">
+              <span>{{ oitm.testingName }}</span>
+            </option>
+          </datalist>
         </div>
 
         <div class="form-group pb-3">
-          <label>Điều kiện</label>
+          <label>Điều kiện kiện kiểm tra</label>
           <input type="text" class="form-control" name="conditions" [(ngModel)]="formAuditParam.conditions"
             #conditions="ngModel" placeholder="Định mức quy định" />
         </div>
@@ -483,23 +522,24 @@
       <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
         <div class="form-group pb-3">
           <label>Nhóm tiêu chí</label>
-          <input type="text" class="form-control"  [(ngModel)]="testingCriticalGroup"  [ngModelOptions]="{ standalone: true }" required
-            placeholder="Nhóm tiêu chí" list="auto38" (change)="findByCritiCalGroup()"/>
-            <datalist  id="auto38">
-              <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
-                <span>{{ oitm.testingCriticalGroup }}</span>
-              </option>
-            </datalist>
+          <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
+            [ngModelOptions]="{ standalone: true }" required placeholder="Nhóm tiêu chí" list="auto38"
+            (change)="findByCritiCalGroup()" />
+          <datalist id="auto38">
+            <option *ngFor="let oitm of listOfCriticalGroup" [value]="oitm.testingCriticalGroup">
+              <span>{{ oitm.testingCriticalGroup }}</span>
+            </option>
+          </datalist>
         </div>
         <div class="form-group pb-3">
           <label>Chỉ tiêu</label>
-          <input type="text" class="form-control"  [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }" required
-            #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto39"/>
-            <datalist  id="auto39">
-              <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
-                <span>{{ oitm.testingName }}</span>
-              </option>
-            </datalist>
+          <input type="text" class="form-control" [(ngModel)]="testingName" [ngModelOptions]="{ standalone: true }"
+            required #content="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto39" />
+          <datalist id="auto39">
+            <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
+              <span>{{ oitm.testingName }}</span>
+            </option>
+          </datalist>
           <div class="alert-danger" *ngIf="content.errors && f.submitted">
             <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
           </div>

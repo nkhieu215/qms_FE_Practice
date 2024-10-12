@@ -620,7 +620,8 @@
                   <tr>
                     <th>#</th>
                     <th>Chỉ tiêu kiểm tra</th>
-                    <th>Mức quy định</th>
+                    <th>Bậc rút nghiệm</th>
+                    <th>Mức chấp nhận</th>
                     <th>Yêu cầu kỹ thuật</th>
                     <th>Số lượng</th>
                     <th>Sai số thực tế</th>
@@ -634,6 +635,7 @@
                     <td>{{ i +1 }}</td>
                     <td>{{ auditLKDT.auditContent }}</td>
                     <td>{{ auditLKDT.regulationLevel }}</td>
+                    <td>{{ auditLKDT.acceptanceLevel }}</td>
                     <td>{{ auditLKDT.technicalRequirement}}</td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
@@ -670,9 +672,9 @@
                 <thead>
                   <tr>
                     <th rowspan="2">#</th>
-                    <th rowspan="2">Thông số</th>
-                    <th rowspan="2">Điều kiện</th>
-                    <th colspan="3">Tiêu chuẩn</th>
+                    <th rowspan="2">Thông số kiểm tra</th>
+                    <th rowspan="2">Điều kiện kiểm tra</th>
+                    <th colspan="3">Tiêu chuẩn kiểm tra</th>
                     <th rowspan="2">Q Trung bình</th>
                     <th rowspan="2">Số lượng</th>
                     <th rowspan="2">Min</th>
@@ -949,8 +951,7 @@
             </datalist>
           </div>
         </div>
-      </div>
-      <div class="row">
+
         <div class="col-sm-6">
           <div class="form-group">
             <label>Chỉ tiêu kiểm tra</label>
@@ -963,12 +964,21 @@
             </datalist>
           </div>
         </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label>Bậc rút nghiệm</label>
+            <input type="text" class="form-control" name="regulationLevel"
+              [(ngModel)]="formAuditCriteriaLKDT.regulationLevel" placeholder="Mức quy định" />
+          </div>
+        </div>
 
         <div class="col-sm-6">
           <div class="form-group">
-            <label>Mức quy định</label>
-            <input type="text" class="form-control" name="regulationLevel"
-              [(ngModel)]="formAuditCriteriaLKDT.regulationLevel" placeholder="Mức quy định" />
+            <label>Mức chấp nhận</label>
+            <input type="text" class="form-control" name="acceptanceLevel"
+              [(ngModel)]="formAuditCriteriaLKDT.acceptanceLevel" placeholder="Mức quy định" />
           </div>
         </div>
       </div>
@@ -1042,16 +1052,21 @@
       <div class="row">
         <div class="col-sm-6">
           <div class="form-group">
-            <label>Thông số</label>
+            <label>Thông số kiểm tra</label>
             <input type="text" class="form-control" name="parameterName" [(ngModel)]="formAuditParam.parameterName"
-              placeholder="Thông số" />
+              placeholder="Thông số" list="parameter" />
+            <datalist id="parameter">
+              <option *ngFor="let oitm of listOfParameters" [value]="oitm.testingName">
+                <span>{{ oitm.testingName }}</span>
+              </option>
+            </datalist>
 
           </div>
         </div>
 
         <div class="col-sm-6">
           <div class="form-group">
-            <label>Điều kiện</label>
+            <label>Điều kiện kiểm tra</label>
             <input type="text" class="form-control" name="conditions" [(ngModel)]="formAuditParam.conditions"
               placeholder="Điều kiện" />
           </div>
@@ -1306,7 +1321,8 @@
               <td style="width: 9%;">{{item.createdAt| date:'dd/MM/yyyy'}}</td>
               <td style="text-align: left;width: 19%;"> <input [id]="item.id+'-input-error-note'" type="text"
                   [(ngModel)]="item.note" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;">
-                <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span></td>
+                <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span>
+              </td>
               <td style="width: 9%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
                 <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateError(item.id)"><i
                     class="fa fa-edit"></i></button>

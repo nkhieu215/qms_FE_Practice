@@ -132,7 +132,8 @@
             <td>
               {{ audit.electCompName }}
             </td>
-            <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span *ngIf="audit.iqcElectType == 'true'">Phiếu SPKPH</span> </td>
+            <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span *ngIf="audit.iqcElectType == 'true'">Phiếu
+                SPKPH</span> </td>
             <td>
               {{ audit.createdAt | date:'dd/MM/YYYY HH:mm'}}
             </td>
@@ -189,7 +190,7 @@
             <div class="col-sm-4">
               <label>Mẫu biên bản</label>
               <input type="text" readonly class="form-control" placeholder="Tên linh kiện"
-                [(ngModel)]="form.templateCode" [ngModelOptions]="{ standalone: true }"/>
+                [(ngModel)]="form.templateCode" [ngModelOptions]="{ standalone: true }" />
             </div>
             <div class="col-sm-4">
               <label>Số biên bản</label>
@@ -304,66 +305,69 @@
             </div>
           </div>
           <!-- Danh sách item được áp dụng -->
-        <div class="table-responsive">
-          <div style="display: flex;flex-direction: column;">
-            <!-- Danh sách mã sản phẩm -->
-            <div style="margin-left: 7px;">
-              <div style="margin: 25px 0px 0px 0px;;width: 99%;">
-                <div class="float-right" style="border:#dee2e6 solid 1px; margin-bottom: -22px;padding: 1%;font-size: 19px;">
-                  Danh sách sản phẩm áp dụng
+          <div class="table-responsive">
+            <div style="display: flex;flex-direction: column;">
+              <!-- Danh sách mã sản phẩm -->
+              <div style="margin-left: 7px;">
+                <div style="margin: 25px 0px 0px 0px;;width: 99%;">
+                  <div class="float-right"
+                    style="border:#dee2e6 solid 1px; margin-bottom: -22px;padding: 1%;font-size: 19px;">
+                    Danh sách sản phẩm áp dụng
+                  </div>
+                  <table class="tables" style="margin-bottom: 0px;">
+                    <thead>
+                      <tr>
+                        <th style="width: 4%;">STT</th>
+                        <th style="width: 7%;">Mã sản phẩm</th>
+                        <th style="width: 29%;">Tên sản phẩm</th>
+                        <th style="width: 7%;">Số lượng lô hàng</th>
+                        <th style="width: 7%;">Số lô</th>
+                        <th style="width: 7%;">Số hóa đơn</th>
+                        <th style="width: 7%;">Số lượng kiểm tra</th>
+                        <th style="width: 6%;">Thông tin lỗi</th>
+                        <th style="width: 20%;">Ghi chú</th>
+                      </tr>
+                    </thead>
+                  </table>
                 </div>
-                <table class="tables" style="margin-bottom: 0px;">
-                  <thead>
-                    <tr>
-                      <th style="width: 4%;">STT</th>
-                      <th style="width: 7%;">Mã sản phẩm</th>
-                      <th style="width: 29%;">Tên sản phẩm</th>
-                      <th style="width: 7%;">Số lượng lô hàng</th>
-                      <th style="width: 7%;">Số lô</th>
-                      <th style="width: 7%;">Số hóa đơn</th>
-                      <th style="width: 7%;">Số lượng kiểm tra</th>
-                      <th style="width: 6%;">Thông tin lỗi</th>
-                      <th style="width: 20%;">Ghi chú</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-              <div id="table-body" style="overflow: auto;height: 324px;width: 99%;margin-bottom: 10px;">
-                <table class="tables" style="margin-top: 0px;">
-                  <tbody>
-                    <tr *ngFor="let item of listOfItem;let i = index;">
-                      <td style="width: 4%;"> {{i+1}}</td>
-                      <td style="text-align: left;width: 7%;"><span>{{item.itemCode}}</span></td>
-                      <td style="text-align: left;width: 29%;"><span>{{item.itemName}}</span></td>
-                          <td style="text-align: left;width: 7%;"> <span >{{item.poQuantity}}</span></td>
-                          <td style="text-align: left;width: 7%;"> <span >{{item.lotNumber}}</span></td>
-                          <td style="text-align: left;width: 7%;"> <span >{{item.billNumber}}</span></td>
-                          <td style="text-align: left;width: 7%;"> <span >{{item.quantityCheck}}</span></td>
-                          <td style="width: 6%;"> <button class="btn btn-sm btn-primary" title="Chi tiết lỗi" style="background-color: #0dcaf0;border:#0dcaf0" (click)="openPopupError(listError,item)"><i
-                            class="fa fa-eye"></i></button></td>
-                          <td style="text-align: left;width: 20%;"> <span>{{item.note}}</span></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div id="table-body" style="overflow: auto;height: 324px;width: 99%;margin-bottom: 10px;">
+                  <table class="tables" style="margin-top: 0px;">
+                    <tbody>
+                      <tr *ngFor="let item of listOfItem;let i = index;">
+                        <td style="width: 4%;"> {{i+1}}</td>
+                        <td style="text-align: left;width: 7%;"><span>{{item.itemCode}}</span></td>
+                        <td style="text-align: left;width: 29%;"><span>{{item.itemName}}</span></td>
+                        <td style="text-align: left;width: 7%;"> <span>{{item.poQuantity}}</span></td>
+                        <td style="text-align: left;width: 7%;"> <span>{{item.lotNumber}}</span></td>
+                        <td style="text-align: left;width: 7%;"> <span>{{item.billNumber}}</span></td>
+                        <td style="text-align: left;width: 7%;"> <span>{{item.quantityCheck}}</span></td>
+                        <td style="width: 6%;"> <button class="btn btn-sm btn-primary" title="Chi tiết lỗi"
+                            style="background-color: #0dcaf0;border:#0dcaf0" (click)="openPopupError(listError,item)"><i
+                              class="fa fa-eye"></i></button></td>
+                        <td style="text-align: left;width: 20%;"> <span>{{item.note}}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-xs-12 col-sm-12 pt-3 pb-3"  *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS' || form.status =='WAIT_APPROVE')">
-          <div class="row">
-            <h2>Thông tin phê duyệt</h2>
-            <div class="col-xs-6 col-sm-6">
-              <label>Nhận xét</label>
-              <input type="text"  readonly="true" class="form-control" placeholder="Nhận xét" name="templateCode"
-                [(ngModel)]="form.approveNote"/>
-            </div>
-            <div class="col-xs-6 col-sm-6">
-              <label>Kết luận</label>
-              <input type="text" readonly="true" class="form-control" placeholder="Kết luận" name="statusStr" value="{{statusStr}}"
-                [(ngModel)]="statusStr"/>
+          <div class="col-xs-12 col-sm-12 pt-3 pb-3"
+            *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS' || form.status =='WAIT_APPROVE')">
+            <div class="row">
+              <h2>Thông tin phê duyệt</h2>
+              <div class="col-xs-6 col-sm-6">
+                <label>Nhận xét</label>
+                <input type="text" readonly="true" class="form-control" placeholder="Nhận xét" name="templateCode"
+                  [(ngModel)]="form.approveNote" />
+              </div>
+              <div class="col-xs-6 col-sm-6">
+                <label>Kết luận</label>
+                <input type="text" readonly="true" class="form-control" placeholder="Kết luận" name="statusStr"
+                  value="{{statusStr}}" [(ngModel)]="statusStr" />
+              </div>
             </div>
           </div>
-        </div>
           <!-- thong tin kiem tra nvl -->
           <div *ngIf="form.type == 1 ; else blockptp">
             <div class="table-responsive">
@@ -371,14 +375,14 @@
                 <button class="btn btn-success" (click)="open(myModalError)" [hidden]="true">
                   <i class="fa fa-plus"></i> Thông tin lỗi
                 </button>
-                <button class="btn  btn-danger"  style="margin-right: 10px;"
-              (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
+                <button class="btn  btn-danger" style="margin-right: 10px;"
+                  (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
               </div>
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="lstAuditCriteriaNvl"
                 [nzFrontPagination]="false">
                 <thead>
                   <tr>
-                    <th colspan="2">Chỉ tiêu kiểm tra</th>
+                    <th colspan="3">Chỉ tiêu kiểm tra</th>
                     <th colspan="3">Yêu cầu</th>
                     <th rowspan="2" style="line-height: 65px">Nội dung lưu ý</th>
                     <th rowspan="2" style="line-height: 65px">Yêu cầu khác</th>
@@ -388,8 +392,9 @@
                     <th rowspan="2" style="line-height: 65px">Ghi chú</th>
                   </tr>
                   <tr>
-                    <th>Tiêu chí</th>
-                    <th>Mức quy định</th>
+                    <th>Tiêu chí kiểm tra</th>
+                    <th>Bậc rút nghiệm</th>
+                    <th>Mức chấp nhận</th>
                     <th>Min</th>
                     <th>Max</th>
                     <th>Đơn vị</th>
@@ -404,6 +409,7 @@
                       <input type="hidden" name="auditCriteriaId" [(ngModel)]="audit.auditCriteriaId" />
                     </td>
                     <td>{{ audit.regulationLevel }}</td>
+                    <td>{{ audit.acceptanceLevel }}</td>
                     <td>{{ audit.minAudit | number }}</td>
                     <td>{{ audit.maxAudit | number }}</td>
                     <td>{{ audit.unitAudit }}</td>
@@ -450,8 +456,8 @@
                   <span *ngIf=" typeAction == 'edit' || typeAction =='add'; else show ">Thông tin lỗi</span>
                   <ng-template #show>Thông tin lỗi</ng-template>
                 </button>
-                <button class="btn  btn-danger"  style="margin-right: 10px;"
-                (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
+                <button class="btn  btn-danger" style="margin-right: 10px;"
+                  (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
               </div>
 
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
@@ -460,7 +466,8 @@
                   <tr>
                     <th>#</th>
                     <th>Chỉ tiêu kiểm tra</th>
-                    <th>Mức quy định</th>
+                    <th>Bậc rút nghiệm</th>
+                    <th>Mức chấp nhận</th>
                     <th>Yêu cầu kỹ thuật</th>
                     <th>Số lượng</th>
                     <th>Sai số thực tế</th>
@@ -473,6 +480,7 @@
                     <td>{{ i +1 }}</td>
                     <td>{{ auditLKDT.auditContent }}</td>
                     <td>{{ auditLKDT.regulationLevel }}</td>
+                    <td>{{ auditLKDT.acceptanceLevel }}</td>
                     <td>{{ auditLKDT.technicalRequirement}}</td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
@@ -690,21 +698,38 @@
   </div>
 </ng-template>
 <!-- Khai báo lỗi biên bản nvl -->
-<ng-template #listError let-modal >
-  <div  style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
+<ng-template #listError let-modal>
+  <div style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
     <div> <button class="close-popup" style="margin-left: 97%;" (click)="modal.dismiss('Cross click')">X</button></div>
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div >Mã sản phẩm <br> <input type="text"  class="input-errors" [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
-        <datalist id="lstItemCode"> <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option></datalist></div>
-              <div >Nhóm lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errGroup" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
-                <datalist id="lstErrGroup"> <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option></datalist></div>
-              <div >Mã lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errCode" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrCode()" list="lstErrCode">
-                <datalist id="lstErrCode"> <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option></datalist></div>
-              <div >Tên lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errName" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrName()" list="lstErrName">
-                <datalist id="lstErrName"> <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option></datalist></div>
-              <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0" (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
+        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+          <datalist id="lstItemCode">
+            <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
+          </datalist>
+        </div>
+        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
+          <datalist id="lstErrGroup">
+            <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
+          </datalist>
+        </div>
+        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
+          <datalist id="lstErrCode">
+            <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
+          </datalist>
+        </div>
+        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
+          <datalist id="lstErrName">
+            <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
+          </datalist>
+        </div>
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+          (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
     </div>
     <div style="margin-left: 7px;">
@@ -745,23 +770,40 @@
   </div>
 </ng-template>
 <!-- View lỗi biên bản nvl -->
-<ng-template #listErrorView let-modal >
-  <div  style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
+<ng-template #listErrorView let-modal>
+  <div style="width: 190%;background: #fff;position: absolute;left: -41%;border-radius: 9px;">
     <div> <button class="close-popup" style="margin-left: 97%;" (click)="modal.dismiss('Cross click')">X</button></div>
-    <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;" ><b>Danh sách lỗi</b></div>
+    <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div >Mã sản phẩm <br> <input type="text"  class="input-errors" [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
-        <datalist id="lstItemCode"> <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option></datalist></div>
-              <div >Nhóm lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errGroup" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
-                <datalist id="lstErrGroup"> <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option></datalist></div>
-              <div >Mã lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errCode" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrCode()" list="lstErrCode">
-                <datalist id="lstErrCode"> <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option></datalist></div>
-              <div >Tên lỗi <br> <input type="text"  class="input-errors" [(ngModel)]="errName" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="getLstErrName()" list="lstErrName">
-                <datalist id="lstErrName"> <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option></datalist></div>
-              <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0" (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
+        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+          <datalist id="lstItemCode">
+            <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
+          </datalist>
+        </div>
+        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
+          <datalist id="lstErrGroup">
+            <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
+          </datalist>
+        </div>
+        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
+          <datalist id="lstErrCode">
+            <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
+          </datalist>
+        </div>
+        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
+          <datalist id="lstErrName">
+            <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
+          </datalist>
+        </div>
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+          (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
-      <div class="float-right" >
+      <div class="float-right">
       </div>
     </div>
     <div style="margin-left: 7px;">
@@ -785,7 +827,7 @@
             <tr *ngFor="let item of listOfError;let i = index;">
               <td style="width: 5%;"> {{i+1}}</td>
               <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
-              <td style="text-align: left;width: 9%;"><span >{{item.errGroup}}</span></td>
+              <td style="text-align: left;width: 9%;"><span>{{item.errGroup}}</span></td>
               <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
               <td style="text-align: left;width: 21%;"><span>{{item.errName}}</span></td>
               <td style="width: 9%;"><span>{{item.quantity}}</span></td>
