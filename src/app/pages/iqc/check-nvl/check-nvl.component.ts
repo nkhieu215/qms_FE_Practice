@@ -60,6 +60,7 @@ export class CheckNvlComponent implements OnInit {
   lstErrName: any[] = [];
   lstErrGroup: any[] = [];
   listErrorGroup: any;
+  listErrorGroup1 = [{ errGroup: 1 }, { errGroup: 11 }, { errGroup: 12 }, { errGroup: 13 }, { errGroup: 14 }, { errGroup: 5 },];
   listErrors: any;
   //-------------------------------------------------------------------------------------------------------------
 
@@ -906,12 +907,16 @@ export class CheckNvlComponent implements OnInit {
     if (item === null) {
       this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
         this.listOfError = res;
+        console.log('list errors:1 ', res, this.id);
+
       })
     } else {
       this.itemCode = item.itemCode;
       this.http.get<any>(`${this.address}/${this.path}/errors/audit-result-item-id/${item.id}`).subscribe(res => {
         this.listOfError = res;
         this.getLstItemCode();
+        console.log('list errors:2 ', res, this.id);
+
       })
     }
 
@@ -980,6 +985,7 @@ export class CheckNvlComponent implements OnInit {
   getListErrorGroup() {
     this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all`).subscribe(res => {
       this.listErrorGroup = res;
+      console.log("check result group error", res)
     })
   }
   getListError() {

@@ -897,19 +897,25 @@
               <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
               <td style="text-align: left;width: 9%;"><input [id]="item.id+'-input-error-errGroup'" type="text"
                   [(ngModel)]="item.errGroup" [ngModelOptions]="{ standalone: true }" [hidden]="true"
-                  style="width: 90%;" list="error-group" (change)="getListErrorById(item.errGroup,i)">
-                <datalist id="error-group">
-                  <option *ngFor="let item of listErrorGroup" value="{{item.errGroup}}"></option>
-                </datalist>
+                  style="width: 90%;" list="error-group" (ngModelChange)="getListErrorById(item.errGroup,i)"
+                  [matAutocomplete]="auto33">
+                <mat-autocomplete [panelWidth]="200" #auto33="matAutocomplete" (optionSelected)="getLstErrGroup()">
+                  <mat-option *ngFor="let oitm of listErrorGroup" [value]="oitm.errGroup">
+                    <span>{{ oitm.errGroup }}</span>
+                  </mat-option>
+                </mat-autocomplete>
                 <span [id]="item.id+'-span-error-errGroup'" [hidden]="false">{{item.errGroup}}</span>
               </td>
               <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
               <td style="text-align: left;width: 21%;"><input [id]="item.id+'-input-error-errCode'" type="text"
                   [(ngModel)]="item.errName" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;"
-                  list="error-name" (change)="mappingErrCode(item.errName,i)">
-                <datalist id="error-name">
-                  <option *ngFor="let item of listErrors" value="{{item.errName}}"></option>
-                </datalist>
+                  list="error-name" (ngModelChange)="mappingErrCode(item.errName,i)" [matAutocomplete]="auto34">
+                <mat-autocomplete [panelWidth]="300" #auto34="matAutocomplete"
+                  (optionSelected)="getListErrorById(item.errGroup,i)">
+                  <mat-option *ngFor="let oitm of listErrors" [value]="oitm.errName">
+                    <span>{{ oitm.errName }}</span>
+                  </mat-option>
+                </mat-autocomplete>
                 <span [id]="item.id+'-span-error-errCode'" [hidden]="false">{{item.errName}}</span>
               </td>
               <td style="width: 9%;"><input [id]="item.id+'-input-quantity'" type="text" style="width: 90%;"

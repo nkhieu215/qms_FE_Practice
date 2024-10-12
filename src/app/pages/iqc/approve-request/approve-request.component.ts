@@ -280,7 +280,7 @@ export class ApproveRequestComponent implements OnInit {
     );
   }
   findInListErrors() {
-    const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode };
+    const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode, electCompId: this.id };
     this.http.post<any>(`${this.address}/${this.path}/errors/search`, data).subscribe(res => {
       this.listOfError = res;
       console.log('list errors: ', res, this.id);
