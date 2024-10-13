@@ -1,8 +1,20 @@
+:root {
+  --primary-color: #0080ff;
+  --secondary-color: #6c757d;
+  --highlight-color: #2CB4DA;
+  --danger-color: red;
+  --background-color: #fff;
+  --border-color: #dee2e6;
+  --text-color: #fff;
+  --font-size: 16px;
+}
+
+
 .table td,
 .table th {
-  padding: 2px;
-  vertical-align: top;
-  border-top: 1px solid #e9ecef;
+  background-color: #f2f2f2;
+  text-align: center;
+  font-weight: bold;
 }
 
 .blink_me {
@@ -23,15 +35,41 @@
   }
 }
 
-.machine-info-btn {
-  width: 30%;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 3px;
-  background: #29A01F;
-  border: #29A01F solid 1px;
+.btn.machine-info-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
   color: #fff;
-  margin: 2% 1%;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.machine-info-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn.machine-info-btn:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.btn-confirm {
+  background-color: #0080ff;
+}
+
+.btn-manage {
+  background-color: #6c757d;
+}
+
+.btn-available {
+  background-color: #2CB4DA;
+}
+
+.btn-scan {
+  background-color: #1F39A0;
 }
 
 /* popup lst machine */
@@ -83,78 +121,62 @@
   border-radius: 5px;
 }
 
-/* table */
+.input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-container {
+  margin-left: 20px;
+  margin-right: 20px;
+  flex: 1;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-field {
+  border-radius: 5px;
+  padding: 5px;
+  width: 100%;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
 .table {
   width: 98%;
+  margin: 10px auto;
   border-collapse: collapse;
-  margin: auto;
-  margin-top: 10px;
-  font-size: 16px;
+  font-size: var(--font-size);
   text-align: left;
+}
 
-  thead {
-    tr {
-      background-color: #f2f2f2;
-      border-bottom: 2px solid #ddd;
-    }
+.table th,
+.table td {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
 
-    th {
-      padding: 12px 15px;
-      cursor: pointer;
-      position: sticky;
-      background-color: #fafafa;
-      border: 0.5px solid #dee2e6;
-      text-align: center;
-      /* &:hover {
-        background-color: #6fbfe7;
-      } */
+.table thead tr {
+  background-color: #f2f2f2;
+  border-bottom: 2px solid #ddd;
+}
 
-      span {
-        font-weight: bold;
-        display: block;
-      }
+.table tbody tr:nth-child(even) {
+  background-color: #d3eefc;
+}
 
-      input {
-        width: 100%;
-        padding: 8px 10px;
-        margin-top: 5px;
-        box-sizing: border-box;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-
-        &:focus {
-          outline: none;
-          border-color: #aaa;
-        }
-      }
-    }
-  }
-
-  tbody {
-    tr {
-      &:nth-child(even) {
-        background-color: #d3eefc;
-      }
-
-      &:hover {
-        background-color: #f1f1f1;
-      }
-    }
-
-    td {
-      width: 175px;
-      padding: 12px 15px;
-      border-bottom: 1px solid #ddd;
-      border: 0.8px solid #dee2e6;
-      font-size: 16px;
-      font-weight: 400;
-      text-align: center;
-
-      &:last-child {
-        text-align: center;
-      }
-    }
-  }
+.table tbody tr:hover {
+  background-color: #f1f1f1;
 }
 
 .paginate {
@@ -185,4 +207,159 @@
       border-color: #007bff;
     }
   }
+}
+
+/* nz-table */
+::ng-deep .table-container {
+  margin: 20px;
+}
+
+::ng-deep .ant-table-thead>tr.table-header>th {
+  background-color: #f2f2f2;
+  text-align: center;
+  font-weight: bold;
+}
+
+::ng-deep .ant-table-thead>tr.table-header>th .table-input {
+  width: 80%;
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+::ng-deep .ant-table-thead>tr.table-header>th .table-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+::ng-deep .ant-table-tbody>tr.table-row {
+  text-align: center;
+}
+
+::ng-deep .ant-table-tbody>tr.table-row:nth-child(even) {
+  background-color: #d3eefc;
+}
+
+::ng-deep .ant-table-tbody>tr.table-row:hover {
+  background-color: #f1f1f1;
+}
+
+::ng-deep .ant-table-tbody>tr.table-row .table-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: color 0.3s ease;
+}
+
+::ng-deep .ant-table-tbody>tr.table-row .table-button:hover {
+  color: #0056b3;
+}
+
+--store-check-- .btn-group .dropdown-menu a {
+  color: #fff;
+}
+
+.btn-default .dropdown-menu {
+  color: #000 !important;
+}
+
+.btn-default .dropdown-menu li>a:hover,
+.btn-default .dropdown-menu li>a:focus {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.btn-group-primary .dropdown-menu {
+  background-color: #3784c5 !important;
+}
+
+.btn-group-primary .dropdown-menu li>a:hover,
+.btn-group-primary .dropdown-menu li>a:focus {
+  background-color: #428bca !important;
+}
+
+.btn-group-success .dropdown-menu {
+  background-color: #51b351 !important;
+}
+
+.btn-group-success .dropdown-menu li>a:hover,
+.btn-group-success .dropdown-menu li>a:focus {
+  background-color: #5cb85c !important;
+}
+
+.btn-group-info .dropdown-menu {
+  background-color: #4ebbdb !important;
+}
+
+.btn-group-info .dropdown-menu li>a:hover,
+.btn-group-info .dropdown-menu li>a:focus {
+  background-color: #5bc0de !important;
+}
+
+.btn-group-warning .dropdown-menu {
+  background-color: #efa640 !important;
+}
+
+.btn-group-warning .dropdown-menu li>a:hover,
+.btn-group-warning .dropdown-menu li>a:focus {
+  background-color: #f0ad4e !important;
+}
+
+.btn-group-danger .dropdown-menu {
+  background-color: #d64742 !important;
+}
+
+.btn-group-danger .dropdown-menu li>a:hover,
+.btn-group-danger .dropdown-menu li>a:focus {
+  background-color: #d9534f !important;
+}
+
+.dropdown-menu>li>a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.428571429;
+  color: #333;
+  white-space: nowrap;
+}
+
+.dropdown-menu a {
+  color: #333;
+}
+
+::ng-deep .modal-xxl .modal-dialog {
+  max-width: 80%;
+  width: 80%;
+}
+
+.my-custom-scrollbar {
+  position: relative;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.table-wrapper-scroll-y {
+  display: block;
+}
+
+.close {
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s;
+  outline: none;
+}
+
+.close:hover {
+  color: #ff0000;
+}
+
+.close:focus {
+  outline: none;
 }

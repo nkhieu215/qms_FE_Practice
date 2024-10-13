@@ -3,27 +3,22 @@
   <h2>Kiểm tra rút nghiệm NVL 100%</h2>
   <div class="card-body">
     <div class="row">
-
       <div class="col-xs-12 col-sm-12">
-        <!-- <form name="form" (ngSubmit)="f.form.valid" #f="ngForm"> -->
         <pqc-show-work-order show_check="{{show_check}}" *ngIf="show_work_order"
           item_id="{{idWorkOrder}}"></pqc-show-work-order>
         <div class="form-group row">
           <div class="col-sm-3" style="display: flex;justify-content: space-between;width: 100%;">
             <label style="color: blue;" *ngIf="show_work_order"><strong>Thực hiện quét mã linh kiện đầu vào . .
                 .</strong></label>
-            <div style="width: 33%;">
-              <button class="machine-info-btn"
-                style="background-color: #0080ff; border: #0080ff solid 1px;   width: 23%;" (click)="open(confirm,'')"
-                *ngIf="condition == true">Xác nhận xử lý lỗi scan</button>
-              <button class="machine-info-btn" (click)="open(machine,'machine')" style="width: 15%;"
+            <div style="width: 34%;">
+              <button class="btn machine-info-btn btn-confirm" (click)="open(confirm,'')" *ngIf="condition == true">Xác
+                nhận xử lý lỗi scan</button>
+              <button class="btn machine-info-btn btn-manage" (click)="open(machine,'machine')"
                 *ngIf="show_work_order">Quản lý
                 feeder</button>
-              <button class="machine-info-btn" (click)="open(myModalAvailable,'available')"
-                style="background-color: #2CB4DA; border: #2CB4DA solid 1px;width: 20%;">Danh sách
+              <button class="btn machine-info-btn btn-available" (click)="open(myModalAvailable,'available')">List
                 part hợp lệ</button>
-              <button class="machine-info-btn" (click)="open(myModalScaned,'scan')"
-                style="background-color: #1F39A0; border: #1F39A0 solid 1px;width: 25%;">Danh sách
+              <button class="btn machine-info-btn btn-scan" (click)="open(myModalScaned,'scan')">List
                 material chưa scan</button>
             </div>
           </div>
@@ -35,16 +30,6 @@
             <input id="machine-code" type="text" class="form-control" placeholder="Thông tin mã máy"
               [ngModelOptions]="{ standalone: true }" [(ngModel)]="form.machineCode" (keyup.enter)="checkScan()">
           </div>
-
-          <!-- <div class="col-sm-3">
-              <label>Chọn mặt trước sau (L/F/R) </label>
-              <select [(ngModel)]="form.side" class="form-control" name="conclude">
-                <option value="L">Mặt trái</option>
-                <option value="R">Mặt phải</option>
-                <option value="F">Mặt trước</option>
-                <option value="RE">Mặt sau</option>
-              </select>
-            </div> -->
 
           <div class="col-sm-4">
             <label>Thông tin Feeder </label>
@@ -204,12 +189,16 @@
           <div class="lst-machine-container-item1-1">
             <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Thông tin máy và feeder
             </div>
-            <div style="display: flex;margin-top: 12px;margin-left: 9px;">
-              <div style="margin-right: 40px;"><label>Mã máy</label><input type="text"
-                  style="border-radius: 5px;margin-left: 15px;" (change)="lstMachineSearch()"
-                  [(ngModel)]="machineSearchKey" [ngModelOptions]="{ standalone: true }"></div>
-              <div><label>Feeder</label><input type="text" style="border-radius: 5px;margin-left: 15px;"
-                  (change)="lstMachineSearch()" [(ngModel)]="feederSearchKey" [ngModelOptions]="{ standalone: true }">
+            <div class="input-row">
+              <div class="input-container">
+                <label class="input-label">Mã máy</label>
+                <input type="text" class="input-field" (change)="lstMachineSearch()" [(ngModel)]="machineSearchKey"
+                  [ngModelOptions]="{ standalone: true }">
+              </div>
+              <div class="input-container">
+                <label class="input-label">Feeder</label>
+                <input type="text" class="input-field" (change)="lstMachineSearch()" [(ngModel)]="feederSearchKey"
+                  [ngModelOptions]="{ standalone: true }">
               </div>
             </div>
             <div style="overflow: auto;height: 390px;">
@@ -251,9 +240,14 @@
           <div class="lst-machine-container-item1-2">
             <div style="font-size: 19px;font-weight: 600;margin-top: 12px;margin-left: 9px;">Thông tin sub feeder</div>
             <div style="display: flex;margin-top: 12px;margin-left: 9px;">
-              <div style="margin-right: 40px;"><label>Sub feeder</label><input type="text"
-                  style="border-radius: 5px;margin-left: 15px;" [(ngModel)]="subFeederSearchKey"
-                  [ngModelOptions]="{ standalone: true }" (change)="filterBySubFeeder()"></div>
+              <!-- <div style="margin-right: 40px;"><label>Sub feeder</label><input type="text"
+                            style="border-radius: 5px;margin-left: 15px;" [(ngModel)]="subFeederSearchKey"
+                            [ngModelOptions]="{ standalone: true }" (change)="filterBySubFeeder()"></div> -->
+              <div class="input-container">
+                <label class="input-label">Sub feeder</label>
+                <input class="input-field" type="text" [(ngModel)]="subFeederSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="filterBySubFeeder()">
+              </div>
             </div>
             <div style="overflow: auto;height: 390px;">
               <table class="table">
@@ -399,30 +393,29 @@
     </div>
 
     <div class="modal-body">
-      <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstPartNumberAvailable">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>PartNumber <br> <input type="text" [(ngModel)]="partNumberSearchKey"
-                [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
-            <th>Feeder hợp lệ <br> <input type="text" [(ngModel)]="feederSearchKey"
-                [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
-            <th>Material hợp lệ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let check of lstPartNumberAvailable| paginate: {id: 'paginate', itemsPerPage: 15, currentPage: page }; let i = index">
-            <td>{{ i+1 }}</td>
-            <td>{{ check.partNumber }}</td>
-            <td>{{ check.feeder }}</td>
-            <!-- <td>
-              <div *ngFor="let item of check.lstFeeder;">{{item}}</div>
-            </td> -->
-            <td><button><i class="fa fa-eye"></i></button></td>
-          </tr>
-        </tbody>
-      </nz-table>
+      <div class="table-container">
+        <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstPartNumberAvailable">
+          <thead>
+            <tr class="table-header">
+              <th>STT</th>
+              <th>PartNumber <br> <input class="table-input" type="text" [(ngModel)]="partNumberSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
+              <th>Feeder hợp lệ <br> <input class="table-input" type="text" [(ngModel)]="feederSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="searchByPartNumber()"></th>
+              <th>Material hợp lệ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table-row"
+              *ngFor="let check of lstPartNumberAvailable| paginate: {id: 'paginate', itemsPerPage: 15, currentPage: page }; let i = index">
+              <td>{{ i+1 }}</td>
+              <td>{{ check.partNumber }}</td>
+              <td>{{ check.feeder }}</td>
+              <td><button class="table-button"><i class="fa fa-eye"></i></button></td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
       <pagination-controls id="paginate" (pageChange)="page = $event" style="float: right"></pagination-controls>
     </div>
   </ng-template>
@@ -436,42 +429,44 @@
     </div>
 
     <div class="modal-body">
-      <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstMaterialScan">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Material <br> <input type="text" [(ngModel)]="materialSearchKey" [ngModelOptions]="{ standalone: true }"
-                (change)="searchByMaterial()"></th>
-            <th>Part number <br> <input type="text" [(ngModel)]="partNumberSearchKey"
-                [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
-            <th>Trạng thái <br> <select [(ngModel)]="statusSearchKey" [ngModelOptions]="{ standalone: true }"
-                (change)="searchByMaterial()">
-                <option value=""></option>
-                <option value="Đã scan">Đã scan</option>
-                <option value="Chưa scan">Chưa scan</option>
-              </select>
-              <!-- <input type="text" [(ngModel)]="statusSearchKey" [ngModelOptions]="{ standalone: true }"
-                (change)="searchByMaterial()"> -->
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let check of lstMaterialScan| paginate: {id: 'paginate1', itemsPerPage: 15, currentPage: page1 }; let i = index">
-            <td>{{ i+1 }}</td>
-            <td>{{ check.material }}</td>
-            <td>{{ check.partNumber }}</td>
-            <td>
-              <div [ngClass]="{greenClass: check.status === 'Đã scan',redClass:check.status === 'Chưa scan'}">{{
-                check.status }}</div>
-            </td>
-            <!-- <td>
-              <div *ngFor="let item of check.lstFeeder;">{{item}}</div>
-            </td> -->
-            <!-- <td><button><i class="fa fa-eye"></i></button></td> -->
-          </tr>
-        </tbody>
-      </nz-table>
+      <div class="table-container">
+        <nz-table #borderedTable nzBordered [nzFrontPagination]="false" [nzData]="lstMaterialScan">
+          <thead>
+            <tr class="table-header">
+              <th>STT</th>
+              <th>Material <br> <input class="table-input" type="text" [(ngModel)]="materialSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
+              <th>Part number <br> <input class="table-input" type="text" [(ngModel)]="partNumberSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
+              <th>Trạng thái <br> <select class="table-input" [(ngModel)]="statusSearchKey"
+                  [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()">
+                  <option value=""></option>
+                  <option value="Đã scan">Đã scan</option>
+                  <option value="Chưa scan">Chưa scan</option>
+                </select>
+                <!-- <input type="text" [(ngModel)]="statusSearchKey" [ngModelOptions]="{ standalone: true }"
+                  (change)="searchByMaterial()"> -->
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table-row"
+              *ngFor="let check of lstMaterialScan| paginate: {id: 'paginate1', itemsPerPage: 15, currentPage: page1 }; let i = index">
+              <td>{{ i+1 }}</td>
+              <td>{{ check.material }}</td>
+              <td>{{ check.partNumber }}</td>
+              <td>
+                <div [ngClass]="{greenClass: check.status === 'Đã scan',redClass:check.status === 'Chưa scan'}">{{
+                  check.status }}</div>
+              </td>
+              <!-- <td>
+                <div *ngFor="let item of check.lstFeeder;">{{item}}</div>
+              </td> -->
+              <!-- <td><button><i class="fa fa-eye"></i></button></td> -->
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
       <pagination-controls id="paginate1" (pageChange)="page1 = $event" style="float: right"></pagination-controls>
     </div>
   </ng-template>

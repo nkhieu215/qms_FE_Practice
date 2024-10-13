@@ -679,7 +679,7 @@ export class CheckNvlComponent implements OnInit {
     this.listOfItem = [item, ... this.listOfItem];
 
     setTimeout(() => {
-      if (this.listOfItem.length > 5) {
+      if (this.listOfItem.length > 4) {
         document.getElementById('table-body')!.style.width = '99.9%';
       } else {
         document.getElementById('table-body')!.style.width = '99%';

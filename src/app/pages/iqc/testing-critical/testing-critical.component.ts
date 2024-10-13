@@ -307,8 +307,6 @@ export class TestingCriticalComponent {
   }
   close() {
     this.updatePopup = false;
-    document.getElementById('background')!.style.background = 'rgb(25 26 26 / 0%)';
-    document.getElementById('background')!.style.position = 'unset';
     this.checkNvl = false;
     this.checkLkdt = false;
     this.checkClSp = false;
@@ -317,8 +315,6 @@ export class TestingCriticalComponent {
     this.status = '';
   }
   closeInsertPopup() {
-    document.getElementById('background')!.style.background = 'rgb(25 26 26 / 0%)';
-    document.getElementById('background')!.style.position = 'unset';
     this.insertPopup = false;
     this.checkNvl = false;
     this.checkLkdt = false;

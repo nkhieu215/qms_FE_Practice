@@ -80,7 +80,7 @@
       <div class="row">
         <div class="col-md-3">
           <div class="form-group">
-            <button class="btn btn-primary m-2" type="submit">
+            <button class="btn btn-primary m-2" type="submit" style="height:40px">
               <i class="fa fa-search"></i> Tìm kiếm
             </button>
 
@@ -96,12 +96,12 @@
 
   </div>
   <div class="card-body">
-    <div class=" table-responsive">
+    <div class="table-responsive">
       <nz-table #basicTable nzBordered [nzPageSize]="10" nzShowSizeChanger [nzFrontPagination]="false"
         [nzData]="auditnvl" [nzTotal]="collectionSize" [(nzPageIndex)]="page" [(nzPageSize)]="pageSize"
         (nzPageIndexChange)="refreshExamination()" (nzPageSizeChange)="refreshExamination()">
         <thead>
-          <tr>
+          <tr class="table-header">
             <th scope="col">#</th>
             <th scope="col">Tên biên bản</th>
             <th scope="col">Mã biên bản</th>
@@ -114,7 +114,7 @@
             <th scope="col">Tùy chọn</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="table-row">
           <tr *ngFor="let audit of auditnvl;let i = index;">
             <td>{{ i+1 }}</td>
             <td>{{ audit.reportCode}}</td>
@@ -164,8 +164,6 @@
 <ng-template #elseBlock1>
   <div>
     <h2>Thông tin biên bản kiểm tra LKDT/BTP</h2>
-
-
     <div class="card-body">
       <div class="col-xs-12 col-sm-12 pt-3 pb-3"
         *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS')">
@@ -486,8 +484,9 @@
               </div>
               <div class="col-sm-4" style="display: flex;flex-direction: column;">
                 <label>Phiếu SPKPH : <i style="color: red;">(*)</i></label>
-                <input type="checkbox" name="iqcElectType" [(ngModel)]="form.iqcElectType"
-                  style="width: 30px;height: 28px;">
+                <input id="cbx" class="hidden-xs-up" checked="" type="checkbox" name="iqcElectType"
+                  [(ngModel)]="form.iqcElectType" style="width: 30px;height: 28px;">
+                <label for="cbx" class="cbx"></label>
               </div>
             </div>
 
@@ -502,14 +501,10 @@
             <div class="table-responsive">
               <div style="display: flex;flex-direction: column;">
                 <!-- Danh sách mã sản phẩm -->
-
                 <div class="float-right" style="margin-bottom: 10px;">
                   <button class="btn  btn-success" (click)="addNewItem()"
                     *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm sản
                     phẩm</button>
-                  <!-- <button id="btn-save-item" class="btn  btn-success"
-                    style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;" [hidden]="true"><i
-                      class="fa fa-save"></i> Lưu</button> -->
                 </div>
                 <div style="margin-left: 7px;">
                   <div style="margin-bottom: 0px;width: 99%;">
@@ -517,15 +512,15 @@
                       <thead>
                         <tr>
                           <th style="width: 4%;">STT</th>
-                          <th style="width: 7%;">Mã sản phẩm</th>
+                          <th style="width: 10%;">Mã sản phẩm</th>
                           <th style="width: 29%;">Tên sản phẩm</th>
                           <th style="width: 7%;">Số lượng lô hàng</th>
                           <th style="width: 7%;">Số lô</th>
                           <th style="width: 7%;">Số hóa đơn</th>
                           <th style="width: 7%;">Số lượng kiểm tra</th>
                           <th style="width: 6%;">Thông tin lỗi</th>
-                          <th style="width: 20%;">Ghi chú</th>
-                          <th style="width: 6%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">Tùy chọn</th>
+                          <th style="width: 15%;">Ghi chú</th>
+                          <th style="width: 10%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">Tùy chọn</th>
                         </tr>
                       </thead>
                     </table>
@@ -535,7 +530,7 @@
                       <tbody>
                         <tr *ngFor="let item of listOfItem;let i = index;">
                           <td style="width: 4%;"> {{i+1}}</td>
-                          <td style="text-align: left;width: 7%;"><input [id]="item.id+'-input'" type="text"
+                          <td style="text-align: left;width: 10%;"><input [id]="item.id+'-input'" type="text"
                               [(ngModel)]="item.itemCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"
                               (ngModelChange)="getListOfItems(item.itemCode)" [matAutocomplete]="auto33"
                               style="width: 90%;">
@@ -569,11 +564,11 @@
                           <td style="width: 6%;"><button class="btn btn-sm btn-primary" title="Chi tiết lỗi"
                               style="background-color: #0dcaf0;border:#0dcaf0"
                               (click)="openPopupError(listError,item)"><i class="fa fa-eye"></i></button> </td>
-                          <td style="text-align: left;width: 20%;"> <input [id]="item.id+'-input-note'" type="text"
+                          <td style="text-align: left;width: 15%;"> <input [id]="item.id+'-input-note'" type="text"
                               [(ngModel)]="item.note" [ngModelOptions]="{ standalone: true }" [hidden]="true"
                               style="width: 90%;"> <span [id]="item.id+'-span-note'"
                               [hidden]="false">{{item.note}}</span></td>
-                          <td style="width: 6%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
+                          <td style="width: 10%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
                             <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateItem(item.id)"><i
                                 class="fa fa-edit"></i></button>
                             <button [id]="item.id+'-button'" class="btn btn-sm btn-info" title="Xác nhận"
@@ -606,10 +601,11 @@
                 </button>
                 <button class="btn  btn-danger"
                   *ngIf=" typeAction == 'edit'||  typeAction == 'add'||  typeAction == 'show'"
-                  style="margin-right: 10px;" (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i>
+                  style="margin-right: 10px; border-radius:8px" (click)="openPopupError(listErrorView,null)"><i
+                    class="fa fa-list"></i>
                   Danh sách lỗi</button>
-                <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()"
-                  type="submit">
+                <button class="btn btn-success" style="border-radius:8px" *ngIf=" typeAction == 'show'"
+                  (click)="exportExcelDetail()" type="submit">
                   <i class="fa fa-download"></i> Xuất excel
                 </button>
               </div>
@@ -1239,38 +1235,39 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
-            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+            [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
+            list="lstItemCode">
           <datalist id="lstItemCode">
             <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
           </datalist>
         </div>
-        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+        <div class="column-table-check-nvl">Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
           <datalist id="lstErrGroup">
             <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
           </datalist>
         </div>
-        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+        <div class="column-table-check-nvl">Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
           <datalist id="lstErrCode">
             <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
           </datalist>
         </div>
-        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+        <div class="column-table-check-nvl">Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
           <datalist id="lstErrName">
             <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
           </datalist>
         </div>
-        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0;margin-top:22px"
           (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
       <div class="float-right">
         <button id="btn-save-item" (click)="submitErrors()" class="btn  btn-success"
           style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;" [hidden]="true"><i
             class="fa fa-save"></i> Lưu</button>
-        <button class="btn  btn-success" style="height: 40px;" (click)="addNewError()"
+        <button class="btn  btn-success" style="height: 40px;margin-top:22px" (click)="addNewError()"
           *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm Lỗi</button>
       </div>
     </div>

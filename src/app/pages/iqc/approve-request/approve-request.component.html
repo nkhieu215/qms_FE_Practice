@@ -149,7 +149,7 @@
 
             <td class="text-center">
 
-              <button *ngIf="audit.status == 'WAIT_APPROVE'" style="margin-right: 10px;" class="btn btn-sm btn-primary"
+              <button *ngIf="audit.status == 'WAIT_APPROVE'" style="margin-right: 5px;" class="btn btn-sm btn-primary"
                 routerLink="/iqc/check-approve/{{audit.id}}/approve">
                 <i class="fa fa-check"></i> Phê duyệt
               </button>
@@ -206,32 +206,9 @@
             </div>
           </div>
 
-          <!-- <div class="row">
-            <div class="col-sm-4">
-              <label>Mã linh kiện</label>
-              <input type="text" readonly class="form-control" placeholder="Mã linh kiện" name="elecCompCode"
-                [(ngModel)]="form.elecCompCode" />
-            </div>
-            <div class="col-sm-4">
-              <label>Tên linh kiện</label>
-              <input type="text" readonly class="form-control" placeholder="Tên linh kiện" name="electCompName"
-                [(ngModel)]="form.electCompName" />
-            </div>
-            <div class="col-sm-4">
-              <label>Số lượng theo PO</label>
-              <input type="text" readonly class="form-control" placeholder="Số lượng theo PO" name="poQuantity"
-                [(ngModel)]="form.poQuantity" />
-            </div>
-          </div> -->
-
           <div class="row">
-            <!-- <div class="col-sm-4">
-              <label>Số lô (cách nhau bởi dấu phẩy)</label>
-              <input type="text" readonly class="form-control" placeholder="Số lô" name="batchNumber"
-                [(ngModel)]="form.batchNumber" />
-            </div> -->
             <div class="col-sm-4">
-              <mat-form-field appearance="fill" style="margin-top: 10px; width: 100%">
+              <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%">
                 <mat-label>Ngày nhận hàng</mat-label>
                 <!-- #docregion toggle -->
                 <input matInput [matDatepicker]="importDate" class="form-control" name="importDate"
@@ -243,7 +220,7 @@
             </div>
 
             <div class="col-sm-4">
-              <mat-form-field appearance="fill" style="margin-top: 10px; width: 100%">
+              <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%">
                 <mat-label>Ngày kiểm</mat-label>
                 <!-- #docregion toggle -->
                 <input matInput [matDatepicker]="checkDate" class="form-control" name="checkDate"
@@ -375,14 +352,16 @@
                 <button class="btn btn-success" (click)="open(myModalError)" [hidden]="true">
                   <i class="fa fa-plus"></i> Thông tin lỗi
                 </button>
-                <button class="btn  btn-danger" style="margin-right: 10px;"
+                <button class="btn  btn-danger" style="margin-right: 10px; border-radius:8px"
                   (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
               </div>
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="lstAuditCriteriaNvl"
                 [nzFrontPagination]="false">
                 <thead>
                   <tr>
-                    <th colspan="3">Chỉ tiêu kiểm tra</th>
+                    <th rowspan="2">Tiêu chí kiểm tra</th>
+                    <th rowspan="2">Bậc rút nghiệm</th>
+                    <th rowspan="2">Mức chấp nhận</th>
                     <th colspan="3">Yêu cầu</th>
                     <th rowspan="2" style="line-height: 65px">Nội dung lưu ý</th>
                     <th rowspan="2" style="line-height: 65px">Yêu cầu khác</th>
@@ -392,9 +371,6 @@
                     <th rowspan="2" style="line-height: 65px">Ghi chú</th>
                   </tr>
                   <tr>
-                    <th>Tiêu chí kiểm tra</th>
-                    <th>Bậc rút nghiệm</th>
-                    <th>Mức chấp nhận</th>
                     <th>Min</th>
                     <th>Max</th>
                     <th>Đơn vị</th>
@@ -456,7 +432,7 @@
                   <span *ngIf=" typeAction == 'edit' || typeAction =='add'; else show ">Thông tin lỗi</span>
                   <ng-template #show>Thông tin lỗi</ng-template>
                 </button>
-                <button class="btn  btn-danger" style="margin-right: 10px;"
+                <button class="btn  btn-danger" style="margin-right: 10px; border-radius:8px"
                   (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
               </div>
 
@@ -704,31 +680,32 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
-            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+            [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
+            list="lstItemCode">
           <datalist id="lstItemCode">
             <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
           </datalist>
         </div>
-        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+        <div class="column-table-check-nvl">Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
           <datalist id="lstErrGroup">
             <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
           </datalist>
         </div>
-        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+        <div class="column-table-check-nvl">Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
           <datalist id="lstErrCode">
             <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
           </datalist>
         </div>
-        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+        <div class="column-table-check-nvl">Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
           <datalist id="lstErrName">
             <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
           </datalist>
         </div>
-        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0; margin-top:22px"
           (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
     </div>
@@ -776,31 +753,32 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
-            [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
+        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+            [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
+            list="lstItemCode">
           <datalist id="lstItemCode">
             <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
           </datalist>
         </div>
-        <div>Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
+        <div class="column-table-check-nvl">Nhóm lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errGroup"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrGroup()" list="lstErrGroup">
           <datalist id="lstErrGroup">
             <option *ngFor="let item of lstErrGroup" value="{{item.errGroup}}"></option>
           </datalist>
         </div>
-        <div>Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
+        <div class="column-table-check-nvl">Mã lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errCode"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrCode()" list="lstErrCode">
           <datalist id="lstErrCode">
             <option *ngFor="let item of lstErrCode" value="{{item.errCode}}"></option>
           </datalist>
         </div>
-        <div>Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
+        <div class="column-table-check-nvl">Tên lỗi <br> <input type="text" class="input-errors" [(ngModel)]="errName"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstErrName()" list="lstErrName">
           <datalist id="lstErrName">
             <option *ngFor="let item of lstErrName" value="{{item.errName}}"></option>
           </datalist>
         </div>
-        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0"
+        <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0; margin-top:22px"
           (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
       <div class="float-right">
