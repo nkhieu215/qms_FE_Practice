@@ -896,7 +896,7 @@ export class CheckNvlComponent implements OnInit {
     }
     this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
-      document.getElementById('btn-save-item')!.hidden = false;
+      // document.getElementById('btn-save-item')!.hidden = false;
       this.updateError(null);
     }, 50)
   }

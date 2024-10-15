@@ -818,6 +818,11 @@
         <button class="btn  btn-success" style="height: 40px;background-color: #0dcaf0;border:#0dcaf0;margin-top: 24px;"
           (click)="findInListErrors()"><i class="fa fa-search"></i>Tìm kiếm</button>
       </div>
+      <div class="float-right">
+        <button class="btn  btn-success" style="height: 40px;margin-top:22px" (click)="addNewError()"
+          *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm Lỗi</button>
+      </div>
+
     </div>
 
     <div style="margin-left: 7px;">

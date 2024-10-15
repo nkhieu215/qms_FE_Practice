@@ -42,6 +42,7 @@ export class CheckLkdtComponent implements OnInit {
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
+  rawData: any;
   listOfItem: any[] = [];
   listOfItems: any;
   @Input() itemResult: any;
@@ -362,6 +363,11 @@ export class CheckLkdtComponent implements OnInit {
     })
   }
   async onSubmit(buttonType: any) {
+    if (this.file) {
+      const body = { iqcElectCompId: this.actRoute.snapshot.params['id'], data: JSON.stringify(this.rawData), createdAt: new Date }
+      this.http.post(`${this.address}/store/download-raw-data`, body).subscribe();
+      console.log("Them moi thanh cong", JSON.stringify(this.rawData))
+    }
     var checkResult = false;
     if ((this.form.reportCode === '' || this.form.itemType === '' || this.form.origin === '' ||
       this.form.grpoNumber === '') ||
@@ -629,6 +635,7 @@ export class CheckLkdtComponent implements OnInit {
     fileReader.readAsArrayBuffer(this.file);
     fileReader.onload = (e) => {
       this.arrayBuffer = fileReader.result;
+      console.log("event", this.arrayBuffer)
       var data = new Uint8Array(this.arrayBuffer);
       var arr = new Array();
       for (var i = 0; i != data.length; ++i)
@@ -648,7 +655,7 @@ export class CheckLkdtComponent implements OnInit {
       }
 
       console.log(filteredData);
-
+      this.rawData = filteredData;
       function getValueByCol(col: number, type: string) {
         var arr = filteredData.map(item => item[col]).filter(Number);
 
@@ -1174,7 +1181,7 @@ export class CheckLkdtComponent implements OnInit {
     }
     this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
-      document.getElementById('btn-save-item')!.hidden = false;
+      // document.getElementById('btn-save-item')!.hidden = false;
       this.updateError(null);
     }, 50)
   }
