@@ -46,6 +46,10 @@ export class NvlProductionComponent implements OnInit {
   show_work_order = true;
   wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'array' };
   data: AOA = [];
+
+  searchTerm = '';
+  filteredData: any[] = []
+  lstbom: PqcDrawNvlTest[] = [];
   constructor(
     private actRoute: ActivatedRoute,
     private pqcService: PQCService,
@@ -58,13 +62,15 @@ export class NvlProductionComponent implements OnInit {
     private _sanitizer: DomSanitizer,
     private exportExelService: ExportExcelService,
     private datapqc: PqcDataService,
-    protected http: HttpClient
+    protected http: HttpClient,
   ) {
-
+    this.filteredData = this.lstbom
+    console.log('show data', this.lstbom)
   }
 
   ngOnInit(): void {
     this.getInfo();
+    this.filteredData = this.lstbom
   }
   selectedFiles?: FileList;
   progressInfos: any[] = [];
@@ -98,7 +104,6 @@ export class NvlProductionComponent implements OnInit {
   pqcInfo?: PQCWorkOrder;
   error?: string;
   classError?: string;
-  lstbom: PqcDrawNvlTest[] = [];
 
   form: any = {};
   fromCheck: any = {};
@@ -107,6 +112,8 @@ export class NvlProductionComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.http.get<any>(`${this.address}/${this.path}/get-lst-one/${id}`).subscribe(res => {
       this.lstError = res;
+      this.lstbom = res;
+      console.log('list lstbom', this.lstbom)
     })
     this.idWorkOrder = id;
     const type = this.actRoute.snapshot.params['type'];
@@ -142,7 +149,8 @@ export class NvlProductionComponent implements OnInit {
     if (this.show_check == 'SHOW' || type == 'show') {
       this.show_work_order = false;
     }
-
+    this.filteredData = this.lstbom
+    console.log("data", this.filteredData)
   }
 
   myClonedArray: PqcDrawNvlTest[] = [];
@@ -454,4 +462,20 @@ export class NvlProductionComponent implements OnInit {
     reader.readAsBinaryString(target.files[0]);
   }
 
+  filterData() {
+    this.filteredData = this.lstbom.filter((bom: any) =>
+      (bom.itemName && bom.itemName.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.itemCode && bom.itemCode.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.uotherNam && bom.uotherNam.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.uctrLevel && bom.uctrLevel.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.partNumber && bom.partNumber.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.ulocation && bom.ulocation.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.quantity && bom.quantity.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.vendor && bom.vendor.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.ualter && bom.ualter.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.version && bom.version.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (bom.uremarks && bom.uremarks.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    )
+    console.log('tìm kiếm', this.filteredData)
+  }
 }
