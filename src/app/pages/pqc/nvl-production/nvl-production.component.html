@@ -24,18 +24,39 @@
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>Tên vật tư</th>
-                  <th>Mã</th>
-                  <th>Tên khác</th>
-                  <th>Thông số KT</th>
-                  <th>Control level</th>
-                  <th>Partnumber</th>
-                  <th>Location</th>
-                  <th>Số lượng cơ bản</th>
-                  <th>Vendor</th>
-                  <th>Mã vật tư thay thế</th>
-                  <th>Version</th>
+                  <th>Tên vật tư <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>Mã <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>Thông số KT <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>PartNumber <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>SL cơ bản</th>
+                  <th>Vendor <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>Mã VT thay thế <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>Version <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
+                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                      <span nz-icon nzType="search"></span>
+                    </ng-template></th>
+                  <th>Tổng lỗi</th>
+                  <th>Tổng thực nhập</th>
                   <th>Lưu ý</th>
+                  <th>Tuỳ chọn</th>
                 </tr>
               </thead>
               <tbody>
@@ -44,7 +65,6 @@
                   <td>{{ bom.itemName }}</td>
                   <td>{{ bom.itemCode }}</td>
                   <td>{{ bom.uotherNam }}</td>
-                  <td>{{ bom.uitmTech }}</td>
                   <td>{{ bom.uctrLevel }}</td>
                   <td>{{ bom.partNumber }}</td>
                   <td>{{ bom.ulocation }}</td>
@@ -53,6 +73,11 @@
                   <td>{{ bom.ualter }}</td>
                   <td>{{ bom.version }}</td>
                   <td>{{ bom.uremarks }}</td>
+                  <td>
+                    <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </nz-table>
@@ -108,6 +133,54 @@
           </div>
         </div>
 
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi" [nzData]="['']" [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên vật tư</th>
+                  <th>Mã</th>
+                  <th>Nhóm lỗi</th>
+                  <th>Tên lỗi</th>
+                  <th>Số lượng lỗi</th>
+                  <th>SL thực nhập</th>
+                  <th>Ngày KT</th>
+                  <th>Ngày cập nhật</th>
+                  <th>Ghi chú</th>
+                  <th>Tuỳ chọn</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bom of lstbom; let i = index">
+                  <td style="text-align: center;">{{i+1}}</td>
+                  <td>{{ bom.itemName }}</td>
+                  <td>{{ bom.itemCode }}</td>
+                  <td>{{ bom.partNumber }}</td>
+                  <td>{{ bom.ulocation }}</td>
+                  <td>{{ bom.quantity }}</td>
+                  <td>{{ bom.vendor }}</td>
+                  <td>{{ bom.ualter }}</td>
+                  <td>{{ bom.version }}</td>
+                  <td>{{ bom.uremarks }}</td>
+                  <td>
+                    <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
+                      <i class="fa fa-check"></i>
+                    </button>
+                    <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+
         <app-button-success item_type="NVL" show_work_order="{{show_work_order}}"></app-button-success>
 
 
@@ -138,7 +211,7 @@
               [nzFrontPagination]="false">
               <thead>
                 <tr>
-                  <th  rowspan="2">STT</th>
+                  <th rowspan="2">STT</th>
                   <th rowspan="2">Tên vật tư</th>
                   <th rowspan="2">Mã</th>
                   <th rowspan="2">Partnumber</th>
@@ -358,3 +431,124 @@
   </ng-template>
 
 </div>
+
+<ng-template #addErr let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">Thêm mới lỗi</h2>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="row mb-2 col-8">
+        <div class="col-4">
+          <label>
+            Mã vật tư
+            <select name="" id="">
+              <option value="">00001</option>
+              <option value="">00002</option>
+              <option value="">00003</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-4">
+
+          <label>
+            Tên vật tư
+            <input type="text" name="" id="">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <div class="col-sm-12 table-responsive">
+        <button class="btn btn-success"><i class="fa fa-plus"></i>Nhập mới</button>
+        <nz-table #borderedTable nzBordered nzTitle="Thông tin nhập" [nzData]="['']" [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>SL thực nhập</th>
+              <th>Tổng SL lỗi kiểm</th>
+              <th>Ngày cập nhật</th>
+              <th>Ghi chú</th>
+              <th>Tuỳ chọn</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let bom of lstbom; let i = index">
+              <td>{{i+1}}</td>
+              <td>{{bom.itemName}}</td>
+              <td>{{ bom.itemCode }}</td>
+              <td>{{ bom.partNumber }}</td>
+              <td>{{ bom.ulocation }}</td>
+              <td>
+                <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-check"></i>
+                </button>
+                <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <div class="col-sm-12 table-responsive">
+        <button class="btn btn-success"><i class="fa fa-plus"></i>Thêm lỗi</button>
+
+        <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi" [nzData]="['']" [nzFrontPagination]="false">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên vật tư</th>
+              <th>Mã</th>
+              <th>Nhóm lỗi</th>
+              <th>Tên lỗi</th>
+              <th>Số lượng lỗi</th>
+              <th>SL thực nhập</th>
+              <th>Ngày KT</th>
+              <th>Ngày cập nhật</th>
+              <th>Ghi chú</th>
+              <th>Tuỳ chọn</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let bom of lstbom; let i = index">
+              <td style="text-align: center;">{{i+1}}</td>
+              <td>{{ bom.itemName }}</td>
+              <td>{{ bom.itemCode }}</td>
+              <td>{{ bom.partNumber }}</td>
+              <td>{{ bom.ulocation }}</td>
+              <td>{{ bom.quantity }}</td>
+              <td>{{ bom.vendor }}</td>
+              <td>{{ bom.ualter }}</td>
+              <td>{{ bom.version }}</td>
+              <td>{{ bom.uremarks }}</td>
+              <td>
+                <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-check"></i>
+                </button>
+                <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+  </div>
+</ng-template>

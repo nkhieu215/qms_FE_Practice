@@ -57,6 +57,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { TemInComponent } from './tem-in/tem-in.component';
 import { TemInLstComponent } from './tem-in-lst/tem-in-lst.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { NzInputModule } from 'ng-zorro-antd/input';
 @NgModule({
   declarations: [
     PendingProductOrderComponent,
@@ -123,7 +124,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     NzLayoutModule,
     NzFormModule,
     NzDatePickerModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    NzInputModule
   ],
   exports: [
 
