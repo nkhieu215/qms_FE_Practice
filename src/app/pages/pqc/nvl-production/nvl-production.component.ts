@@ -14,7 +14,7 @@ import {
   ModalDismissReasons,
 } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
-import { HttpEventType, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
 import Utils from 'src/app/share/_utils/utils';
 import { UploadFileService } from 'src/app/share/_services/upload-file.service';
 import { PQCNVlService } from 'src/app/share/_services/pqc_nvl.service';
@@ -32,8 +32,16 @@ type AOA = any[][];
 })
 
 export class NvlProductionComponent implements OnInit {
+  // ------------------------------------------------ list item ----------------------------------------------
+  // bản test
+  address = 'http://localhost:8449';
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
+  path = 'check-nvl-new';
   @Input() show_check = '';
   @Input() woData: any = null;
+  //danh sách
+  lstError: any;
   idWorkOrder?: string;
   show_work_order = true;
   wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'array' };
@@ -49,7 +57,8 @@ export class NvlProductionComponent implements OnInit {
     private nvlService: PQCNVlService,
     private _sanitizer: DomSanitizer,
     private exportExelService: ExportExcelService,
-    private datapqc: PqcDataService
+    private datapqc: PqcDataService,
+    protected http: HttpClient
   ) {
 
   }
@@ -96,6 +105,9 @@ export class NvlProductionComponent implements OnInit {
   id = this.actRoute.snapshot.params['id'];
   getInfo() {
     const id = this.actRoute.snapshot.params['id'];
+    this.http.get<any>(`${this.address}/${this.path}/get-lst-one/${id}`).subscribe(res => {
+      this.lstError = res;
+    })
     this.idWorkOrder = id;
     const type = this.actRoute.snapshot.params['type'];
 
@@ -127,7 +139,7 @@ export class NvlProductionComponent implements OnInit {
       );
     }
 
-    if (this.show_check == 'SHOW' || type =='show') {
+    if (this.show_check == 'SHOW' || type == 'show') {
       this.show_work_order = false;
     }
 
@@ -297,7 +309,7 @@ export class NvlProductionComponent implements OnInit {
   }
 
   uploadForm?: FormGroup;
-  upload(idx: number, file: File):  void  {
+  upload(idx: number, file: File): void {
     this.progressInfos[idx] = { value: 0, fileName: file.name };
     if (file) {
       this.uploadFileService.upload(file, this.id, this.idCheckNvl).toPromise().then(

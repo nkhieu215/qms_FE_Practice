@@ -362,10 +362,10 @@
                     <th rowspan="2">Tiêu chí kiểm tra</th>
                     <th rowspan="2">Bậc rút nghiệm</th>
                     <th rowspan="2">Mức chấp nhận</th>
-                    <th colspan="3">Yêu cầu</th>
-                    <th rowspan="2" style="line-height: 65px">Nội dung lưu ý</th>
-                    <th rowspan="2" style="line-height: 65px">Yêu cầu khác</th>
-                    <th rowspan="2" style="line-height: 65px">Số lượng</th>
+                    <th colspan="3">Yêu cầu kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px">Yêu cầu chi tiết, lưu ý</th>
+                    <th rowspan="2" style="line-height: 65px">Số lượng kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px">Số lỗi thực tế</th>
                     <th colspan="2">Kết quả kiểm tra</th>
                     <th rowspan="2" style="line-height: 65px">Đánh giá</th>
                     <th rowspan="2" style="line-height: 65px">Ghi chú</th>
@@ -391,12 +391,12 @@
                     <td>{{ audit.unitAudit }}</td>
                     <td>{{ audit.noteAudit }}</td>
                     <td>
-                      <input type="text" readonly placeholder="Yêu cầu khác" class="form-control"
-                        name="{{ 'ortherRequerement['+i+']' }}" [(ngModel)]="audit.ortherRequerement" />
-                    </td>
-                    <td>
                       <input type="text" readonly placeholder="Số lượng" class="form-control"
                         name="{{ 'quantity['+i+']' }}" [(ngModel)]="audit.quantity" />
+                    </td>
+                    <td>
+                      <input type="text" readonly placeholder="Số lỗi thực tế" class="form-control"
+                        name="{{ 'ortherRequerement['+i+']' }}" [(ngModel)]="audit.ortherRequerement" />
                     </td>
                     <td>
                       <input type="text" readonly placeholder="min" class="form-control" name="{{ 'min['+i+']' }}"

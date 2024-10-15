@@ -36,6 +36,7 @@
                   <th>Mã vật tư thay thế</th>
                   <th>Version</th>
                   <th>Lưu ý</th>
+                  <th>Tùy chọn</th>
                 </tr>
               </thead>
               <tbody>
@@ -53,6 +54,7 @@
                   <td>{{ bom.ualter }}</td>
                   <td>{{ bom.version }}</td>
                   <td>{{ bom.uremarks }}</td>
+                  <td><button>Setting</button></td>
                 </tr>
               </tbody>
             </nz-table>
@@ -107,7 +109,40 @@
             </nz-table>
           </div>
         </div>
-
+        <div class="form-group row">
+          <div class="col-sm-12 table-responsive">
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi" [nzData]="['']" [nzFrontPagination]="false">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên vật tư</th>
+                  <th>Mã vật tư</th>
+                  <th>Nhóm lỗi</th>
+                  <th>Tên lỗi</th>
+                  <th>Số lượng lỗi</th>
+                  <th>Số lượng thực nhập</th>
+                  <th>Ngày kiểm tra</th>
+                  <th>Ngày cập nhật</th>
+                  <th>Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let bom of lstError; let i = index">
+                  <td style="text-align: center;">{{i+1}}</td>
+                  <td>{{ bom.itemName }}</td>
+                  <td>{{ bom.itemCode }}</td>
+                  <td>{{ bom.uotherNam }}</td>
+                  <td>{{ bom.uitmTech }}</td>
+                  <td>{{ bom.uctrLevel }}</td>
+                  <td>{{ bom.partNumber }}</td>
+                  <td>{{ bom.ulocation }}</td>
+                  <td>{{ bom.quantity }}</td>
+                  <td>{{ bom.vendor }}</td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
         <app-button-success item_type="NVL" show_work_order="{{show_work_order}}"></app-button-success>
 
 
@@ -138,7 +173,7 @@
               [nzFrontPagination]="false">
               <thead>
                 <tr>
-                  <th  rowspan="2">STT</th>
+                  <th rowspan="2">STT</th>
                   <th rowspan="2">Tên vật tư</th>
                   <th rowspan="2">Mã</th>
                   <th rowspan="2">Partnumber</th>
