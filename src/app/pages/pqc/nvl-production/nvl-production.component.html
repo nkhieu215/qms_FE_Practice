@@ -25,32 +25,39 @@
                 <tr>
                   <th>STT</th>
                   <th>Tên vật tư <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
-                  <th>Mã <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                  <th>Mã <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input placeholder="Search"
+                        [(ngModel)]="searchTerm" (ngModelChange)="filterData()"></nz-input-group><ng-template
+                      #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>Thông số KT <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>PartNumber <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>SL cơ bản</th>
                   <th>Vendor <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>Mã VT thay thế <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>Version <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search"></nz-input-group><ng-template #suffixIconSearch>
+                        placeholder="Search" [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>Tổng lỗi</th>
@@ -60,7 +67,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let bom of lstbom; let i = index">
+                <tr *ngFor="let bom of filteredData; let i = index">
                   <td style="text-align: center;">{{i+1}}</td>
                   <td>{{ bom.itemName }}</td>
                   <td>{{ bom.itemCode }}</td>
