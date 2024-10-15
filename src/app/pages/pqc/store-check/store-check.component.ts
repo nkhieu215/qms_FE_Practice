@@ -51,6 +51,7 @@ export class StoreCheckComponent implements OnInit {
   address = 'http://localhost:8449';
   // hệ thống
   //address = 'http://192.168.68.92/qms';
+
   //Điều kiện triển khai hiện tại
   path = 'store-check';
   packing = '';
@@ -221,7 +222,7 @@ export class StoreCheckComponent implements OnInit {
         .then(
           (data) => {
             this.lstStoreCheck = data.lstCheck;
-            console.log('load check store', data.lstCheck);
+            // console.log('load check store', data.lstCheck);
             this.lstStoreCheck.forEach((element) => {
               element.ids = Utils.randomString(5);
               element.statusApproveSapStr = Utils.getStatusName(element.statusApproveSap);
@@ -248,8 +249,39 @@ export class StoreCheckComponent implements OnInit {
     keyboard: false,
   };
   error = '';
+  findMax(id: any, quantity: any) {
+    this.http.get<any>(`${this.address}/store-check/find-max/${id}`).subscribe(res => {
+      var max = 0;
+      if (res.maxELECT > max) {
+        max = res.maxELECT;
+      }
+      if (res.maxEXTER > max) {
+        max = res.maxEXTER;
+      }
+      if (res.maxSIZE > max) {
+        max = res.maxSIZE;
+      }
+      if (res.maxSAFE > max) {
+        max = res.maxSAFE;
+      }
+      if (res.maxCONFUSED > max) {
+        max = res.maxCONFUSED;
+      }
+      if (res.maxSTRUCTURE > max) {
+        max = res.maxSTRUCTURE;
+      }
+      if (quantity > max) {
+        max = quantity;
+      }
+      // this.lstStoreCheck.forEach(e=>{
+      //   if
+      // })
+      console.log("find max: ", max);
+      this.updateStoreCheck(id, max);
+    })
+  }
   onSubmit(action: any) {
-    console.log(this.formEx);
+    // console.log(this.formEx);
     var data = {
       lstCheckStore: this.lstStoreCheck,
     };
@@ -315,7 +347,7 @@ export class StoreCheckComponent implements OnInit {
     } else {
       this.lstStoreCheck.forEach((element) => {
 
-        console.log(ids, action)
+        // console.log(ids, action)
 
         if (element.ids == ids) {
           this.storeCheck = element;
@@ -326,6 +358,7 @@ export class StoreCheckComponent implements OnInit {
                 'Thành công',
                 'warning'
               )
+              this.findMax(this.openId, 0);
             },
             error => { }
           );
@@ -333,7 +366,6 @@ export class StoreCheckComponent implements OnInit {
             case 'ELEC':
               element.lstElectronic.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quantityCheck));
                   element.lstElectronic?.splice(index, 1);
                 }
               });
@@ -342,7 +374,7 @@ export class StoreCheckComponent implements OnInit {
             case 'EXTER':
               element.lstExternal.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quantity));
+                  // this.findMax(this.openId);
                   element.lstExternal?.splice(index, 1);
                 }
               });
@@ -351,7 +383,7 @@ export class StoreCheckComponent implements OnInit {
             case 'SIZE':
               element.lstSize.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
+                  // this.findMax(this.openId);
                   element.lstSize?.splice(index, 1);
                 }
               });
@@ -359,7 +391,7 @@ export class StoreCheckComponent implements OnInit {
             case 'SAFE':
               element.lstSafe.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
+                  // this.findMax(this.openId);
                   element.lstSafe?.splice(index, 1);
                 }
               });
@@ -368,7 +400,7 @@ export class StoreCheckComponent implements OnInit {
             case 'CONFUSED':
               element.lstConfused.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
+                  // this.findMax(this.openId);
                   element.lstConfused?.splice(index, 1);
                 }
               });
@@ -376,7 +408,7 @@ export class StoreCheckComponent implements OnInit {
             case 'STRUCTURE':
               element.lstStructure.forEach((ele, index) => {
                 if (ele.id == id) {
-                  this.updateStoreCheck(this.openId, 0 - Number(ele.quatity));
+                  // this.findMax(this.openId);
                   element.lstStructure?.splice(index, 1);
                 }
               });
@@ -402,15 +434,15 @@ export class StoreCheckComponent implements OnInit {
     var check = new StoreCheck();
     this.lstStoreCheck.forEach((x: StoreCheck) => {
       if (x.id == ids) {
-        console.log('check: ', ids, this.lstStoreCheck);
-        x.quatity = Number(x.quatity) + Number(quantity);
+        // console.log('check: ', ids, this.lstStoreCheck);
+        x.quatity = quantity;
         check = x;
       }
     });
     this.http.post<any>(`${this.address}/${this.path}/update`, check).subscribe();
   }
   onAddError(action: any, ids: any) {
-    console.log("save store check : ", this.formEx, action)
+    // console.log("save store check : ", this.formEx, action)
     if (action == 'CHECK' || action == 'CHECK_EDIT') {
       var check = new StoreCheck();
       check.checkDate = this.formEx.checkDate;
@@ -488,7 +520,7 @@ export class StoreCheckComponent implements OnInit {
               checkelec.note = this.formEx.note;
               checkelec.quantityCheck = this.formEx.quantityCheck;
               checkelec.storeCheckId = store_check_id;
-              this.updateStoreCheck(store_check_id, this.formEx.quantityCheck);
+              this.findMax(store_check_id, this.formEx.quantityCheck);
               this.storeCheckService
                 .createCheck(checkelec, 'ELEC')
                 .toPromise()
@@ -514,9 +546,11 @@ export class StoreCheckComponent implements OnInit {
                   element.workOrderId = this.id;
                 element.storeCheckId = store_check_id;
                 element.allow = element.allowedError;
-                quatity += Number(element.quantity);
+                if (quatity < element.quantity) {
+                  quatity = element.quantity;
+                }
               })
-              this.updateStoreCheck(store_check_id, quatity);
+              this.findMax(store_check_id, quatity);
               this.storeCheckService
                 .createCheck(this.lstAqlCheck, 'EXTER')
                 .toPromise()
@@ -555,7 +589,7 @@ export class StoreCheckComponent implements OnInit {
               size.quatity = this.formEx.quatity;
               size.storeCheckId = store_check_id;
               size.workOrderId = this.id;
-              this.updateStoreCheck(store_check_id, this.formEx.quatity);
+              this.findMax(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(size, 'SIZE')
                 .toPromise()
@@ -585,7 +619,7 @@ export class StoreCheckComponent implements OnInit {
               safe.storeCheckId = store_check_id;
               safe.workOrderId = this.id;
               safe.standard = this.formEx.standard
-              this.updateStoreCheck(store_check_id, this.formEx.quatity);
+              this.findMax(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(safe, 'SAFE')
                 .toPromise()
@@ -613,7 +647,7 @@ export class StoreCheckComponent implements OnInit {
               confu.quatity = this.formEx.quatity;
               confu.storeCheckId = store_check_id;
               confu.workOrderId = this.id;
-              this.updateStoreCheck(store_check_id, this.formEx.quatity);
+              this.findMax(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(confu, 'CONFUSED')
                 .toPromise()
@@ -642,7 +676,7 @@ export class StoreCheckComponent implements OnInit {
               struct.quatity = this.formEx.quatity;
               struct.storeCheckId = store_check_id;
               struct.workOrderId = this.id;
-              this.updateStoreCheck(store_check_id, this.formEx.quatity);
+              this.findMax(store_check_id, this.formEx.quatity);
               this.storeCheckService
                 .createCheck(struct, 'STRUCTURE')
                 .toPromise()
@@ -905,7 +939,7 @@ export class StoreCheckComponent implements OnInit {
       data => {
         this.lstAql = data.lstTemplate;
         this.aql_collectionSize = Number(data.total) * this.aql_pageSize;
-        console.log(this.aql_collectionSize);
+        // console.log(this.aql_collectionSize);
       },
       err => {
 
@@ -984,7 +1018,7 @@ export class StoreCheckComponent implements OnInit {
           el.status = Utils.getStatusName(el.status);
           el.checked = true;
         })
-        console.log(data.lstStep)
+        // console.log(data.lstStep)
       },
       error => { }
     )
@@ -1055,11 +1089,11 @@ export class StoreCheckComponent implements OnInit {
   selectColor(color: any) {
     this.formEx.colorName = color.name;
     this.formEx.colorCode = color.code;
-    console.log(this.formEx);
+    // console.log(this.formEx);
   }
   updateStatus() {
     var body = this.lstCheck.filter(x => x.status != 'Hoàn thành' && x.checked == true);
-    console.log(body)
+    // console.log(body)
     this.http.post(`${this.address}/pqc/approves`, body).subscribe(() => {
       Swal.fire({
         title: 'Thành công',
