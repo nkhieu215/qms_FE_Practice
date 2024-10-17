@@ -25,13 +25,13 @@
     </div>
     <div class="button-group">
       <div>
-        <button class="create-btn" (click)=" findFucntion()">
+        <button class="btn create-btn" (click)=" findFucntion()">
           <i class="fa fa-search"></i>
           Tìm kiếm
         </button>
       </div>
       <div>
-        <button class="create-btn" (click)="openInsertPopup(listInsertError)">
+        <button class="btn create-btn" (click)="openInsertPopup(listInsertError)">
           <i class="fa fa-plus"></i>
           Thêm mới
         </button>
@@ -65,13 +65,13 @@
         <td>{{item.createdAt | date:'dd/MM/yyyy'}}</td>
         <td>{{item.updateAt | date:'dd/MM/yyyy'}}</td>
         <td>
-          <div *ngFor="let item1 of item.typeList;"
+          <div class="status-display" *ngFor="let item1 of item.typeList;"
             [ngClass]="{nvlClass: item1 === 'NVL',lkdtClass:item1 === 'LKDT',dgclClass: item1 ==='Đánh giá CL SP'}">
             {{item1}}</div>
         </td>
         <td>{{item.username}}</td>
         <td>
-          <div [id]="item.id+'-div'" [hidden]="false"
+          <div class="status-display" [id]="item.id+'-div'" [hidden]="false"
             [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}">{{item.status}}
           </div>
           <select [id]="item.id+'-select'" [(ngModel)]="item.status" [ngModelOptions]="{ standalone: true }"

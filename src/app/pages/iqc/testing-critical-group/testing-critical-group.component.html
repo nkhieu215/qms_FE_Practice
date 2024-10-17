@@ -58,11 +58,24 @@
       <td>{{item.createdAt| date:'dd/MM/yyyy'}}</td>
       <td>{{item.updateAt | date:'dd/MM/yyyy'}}</td>
       <td>{{item.username}}</td>
-      <td>
+      <!-- <td>
         <div [id]="item.id+'-div'" [hidden]="false"
           [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}">{{item.status}}</div>
         <select [id]="item.id+'-select'" [(ngModel)]="item.status" [ngModelOptions]="{ standalone: true }"
           style=" width: 110px;height: 24px;" [hidden]="true">
+          <option value=""></option>
+          <option value="Active">Active</option>
+          <option value="Deactivate">Deactivate</option>
+        </select>
+      </td> -->
+      <td>
+        <div [id]="item.id+'-div'" [hidden]="false"
+          [ngClass]="{greenClass: item.status === 'Active', redClass: item.status === 'Deactivate'}"
+          class="status-display">
+          {{item.status}}
+        </div>
+        <select [id]="item.id+'-select'" [(ngModel)]="item.status" [ngModelOptions]="{ standalone: true }"
+          class="status-select" [hidden]="true">
           <option value=""></option>
           <option value="Active">Active</option>
           <option value="Deactivate">Deactivate</option>
@@ -102,7 +115,8 @@
 <!-- pop up insert info -->
 <ng-template #listError let-modal>
   <div id="update-popup" [hidden]="!insertPopup" class="popup">
-    <div> <button class="close-popup" (click)="close()" (click)="modal.dismiss('Cross click')">X</button></div>
+    <div> <button class="close-popup" (click)="close()" (click)="modal.dismiss('Cross click')"><span
+          aria-hidden="true">&times;</span></button></div>
     <div class="popup-title"><b>{{popupTitle}}</b></div>
     <div>
       <div>

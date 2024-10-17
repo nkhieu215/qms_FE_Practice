@@ -83,9 +83,9 @@
                   <td>{{ bom.sumQuantity }}</td>
                   <td>{{ bom.uremarks }}</td>
                   <td>
-                    <button class="btn btn-warning"
+                    <button class="btn btn-info"
                       (click)="open(addErr,'quantity',null,bom.id,bom.itemName,bom.itemCode)">
-                      <i class="fa fa-pencil"></i>
+                      <i class="fa fa-eye"></i>
                     </button>
                   </td>
                 </tr>
@@ -210,7 +210,8 @@
   <ng-template #myModal5 let-modal>
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">Thông tin kiểm tra NVL</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"><span
+          aria-hidden="true">&times;</span></button>
     </div>
     <div class="modal-body">
       <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
@@ -445,7 +446,7 @@
 <ng-template #addErr let-modal>
   <div class="modal-header">
     <h2 class="modal-title" id="modal-basic-title">Thêm mới lỗi</h2>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+    <button type="button" class="btn close" aria-label="Close" (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -453,9 +454,9 @@
     <div class="row">
       <div class="row mb-2 col-8">
         <div class="col-4">
-          <label>
+          <label class="form-label">
             Mã vật tư
-            <input type="text" [value]="insertItemName">
+            <input class="form-select-header" type="text" [value]="insertItemCode" readonly>
             <!-- <select name="" id="">
               <option value="">00001</option>
               <option value="">00002</option>
@@ -464,10 +465,9 @@
           </label>
         </div>
         <div class="col-4">
-
-          <label>
+          <label class="form-label">
             Tên vật tư
-            <input type="text" [value]="insertItemCode">
+            <input class="form-select-header" type="text" [value]="insertItemName" readonly>
           </label>
         </div>
       </div>
@@ -475,7 +475,7 @@
 
     <div class="mb-2">
       <div class="col-sm-12 table-responsive">
-        <button class="btn btn-success" (click)="addNewQuantity()" *ngIf="show_work_order"><i
+        <button class="btn btn-success btn-add" (click)="addNewQuantity()" *ngIf="show_work_order"><i
             class="fa fa-plus"></i>Nhập mới</button>
         <nz-table #borderedTable nzBordered nzTitle="Thông tin nhập" [nzData]="['']" [nzFrontPagination]="false">
           <thead>
@@ -492,12 +492,12 @@
           <tbody>
             <tr *ngFor="let bom of lstQuantityByItem; let i = index">
               <td>{{i+1}}</td>
-              <td><span [id]="bom.id+'-span-bom-quantity'" [hidden]="false">{{bom.quantity}}</span> <input type="text"
-                  *ngIf="show_work_order" [id]="bom.id+'-input-bom-quantity'" [(ngModel)]="bom.quantity"
-                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td><span [id]="bom.id+'-span-bom-quantity'" [hidden]="false">{{bom.quantity}}</span> <input
+                  class="form-select-header" type="text" *ngIf="show_work_order" [id]="bom.id+'-input-bom-quantity'"
+                  [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
               <td>{{ bom.totalError }}</td>
-              <td>{{ bom.createdAt }}</td>
-              <td>{{ bom.updatedAt }}</td>
+              <td>{{ bom.createdAt | date:'dd/MM/YY HH:mm:ss'}}</td>
+              <td>{{ bom.updatedAt | date:'dd/MM/YY HH:mm:ss'}}</td>
               <td>
                 <button [id]="bom.id+'-button'" *ngIf="show_work_order" [hidden]="true" class="btn btn-success"
                   (click)="updateQuantity(bom)">
@@ -524,10 +524,10 @@
 
     <div class="mb-2">
       <div class="col-sm-12 table-responsive">
-        <button class="btn btn-success" *ngIf="showBtn == true" (click)="addNewError()"><i class="fa fa-plus"></i>Thêm
+        <button class="btn btn-success btn-add" *ngIf="showBtn == true" (click)="addNewError()"><i
+            class="fa fa-plus"></i>Thêm
           lỗi</button>
-        <button class="btn btn-success" *ngIf="showBtn == true" (click)="updateError(null)"><i
-            class="fa fa-plus"></i>Lưu</button>
+
 
         <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi" [nzData]="['']" [nzFrontPagination]="false">
           <thead>
@@ -542,7 +542,7 @@
               <th>Ngày KT</th>
               <th>Ngày cập nhật</th>
               <th>Ghi chú</th>
-              <th *ngIf="show_work_order">Tuỳ chọn</th>
+              <th *ngIf="show_work_order" style="width: 8%;">Tuỳ chọn</th>
             </tr>
           </thead>
 
@@ -552,20 +552,20 @@
               <td>{{ bom.itemName }}</td>
               <td>{{ bom.itemCode }}</td>
               <td><span [id]="bom.id+'-span-error-errorCode'" [hidden]="false">{{bom.errorCode}}</span> <input
-                  type="text" [id]="bom.id+'-input-error-errorCode'" [(ngModel)]="bom.errorCode"
-                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+                  class="form-select-header" type="text" [id]="bom.id+'-input-error-errorCode'"
+                  [(ngModel)]="bom.errorCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
               <td><span [id]="bom.id+'-span-error-errorName'" [hidden]="false">{{bom.errorName}}</span> <input
-                  type="text" [id]="bom.id+'-input-error-errorName'" [(ngModel)]="bom.errorName"
-                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
-              <td><span [id]="bom.id+'-span-error-quantity'" [hidden]="false">{{bom.quantity}}</span> <input type="text"
-                  [id]="bom.id+'-input-error-quantity'" [(ngModel)]="bom.quantity"
-                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+                  class="form-select-header" type="text" [id]="bom.id+'-input-error-errorName'"
+                  [(ngModel)]="bom.errorName" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td><span [id]="bom.id+'-span-error-quantity'" [hidden]="false">{{bom.quantity}}</span> <input
+                  class="form-select-header" type="text" [id]="bom.id+'-input-error-quantity'"
+                  [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
               <td>{{ bom.quantity2 }}</td>
-              <td>{{ bom.createdAt }}</td>
-              <td>{{ bom.updatedAt }}</td>
-              <td><span [id]="bom.id+'-span-error-note'" [hidden]="false">{{bom.note}}</span> <input type="text"
-                  [id]="bom.id+'-input-error-note'" [(ngModel)]="bom.note" [ngModelOptions]="{ standalone: true }"
-                  [hidden]="true"></td>
+              <td>{{ bom.createdAt | date:'dd/MM/YY HH:mm:ss' }}</td>
+              <td>{{ bom.updatedAt | date:'dd/MM/YY HH:mm:ss' }}</td>
+              <td><span [id]="bom.id+'-span-error-note'" [hidden]="false">{{bom.note}}</span> <input
+                  class="form-select-header" type="text" [id]="bom.id+'-input-error-note'" [(ngModel)]="bom.note"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
               <td>
                 <button class="btn btn-success" [id]="bom.id+'-error-button'" [hidden]="true" *ngIf="show_work_order"
                   (click)="updateError(i)">
@@ -581,6 +581,8 @@
             </tr>
           </tbody>
         </nz-table>
+        <button class="btn btn-primary btn-add" *ngIf="showBtn == true" (click)="updateError(null)"><i
+            class="fa fa-file"></i>Lưu</button>
       </div>
     </div>
   </div>
