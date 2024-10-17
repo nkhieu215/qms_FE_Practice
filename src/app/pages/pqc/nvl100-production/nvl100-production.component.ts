@@ -40,9 +40,9 @@ import { async } from 'rxjs/internal/scheduler/async';
 })
 export class Nvl100ProductionComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   //Điều kiện triển khai hiện tại
   page?: number;
   page1?: number;
@@ -802,16 +802,19 @@ export class Nvl100ProductionComponent implements OnInit {
             })
           })
           this.dnlnvl![0].partNumber.forEach((itemPart: any) => {
-            itemPart.lstMachine = []
-            if (itemPart.subPart[0] != null) {
-              itemPart.subPart.forEach((y: any) => {
-                const data = { partNumberCode: y.partNumberCode, name: y.name, lstMachine: [], subPart: [] };
-                this.dnlnvl![0].partNumber.push(data as any);
-              })
-            }
+            itemPart.lstMachine = [];
+            itemPart.lstFeeder = [];
+            // if (itemPart.subPart[0] != null) {
+            //   itemPart.subPart.forEach((y: any) => {
+            //     const data = { partNumberCode: y.partNumberCode, name: y.name, lstMachine: [], subPart: [] };
+            //     this.dnlnvl![0].partNumber.push(data as any);
+            //   })
+            // }
           })
-          this.getFeederHistoryInfo(this.dnlnvl);
-          this.updateListPathNumber(this.dnlnvl);
+          setTimeout(() => {
+            this.getFeederHistoryInfo(this.dnlnvl);
+            this.updateListPathNumber(this.dnlnvl);
+          }, 300);
         }, 300);
       },
       err => {
@@ -992,6 +995,8 @@ export class Nvl100ProductionComponent implements OnInit {
     }
   }
   open(content: any, idBom: any) {
+    this.totalNotScan = 0;
+    this.totalScaned = 0;
     this.lstPartNumberAvailable = this.lstPartNumberAvailableOrigin = [];
     // console.log(idBom, this.lstbom);
     this.lstScanView = [];
@@ -1031,34 +1036,27 @@ export class Nvl100ProductionComponent implements OnInit {
       console.log(this.lstPartNumberAvailable)
     }
     if (idBom === 'scan') {
-      this.lstMaterialScan = this.lstMaterialScanOrigin = [];
+      this.lstMaterialScan = [];
+      this.lstMaterialScanOrigin = [];
       this.materialSearchKey = '';
       this.dnlnvl![0].machine.forEach(x => {
         x.partNumber.forEach((y: any) => {
           y.materials.forEach((z: any) => {
             var result = this.lstScan.find(item => item.material == z.materialId);
             if (result) {
+              this.totalScaned++;
               const data = { partNumber: y.name, material: z.materialId, status: 'Đã scan' };
               this.lstMaterialScanOrigin.push(data);
             } else {
               const data = { partNumber: y.name, material: z.materialId, status: 'Chưa scan' };
+              this.totalNotScan++;
               this.lstMaterialScanOrigin.push(data);
+              this.lstMaterialScan.push(data);
             }
           })
         })
       })
-      setTimeout(() => {
-        this.lstMaterialScan = this.lstMaterialScanOrigin;
-        this.totalNotScan = 0;
-        this.totalScaned = 0;
-        this.lstMaterialScanOrigin.forEach(x => {
-          if (x.status == 'Đã scan') {
-            this.totalScaned++;
-          } else {
-            this.totalNotScan++;
-          }
-        })
-      }, 100);
+
       console.log(this.lstMaterialScan)
     }
   }
@@ -1116,6 +1114,21 @@ export class Nvl100ProductionComponent implements OnInit {
               }
             }
           })
+          // lstMachine.machine.forEach((machineItem: any) => {
+          //   var findMc = x.lstMachine.find((x1:any)=>x1 == machineItem.machineName);
+          //   if(findMc){
+          //     var findPart = machineItem.partNumber.find((part:any)=>part.name == x.name);
+          //     if(findPart){
+          //       findPart.qrFeederDtos.forEach((y:any)=>{
+          //         var findReplaceFeeder = this.lstMachineOrigin.find((k:any)=> k.qrFeederCode == y.qrFeederCode)
+          //         var findFeeder = x.lstFeeder.find((z:any)=>z == y.qrFeederCode);
+          //         if(!findFeeder){
+          //           x.lstFeeder = [y.qrFeederCode, ...x.lstFeeder];
+          //         }
+          //       })
+          //     }
+          //   }
+          // })
         })
       }, 3000);
     })
@@ -1162,37 +1175,49 @@ export class Nvl100ProductionComponent implements OnInit {
               // })
               // console.log('check lst part number final :', lstPartNumber);
               qrCode.qrFeederDtos.forEach((feederItem: any) => {
-                var result = this.lstMachine.find(x => x.qrFeederCode === feederItem.qrFeederCode && x.machineName === item.machineName);
-                var group = lstSubFeeder.find(x => x.qrFeederCode === feederItem.qrFeederCode);
-                if (!result) {
-                  var lstPartNumberFinal = lstPartNumber.length > 0 ? lstPartNumber : [qrCode.name];
-                  const exist = this.lstFeederHistory.filter(x => x.machineCode === item.machineName && x.mainQrFeeder === feederItem.qrFeederCode);
-                  if (exist.length > 0) {
-                    const data = { machineName: item.machineName, qrFeederCode: feederItem.qrFeederCode, qrFeederId: feederItem.qrFeederId, status: 'Deactivate', feederGroupId: group.id, timeUpdate: exist[0].timeUpdate, replaceQrFeeder: exist[0].replaceQrFeeder, partNumber: lstPartNumberFinal };
-                    if (data.replaceQrFeeder === data.qrFeederCode) {
-                      data.status = 'Active';
-                    }
-                    this.lstMachine.push(data);
-                    this.lstMachineOrigin.push(data);
-                  } else if (exist.length === 0) {
-                    const data = { machineName: item.machineName, qrFeederCode: feederItem.qrFeederCode, qrFeederId: feederItem.qrFeederId, status: 'Active', feederGroupId: group.id, replaceQrFeeder: feederItem.qrFeederCode, partNumber: lstPartNumberFinal };
-                    this.lstMachine.push(data);
-                    this.lstMachineOrigin.push(data);
-                  }
-                } else {
-                  var index = this.lstMachine.findIndex(x => x.qrFeederCode === feederItem.qrFeederCode && x.machineName === item.machineName);
-                  var result = this.lstMachine[index].partNumber.find((x: any) => x === qrCode.name);
+                var result = this.lstMachine.find(x => x.qrFeederCode == feederItem.qrFeederCode && x.machineName == item.machineName);
+                var group = lstSubFeeder.find(x => x.qrFeederCode == feederItem.qrFeederCode);
+                setTimeout(() => {
+                  console.log('check subfeeder', group, feederItem.qrFeederCode)
                   if (!result) {
-                    this.lstMachine[index].partNumber.push(qrCode.name);
+                    var lstPartNumberFinal = lstPartNumber.length > 0 ? lstPartNumber : [qrCode.name];
+                    const exist = this.lstFeederHistory.filter(x => x.machineCode === item.machineName && x.mainQrFeeder === feederItem.qrFeederCode);
+                    if (exist.length > 0) {
+                      const data = {
+                        machineName: item.machineName,
+                        feederGroupId: group.id,
+                        qrFeederCode: feederItem.qrFeederCode, qrFeederId: feederItem.qrFeederId, status: 'Deactivate', timeUpdate: exist[0].timeUpdate, replaceQrFeeder: exist[0].replaceQrFeeder, partNumber: lstPartNumberFinal
+                      };
+                      if (data.replaceQrFeeder === data.qrFeederCode) {
+                        data.status = 'Active';
+                      }
+                      this.lstMachine.push(data);
+                      this.lstMachineOrigin.push(data);
+                    } else if (exist.length === 0) {
+                      const data = {
+                        machineName: item.machineName,
+                        feederGroupId: group.id,
+                        qrFeederCode: feederItem.qrFeederCode, qrFeederId: feederItem.qrFeederId, status: 'Active', replaceQrFeeder: feederItem.qrFeederCode, partNumber: lstPartNumberFinal
+                      };
+                      this.lstMachine.push(data);
+                      this.lstMachineOrigin.push(data);
+                    }
+                  } else {
+                    var index = this.lstMachine.findIndex(x => x.qrFeederCode === feederItem.qrFeederCode && x.machineName === item.machineName);
+                    var result = this.lstMachine[index].partNumber.find((x: any) => x === qrCode.name);
+                    if (!result) {
+                      this.lstMachine[index].partNumber.push(qrCode.name);
+                    }
                   }
-                }
+                }, 100);
               })
             })
           }, 1000);
         })
-      })
+      }, 200)
       console.log('check machine', this.lstMachineOrigin)
-    }, 100)
+      console.log('check subfeeder -2', lstSubFeeder)
+    })
   }
   openAlert(mss: any) {
     this.alertMessage = mss;
