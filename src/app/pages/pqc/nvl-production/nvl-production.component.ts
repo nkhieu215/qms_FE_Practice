@@ -40,16 +40,30 @@ export class NvlProductionComponent implements OnInit {
   path = 'check-nvl-new';
   @Input() show_check = '';
   @Input() woData: any = null;
-  //danh sách
+  //danh sách khai báo lỗi
+  itemId = 0;
+  quantityId = 0;
+  quantityValue = 0;
+  insertItemName = '';
+  insertItemCode = '';
   lstError: any;
+  lstErrorByItem: any;
+  lstQuantityByItem: any;
   idWorkOrder?: string;
   show_work_order = true;
   wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'array' };
   data: AOA = [];
-
-  searchTerm = '';
+  showBtn = false;
+  confirmChange = false;
+  itemName = '';
+  itemCode = '';
+  uotherNam = '';
+  partNumber = '';
+  vendor = '';
+  ualter = '';
+  version = '';
   filteredData: any[] = []
-  lstbom: PqcDrawNvlTest[] = [];
+  lstbom: any[] = [];
   constructor(
     private actRoute: ActivatedRoute,
     private pqcService: PQCService,
@@ -64,13 +78,10 @@ export class NvlProductionComponent implements OnInit {
     private datapqc: PqcDataService,
     protected http: HttpClient,
   ) {
-    this.filteredData = this.lstbom
-    console.log('show data', this.lstbom)
   }
 
   ngOnInit(): void {
     this.getInfo();
-    this.filteredData = this.lstbom
   }
   selectedFiles?: FileList;
   progressInfos: any[] = [];
@@ -112,8 +123,6 @@ export class NvlProductionComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.http.get<any>(`${this.address}/${this.path}/get-lst-one/${id}`).subscribe(res => {
       this.lstError = res;
-      this.lstbom = res;
-      console.log('list lstbom', this.lstbom)
     })
     this.idWorkOrder = id;
     const type = this.actRoute.snapshot.params['type'];
@@ -135,12 +144,29 @@ export class NvlProductionComponent implements OnInit {
     } else {
       this.pqcService.getDetailPqcWorkOrder(id).subscribe(
         (data) => {
+          const check: any[] = [{ id: 0 }];
           this.form = data.pqcWorkOrder;
-          this.lstbom = data.pqcWorkOrder.lstbom;
+          this.filteredData = this.lstbom = data.pqcWorkOrder.lstbom;
           this.lstCheck = data.pqcWorkOrder.lstPqcDrawNvl;
           this.lstCheck.forEach(element => {
             element.ids = Utils.randomString(5);
           });
+          console.log('list lstbom', this.lstError, this.lstbom)
+          this.filteredData.forEach(item => {
+            item.sumQuantity = 0;
+            item.sumError = 0;
+            this.lstError.forEach((error: any) => {
+              if (error.pqcBomWorkOrderId == item.id) {
+                item.sumError += error.quantity;
+                var result = check.find((x: any) => x.id == error.pqcBomQuantityId);
+                if (!result) {
+                  const data = { id: error.pqcBomQuantityId };
+                  check.push(data);
+                  item.sumQuantity += error.quantity2;
+                }
+              }
+            })
+          })
         },
         (err) => { }
       );
@@ -149,14 +175,12 @@ export class NvlProductionComponent implements OnInit {
     if (this.show_check == 'SHOW' || type == 'show') {
       this.show_work_order = false;
     }
-    this.filteredData = this.lstbom
-    console.log("data", this.filteredData)
   }
 
   myClonedArray: PqcDrawNvlTest[] = [];
   ids?: any;
   idCheckNvl?: any;
-  open(content: any, action: any, ids: any, id: any) {
+  open(content: any, action: any, ids: any, id: any, itemName: any, itemCode: any) {
     console.log(ids)
     this.ids = ids;
     this.myClonedArray = [];
@@ -186,6 +210,17 @@ export class NvlProductionComponent implements OnInit {
         this.fileInfos = data.lstImg;
       });
     }
+    else if (action == 'quantity') {
+      this.insertItemName = itemName;
+      this.insertItemCode = itemCode;
+      this.itemId = id;
+      this.http.get<any>(`${this.address}/${this.path}/get-lst-quantity/${id}`).subscribe(res => {
+        this.lstQuantityByItem = res;
+      })
+      this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${id}`).subscribe(res => {
+        this.lstErrorByItem = res;
+      })
+    }
     else {
       this.lstbom.forEach(element => {
         var bom = new PqcDrawNvlTest();
@@ -209,9 +244,34 @@ export class NvlProductionComponent implements OnInit {
     this.modalService.open(content, this.modalOptions).result.then(
       (result) => {
         this.closeResult = `Closed with: ${result}`;
+
       },
       (reason) => {
+
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        setTimeout(() => {
+          this.http.get<any>(`${this.address}/${this.path}/get-lst-one/${this.id}`).subscribe(res => {
+            this.lstError = res;
+            const check: any[] = [{ id: 0 }];
+            setTimeout(() => {
+              this.filteredData.forEach(item => {
+                item.sumQuantity = 0;
+                item.sumError = 0;
+                this.lstError.forEach((error: any) => {
+                  if (error.pqcBomWorkOrderId == item.id) {
+                    item.sumError += error.quantity;
+                    var result = check.find((x: any) => x.id == error.pqcBomQuantityId);
+                    if (!result) {
+                      const data = { id: error.pqcBomQuantityId };
+                      check.push(data);
+                      item.sumQuantity += error.quantity2;
+                    }
+                  }
+                })
+              })
+            }, 50);
+          })
+        }, 50);
       }
     );
   }
@@ -463,19 +523,292 @@ export class NvlProductionComponent implements OnInit {
   }
 
   filterData() {
-    this.filteredData = this.lstbom.filter((bom: any) =>
-      (bom.itemName && bom.itemName.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.itemCode && bom.itemCode.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.uotherNam && bom.uotherNam.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.uctrLevel && bom.uctrLevel.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.partNumber && bom.partNumber.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.ulocation && bom.ulocation.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.quantity && bom.quantity.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.vendor && bom.vendor.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.ualter && bom.ualter.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.version && bom.version.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (bom.uremarks && bom.uremarks.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    this.lstbom = this.filteredData.filter((bom: any) =>
+      (bom.itemName && bom.itemName.toLowerCase().includes(this.itemName.toLowerCase())) &&
+      (bom.itemCode && bom.itemCode.toLowerCase().includes(this.itemCode.toLowerCase()))
+      // (bom.partNumber && bom.partNumber.includes(this.partNumber)) &&
+      // (bom.vendor && bom.vendor.includes(this.vendor)) &&
+      // (bom.version && bom.version.includes(this.version))
     )
-    console.log('tìm kiếm', this.filteredData)
+    console.log('check')
+  }
+  //------------------------------- Khai báo lỗi
+  fixQuantity(id: any, bomId: any, quantity: any) {
+    if (id === null) {
+      document.getElementById(`null-input-bom-quantity`)!.hidden = false;;
+      document.getElementById(`null-button`)!.hidden = false;
+      document.getElementById(`null-span-bom-quantity`)!.hidden = true;
+      this.lstErrorByItem = [];
+      this.showBtn = true;
+      this.quantityId = id;
+      this.quantityValue = quantity;
+    } else {
+      this.quantityId = id;
+      this.quantityValue = quantity;
+      if (document.getElementById(`${id.toString()}-input-bom-quantity`)!.hidden == true) {
+        this.http.get<any>(`${this.address}/${this.path}/get-lst-three/${id}`).subscribe(res => {
+          this.lstErrorByItem = res;
+        })
+        this.showBtn = true;
+        document.getElementById(`${id.toString()}-input-bom-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-button`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-bom-quantity`)!.hidden = true;
+        this.lstQuantityByItem.forEach((x: any) => {
+          if (x.id != id) {
+            document.getElementById(`${x.id.toString()}-fix-button`)!.hidden = true;
+            document.getElementById(`${x.id.toString()}-del-button`)!.hidden = true;
+          }
+        })
+      } else {
+        this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${bomId}`).subscribe(res => {
+          this.lstErrorByItem = res;
+        })
+        this.showBtn = false;
+        document.getElementById(`${id.toString()}-input-bom-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-button`)!.hidden = true;
+        this.lstQuantityByItem.forEach((x: any) => {
+          if (x.id != id) {
+            document.getElementById(`${x.id.toString()}-fix-button`)!.hidden = false;
+            document.getElementById(`${x.id.toString()}-del-button`)!.hidden = false;
+          }
+        })
+        document.getElementById(`${id.toString()}-span-bom-quantity`)!.hidden = false;
+      }
+    }
+  }
+  showQuantity(id: any) {
+    this.http.get<any>(`${this.address}/${this.path}/get-lst-three/${id}`).subscribe(res => {
+      this.lstErrorByItem = res;
+    })
+
+  }
+  updateQuantity(item: any) {
+    item.updatedAt = new Date;
+    this.http.post<any>(`${this.address}/${this.path}/update-bom-quantity`, item).subscribe((res) => {
+      if (item.id == null) {
+        Swal.fire({
+          title: 'Thêm mới',
+          text: 'Thêm mới thông tin nhập thành công! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+        this.confirmChange = true;
+        item.id = res;
+        this.quantityId = res;
+        setTimeout(() => {
+          this.fixQuantity(item.id, this.itemId, item.quantity);
+        }, 50);
+      } else {
+        Swal.fire({
+          title: 'Cập nhật',
+          text: 'Cập nhật thông tin nhập thành công! ',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: false,
+          timer: 1000
+        })
+        this.confirmChange = true;
+        this.showBtn = false;
+        this.fixQuantity(item.id, this.itemId, item.quantity);
+      }
+    })
+  }
+  addNewQuantity() {
+    this.quantityValue = 0;
+    this.quantityId = 0;
+    const item = {
+      id: null,
+      quantity: 0,
+      totalError: 0,
+      createdAt: new Date,
+      updatedAt: new Date,
+      pqcWorkOrderId: this.id,
+      pqcBomWorkOrderId: this.itemId,
+    }
+    this.lstQuantityByItem = [item, ...this.lstQuantityByItem]
+    setTimeout(() => {
+      this.fixQuantity(null, null, 0)
+    }, 50);
+  }
+  deleteQuantityItem(id: any) {
+    Swal.fire({
+      title: '',
+      text: "Xác nhận xóa",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (id == null) {
+          this.lstQuantityByItem = this.lstQuantityByItem.filter((x: any) => x.id != id);
+        } else {
+          this.http.delete<any>(`${this.address}/${this.path}/delete-bom-quantity/${id}`).subscribe(() => {
+            Swal.fire({
+              title: 'Xóa',
+              text: 'Xóa thông tin nhập thành công! ',
+              icon: 'success',
+              showCancelButton: false,
+              showConfirmButton: false,
+              timer: 1000
+            })
+            this.showBtn = false;
+            this.confirmChange = true;
+            this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${this.itemId}`).subscribe(res => {
+              this.lstErrorByItem = res;
+            })
+            this.lstQuantityByItem = this.lstQuantityByItem.filter((x: any) => x.id != id);
+            this.lstQuantityByItem.forEach((x: any) => {
+              document.getElementById(`${x.id.toString()}-fix-button`)!.hidden = false;
+              document.getElementById(`${x.id.toString()}-del-button`)!.hidden = false;
+            })
+          })
+        }
+      }
+    })
+  }
+  addNewError() {
+    const item = {
+      id: null,
+      itemName: this.insertItemName,
+      itemCode: this.insertItemCode,
+      errCode: '',
+      errName: '',
+      quantity: 0,
+      quantity2: this.quantityValue,
+      createdAt: new Date,
+      updatedAt: new Date,
+      note: '',
+      pqcBomQuantityId: this.quantityId,
+      pqcWorkOrderId: this.id,
+      pqcBomWorkOrderId: this.itemId
+    }
+    this.lstErrorByItem = [item, ...this.lstErrorByItem];
+    setTimeout(() => {
+      this.fixError(null);
+    }, 50);
+  }
+  fixError(id: any) {
+    if (id === null) {
+      document.getElementById(`null-input-error-errorCode`)!.hidden = false;
+      document.getElementById(`null-input-error-errorName`)!.hidden = false;
+      document.getElementById(`null-input-error-quantity`)!.hidden = false;
+      document.getElementById(`null-input-error-note`)!.hidden = false;
+      document.getElementById(`null-error-button`)!.hidden = false;
+      document.getElementById(`null-span-error-errorCode`)!.hidden = true;
+      document.getElementById(`null-span-error-errorName`)!.hidden = true;
+      document.getElementById(`null-span-error-quantity`)!.hidden = true;
+      document.getElementById(`null-span-error-note`)!.hidden = true;
+    } else {
+      if (document.getElementById(`${id.toString()}-input-error-errorCode`)!.hidden == true) {
+        document.getElementById(`${id.toString()}-input-error-errorCode`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-error-errorName`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-error-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-input-error-note`)!.hidden = false;
+        // document.getElementById(`${id.toString()}-error-button`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-errorCode`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-errorName`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-note`)!.hidden = true;
+      } else {
+        document.getElementById(`${id.toString()}-input-error-errorCode`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-error-errorName`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-error-quantity`)!.hidden = true;
+        document.getElementById(`${id.toString()}-input-error-note`)!.hidden = true;
+        // document.getElementById(`${id.toString()}-error-button`)!.hidden = true;
+        document.getElementById(`${id.toString()}-span-error-errorCode`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-errorName`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-quantity`)!.hidden = false;
+        document.getElementById(`${id.toString()}-span-error-note`)!.hidden = false;
+      }
+    }
+  }
+  updateError(index: any) {
+    var result = this.lstQuantityByItem.find((x: any) => x.id == null)
+    console.log(result)
+    if (result) {
+      this.updateQuantity(result);
+      setTimeout(() => {
+        this.lstErrorByItem.forEach((x: any) => {
+          x.pqcBomQuantityId = this.quantityId;
+        })
+        this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
+          Swal.fire({
+            title: 'Thêm mới',
+            text: 'Thêm mới danh sách lỗi thành công! ',
+            icon: 'success',
+            showCancelButton: false,
+            showConfirmButton: false,
+            timer: 1000
+          })
+          this.confirmChange = true;
+          this.showBtn = false;
+        })
+      }, 100);
+    } else {
+      this.updateQuantity(this.lstQuantityByItem[Number(index)]);
+      if (index == null) {
+        this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
+          Swal.fire({
+            title: 'Cập nhật',
+            text: 'Cập nhật danh sách lỗi thành công! ',
+            icon: 'success',
+            showCancelButton: false,
+            showConfirmButton: false,
+            timer: 1000
+          })
+          this.http.get<any>(`${this.address}/${this.path}/get-lst-quantity/${this.itemId}`).subscribe(res => {
+            this.lstQuantityByItem = res;
+          })
+          this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${this.itemId}`).subscribe(res => {
+            this.lstErrorByItem = res;
+          })
+          this.confirmChange = true;
+          this.showBtn = false;
+        })
+      } else {
+        this.lstErrorByItem[Number(index)].updatedAt = new Date;
+        const data = [this.lstErrorByItem[Number(index)]];
+        this.http.post<any>(`${this.address}/${this.path}/update-errors`, data).subscribe(() => {
+          Swal.fire({
+            title: 'Cập nhật',
+            text: 'Cập nhật thông tin lỗi thành công! ',
+            icon: 'success',
+            showCancelButton: false,
+            showConfirmButton: false,
+            timer: 1000
+          })
+          this.confirmChange = true;
+        })
+      }
+    }
+  }
+  deleteError(id: any) {
+    Swal.fire({
+      title: '',
+      text: "Xác nhận xóa",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (id == null) {
+          this.lstErrorByItem = this.lstErrorByItem.filter((x: any) => x.id != id);
+        } else {
+          this.http.delete(`${this.address}/${this.path}/delete-bom-error/${id}`).subscribe(() => {
+            Swal.fire({
+              title: 'Xóa',
+              text: 'Xóa thông tin lỗi thành công! ',
+              icon: 'success',
+              showCancelButton: false,
+              showConfirmButton: false,
+              timer: 1000
+            })
+          })
+        }
+        this.lstErrorByItem = this.lstErrorByItem.filter((x: any) => x.id != id);
+      }
+    })
   }
 }

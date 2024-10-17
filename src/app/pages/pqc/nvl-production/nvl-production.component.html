@@ -19,44 +19,44 @@
 
         <div class="form-group row">
           <div class="col-sm-12 table-responsive">
-            <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']"
+            <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="[lstbom]"
               [nzFrontPagination]="false">
               <thead>
                 <tr>
                   <th>STT</th>
                   <th>Tên vật tư <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                        placeholder="Search" [(ngModel)]="itemName"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>Mã <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input placeholder="Search"
-                        [(ngModel)]="searchTerm" (ngModelChange)="filterData()"></nz-input-group><ng-template
+                        [(ngModel)]="itemCode" (ngModelChange)="filterData()"></nz-input-group><ng-template
                       #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
-                  <th>Thông số KT <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                  <th>Thông số KT <nz-input-group [nzSuffix]="suffixIconSearch" [hidden]="true"><input type="text"
+                        nz-input placeholder="Search" [(ngModel)]="uotherNam"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
-                  <th>PartNumber <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                  <th>PartNumber <nz-input-group [nzSuffix]="suffixIconSearch" [hidden]="true"><input type="text"
+                        nz-input placeholder="Search" [(ngModel)]="partNumber"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
                   <th>SL cơ bản</th>
-                  <th>Vendor <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                  <th>Vendor <nz-input-group [nzSuffix]="suffixIconSearch" [hidden]="true"><input type="text" nz-input
+                        placeholder="Search" [(ngModel)]="vendor"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
-                  <th>Mã VT thay thế <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                  <th>Mã VT thay thế <nz-input-group [nzSuffix]="suffixIconSearch" [hidden]="true"><input type="text"
+                        nz-input placeholder="Search" [(ngModel)]="ualter"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
-                  <th>Version <nz-input-group [nzSuffix]="suffixIconSearch"><input type="text" nz-input
-                        placeholder="Search" [(ngModel)]="searchTerm"
+                  <th>Version <nz-input-group [nzSuffix]="suffixIconSearch" [hidden]="true"><input type="text" nz-input
+                        placeholder="Search" [(ngModel)]="version"
                         (ngModelChange)="filterData()"></nz-input-group><ng-template #suffixIconSearch>
                       <span nz-icon nzType="search"></span>
                     </ng-template></th>
@@ -67,21 +67,24 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let bom of filteredData; let i = index">
+                <tr *ngFor="let bom of lstbom; let i = index">
                   <td style="text-align: center;">{{i+1}}</td>
                   <td>{{ bom.itemName }}</td>
                   <td>{{ bom.itemCode }}</td>
                   <td>{{ bom.uotherNam }}</td>
-                  <td>{{ bom.uctrLevel }}</td>
+                  <!-- <td>{{ bom.uctrLevel }}</td> -->
                   <td>{{ bom.partNumber }}</td>
-                  <td>{{ bom.ulocation }}</td>
+                  <!-- <td>{{ bom.ulocation }}</td> -->
                   <td>{{ bom.quantity }}</td>
                   <td>{{ bom.vendor }}</td>
                   <td>{{ bom.ualter }}</td>
                   <td>{{ bom.version }}</td>
+                  <td>{{ bom.sumError }}</td>
+                  <td>{{ bom.sumQuantity }}</td>
                   <td>{{ bom.uremarks }}</td>
                   <td>
-                    <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                    <button class="btn btn-warning"
+                      (click)="open(addErr,'quantity',null,bom.id,bom.itemName,bom.itemCode)">
                       <i class="fa fa-pencil"></i>
                     </button>
                   </td>
@@ -94,7 +97,7 @@
         <div class="form-group row">
           <div class="col-sm-12 table-responsive">
             <div class="float-right btn-group" style="margin-bottom: 10px;" *ngIf="show_work_order">
-              <button class="btn btn-success" (click)="open(myModal5,'add',null,'')">
+              <button class="btn btn-success" (click)="open(myModal5,'add',null,'',null,null)">
                 <i class="fa fa-plus"></i>
                 Khai báo thông tin kiểm tra
               </button>
@@ -118,12 +121,12 @@
                   <td>{{check.note}}</td>
                   <td>
                     <div class="btn-group">
-                      <button class="btn btn-primary" (click)="open(myModal5, 'show', check.ids, check.id)">
+                      <button class="btn btn-primary" (click)="open(myModal5, 'show', check.ids, check.id,null,null)">
                         <i class="fa fa-check"></i>
                       </button>
 
                       <button class="btn btn-success" title="Thêm file ảnh"
-                        (click)="open(uploadfile, 'show_img', check.ids, check.id)">
+                        (click)="open(uploadfile, 'show_img', check.ids, check.id,null,null)">
                         <i class="fa fa-upload"></i>
                       </button>
 
@@ -147,31 +150,31 @@
                 <tr>
                   <th>STT</th>
                   <th>Tên vật tư</th>
-                  <th>Mã</th>
-                  <th>Nhóm lỗi</th>
+                  <th>Mã vật tư</th>
+                  <th>Mã lỗi</th>
                   <th>Tên lỗi</th>
                   <th>Số lượng lỗi</th>
                   <th>SL thực nhập</th>
-                  <th>Ngày KT</th>
+                  <th>Ngày kiểm tra</th>
                   <th>Ngày cập nhật</th>
                   <th>Ghi chú</th>
-                  <th>Tuỳ chọn</th>
+                  <!-- <th>Tuỳ chọn</th> -->
 
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let bom of lstbom; let i = index">
+                <tr *ngFor="let bom of lstError; let i = index">
                   <td style="text-align: center;">{{i+1}}</td>
                   <td>{{ bom.itemName }}</td>
                   <td>{{ bom.itemCode }}</td>
-                  <td>{{ bom.partNumber }}</td>
-                  <td>{{ bom.ulocation }}</td>
+                  <td>{{ bom.errorCode }}</td>
+                  <td>{{ bom.errorName }}</td>
                   <td>{{ bom.quantity }}</td>
-                  <td>{{ bom.vendor }}</td>
-                  <td>{{ bom.ualter }}</td>
-                  <td>{{ bom.version }}</td>
-                  <td>{{ bom.uremarks }}</td>
-                  <td>
+                  <td>{{ bom.quantity2 }}</td>
+                  <td>{{ bom.createdAt }}</td>
+                  <td>{{ bom.updatedAt }}</td>
+                  <td>{{ bom.note }}</td>
+                  <!-- <td>
                     <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
                       <i class="fa fa-check"></i>
                     </button>
@@ -181,7 +184,7 @@
                     <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
                       <i class="fa fa-trash"></i>
                     </button>
-                  </td>
+                  </td> -->
                 </tr>
               </tbody>
             </nz-table>
@@ -452,18 +455,19 @@
         <div class="col-4">
           <label>
             Mã vật tư
-            <select name="" id="">
+            <input type="text" [value]="insertItemName">
+            <!-- <select name="" id="">
               <option value="">00001</option>
               <option value="">00002</option>
               <option value="">00003</option>
-            </select>
+            </select> -->
           </label>
         </div>
         <div class="col-4">
 
           <label>
             Tên vật tư
-            <input type="text" name="" id="">
+            <input type="text" [value]="insertItemCode">
           </label>
         </div>
       </div>
@@ -471,34 +475,44 @@
 
     <div class="mb-2">
       <div class="col-sm-12 table-responsive">
-        <button class="btn btn-success"><i class="fa fa-plus"></i>Nhập mới</button>
+        <button class="btn btn-success" (click)="addNewQuantity()" *ngIf="show_work_order"><i
+            class="fa fa-plus"></i>Nhập mới</button>
         <nz-table #borderedTable nzBordered nzTitle="Thông tin nhập" [nzData]="['']" [nzFrontPagination]="false">
           <thead>
             <tr>
               <th>STT</th>
               <th>SL thực nhập</th>
               <th>Tổng SL lỗi kiểm</th>
+              <th>Ngày kiểm tra</th>
               <th>Ngày cập nhật</th>
-              <th>Ghi chú</th>
               <th>Tuỳ chọn</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let bom of lstbom; let i = index">
+            <tr *ngFor="let bom of lstQuantityByItem; let i = index">
               <td>{{i+1}}</td>
-              <td>{{bom.itemName}}</td>
-              <td>{{ bom.itemCode }}</td>
-              <td>{{ bom.partNumber }}</td>
-              <td>{{ bom.ulocation }}</td>
+              <td><span [id]="bom.id+'-span-bom-quantity'" [hidden]="false">{{bom.quantity}}</span> <input type="text"
+                  *ngIf="show_work_order" [id]="bom.id+'-input-bom-quantity'" [(ngModel)]="bom.quantity"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td>{{ bom.totalError }}</td>
+              <td>{{ bom.createdAt }}</td>
+              <td>{{ bom.updatedAt }}</td>
               <td>
-                <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
+                <button [id]="bom.id+'-button'" *ngIf="show_work_order" [hidden]="true" class="btn btn-success"
+                  (click)="updateQuantity(bom)">
                   <i class="fa fa-check"></i>
                 </button>
-                <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                <button class="btn btn-warning" *ngIf="show_work_order" [id]="bom.id+'-fix-button'" [hidden]="false"
+                  (click)="fixQuantity(bom.id,bom.pqcBomWorkOrderId,bom.quantity)">
                   <i class="fa fa-pencil"></i>
                 </button>
-                <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
+                <button class="btn btn-warning" style="background-color:aqua;border: aqua;" [id]="bom.id+'-fix-button'"
+                  [hidden]="false" (click)="showQuantity(bom.id)">
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button class="btn btn-danger" *ngIf="show_work_order" [id]="bom.id+'-del-button'" [hidden]="false"
+                  (click)="deleteQuantityItem(bom.id)">
                   <i class="fa fa-trash"></i>
                 </button>
               </td>
@@ -510,7 +524,10 @@
 
     <div class="mb-2">
       <div class="col-sm-12 table-responsive">
-        <button class="btn btn-success"><i class="fa fa-plus"></i>Thêm lỗi</button>
+        <button class="btn btn-success" *ngIf="showBtn == true" (click)="addNewError()"><i class="fa fa-plus"></i>Thêm
+          lỗi</button>
+        <button class="btn btn-success" *ngIf="showBtn == true" (click)="updateError(null)"><i
+            class="fa fa-plus"></i>Lưu</button>
 
         <nz-table #borderedTable nzBordered nzTitle="Thông tin lỗi" [nzData]="['']" [nzFrontPagination]="false">
           <thead>
@@ -525,30 +542,39 @@
               <th>Ngày KT</th>
               <th>Ngày cập nhật</th>
               <th>Ghi chú</th>
-              <th>Tuỳ chọn</th>
+              <th *ngIf="show_work_order">Tuỳ chọn</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let bom of lstbom; let i = index">
+            <tr *ngFor="let bom of lstErrorByItem; let i = index">
               <td style="text-align: center;">{{i+1}}</td>
               <td>{{ bom.itemName }}</td>
               <td>{{ bom.itemCode }}</td>
-              <td>{{ bom.partNumber }}</td>
-              <td>{{ bom.ulocation }}</td>
-              <td>{{ bom.quantity }}</td>
-              <td>{{ bom.vendor }}</td>
-              <td>{{ bom.ualter }}</td>
-              <td>{{ bom.version }}</td>
-              <td>{{ bom.uremarks }}</td>
+              <td><span [id]="bom.id+'-span-error-errorCode'" [hidden]="false">{{bom.errorCode}}</span> <input
+                  type="text" [id]="bom.id+'-input-error-errorCode'" [(ngModel)]="bom.errorCode"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td><span [id]="bom.id+'-span-error-errorName'" [hidden]="false">{{bom.errorName}}</span> <input
+                  type="text" [id]="bom.id+'-input-error-errorName'" [(ngModel)]="bom.errorName"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td><span [id]="bom.id+'-span-error-quantity'" [hidden]="false">{{bom.quantity}}</span> <input type="text"
+                  [id]="bom.id+'-input-error-quantity'" [(ngModel)]="bom.quantity"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td>{{ bom.quantity2 }}</td>
+              <td>{{ bom.createdAt }}</td>
+              <td>{{ bom.updatedAt }}</td>
+              <td><span [id]="bom.id+'-span-error-note'" [hidden]="false">{{bom.note}}</span> <input type="text"
+                  [id]="bom.id+'-input-error-note'" [(ngModel)]="bom.note" [ngModelOptions]="{ standalone: true }"
+                  [hidden]="true"></td>
               <td>
-                <button class="btn btn-success" (click)="open(addErr,'add',null,'')">
+                <button class="btn btn-success" [id]="bom.id+'-error-button'" [hidden]="true" *ngIf="show_work_order"
+                  (click)="updateError(i)">
                   <i class="fa fa-check"></i>
                 </button>
-                <button class="btn btn-warning" (click)="open(addErr,'add',null,'')">
+                <button class="btn btn-warning" *ngIf="showBtn == true && show_work_order" (click)="fixError(bom.id)">
                   <i class="fa fa-pencil"></i>
                 </button>
-                <button class="btn btn-danger" (click)="open(addErr,'add',null,'')">
+                <button class="btn btn-danger" *ngIf="show_work_order" (click)="deleteError(bom.id)">
                   <i class="fa fa-trash"></i>
                 </button>
               </td>

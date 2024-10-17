@@ -10,14 +10,14 @@ import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationR
 })
 export class ErrorListComponent implements OnInit {
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   page = 1;
   pageSize = 10;
   collectionSize = 0;
 
   auditCriteria: any[] = [];
-  errorListRes?: ErrorListResponse ;
+  errorListRes?: ErrorListResponse;
 
   formSearch: any = {
     name: null,
@@ -32,8 +32,9 @@ export class ErrorListComponent implements OnInit {
     const { name, code } = this.formSearch;
     this.errorService.getAll(this.page, this.pageSize, name, code).subscribe(
       data => {
-        this.errorListRes  = data;
-        this.auditCriteria =  data.lstError;
+        console.log(data)
+        this.errorListRes = data;
+        this.auditCriteria = data.lstError;
         this.collectionSize = Number(this.errorListRes?.total) * this.pageSize;
       },
       err => {
@@ -47,12 +48,12 @@ export class ErrorListComponent implements OnInit {
 
 
 
-  delete(id?: any, name?:any) {
-    if(confirm("Bạn có muốn thực hiện xóa "+name)) {
+  delete(id?: any, name?: any) {
+    if (confirm("Bạn có muốn thực hiện xóa " + name)) {
       console.log("xóa");
       this.errorService.delete(id).subscribe(
         data => {
-          this.errorListRes  = data;
+          this.errorListRes = data;
           this.refreshExamination();
         },
         err => {
