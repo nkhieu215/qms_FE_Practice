@@ -379,3 +379,36 @@
 .btn-save i {
   margin-right: 5px;
 }
+
+.status-display {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.greenClass {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.redClass {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-select {
+  width: 110px;
+  height: 24px;
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.status-select:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}

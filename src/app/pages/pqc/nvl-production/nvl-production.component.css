@@ -1,18 +1,19 @@
 .table td,
 .table th {
-    padding: 5px;
-    vertical-align: top;
-    border-top: 1px solid #e9ecef;
+  padding: 5px;
+  vertical-align: top;
+  border-top: 1px solid #e9ecef;
 }
 
 ::ng-deep .modal-xxl .modal-dialog {
-    max-width: 90%;
-    width: 90%;
+  max-width: 90%;
+  width: 90%;
 }
 
 .table td input {
   min-width: 50px;
 }
+
 .form-control {
   display: block;
   width: 100%;
@@ -29,9 +30,72 @@
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-
-.ant-table tfoot>tr>td, .ant-table tfoot>tr>th, .ant-table-tbody>tr>td, .ant-table-thead>tr>th {
+.ant-table tfoot>tr>td,
+.ant-table tfoot>tr>th,
+.ant-table-tbody>tr>td,
+.ant-table-thead>tr>th {
   position: relative;
   padding: 5px;
   overflow-wrap: break-word;
+}
+
+.row {
+  margin: 0
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.form-select-header,
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.form-select-header:focus,
+.form-control:focus {
+  /* background-color: #80bdff; */
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.mb-2 {
+  margin-bottom: 1rem;
+}
+
+.col-4 {
+  padding: 0 10px
+}
+
+.btn-add {
+  float: right;
+  margin-bottom: 10px;
+}
+
+.btn-add>i {
+  margin-right: 10px;
+}
+
+.close {
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s;
+  outline: none;
+}
+
+.close:hover {
+  color: #ff0000;
+}
+
+.close:focus {
+  outline: none;
 }

@@ -18,22 +18,6 @@
 //   },
 // };
 //------------------------------------------config cho bản test
-export const environment = {
-  production: false,
-  serverUrl: '/api',
-  title: 'QMS',
-  apiURL: 'http://localhost:8449',
-  api_end_point: 'http://localhost:8449',
-  auth_api: '/api/auth/',
-  keycloak: {
-    // Url of the Identity Provider
-    issuer: 'http://localhost:8080/auth/',
-    // Realm
-    realm: 'jhipster',
-    clientId: 'qms',
-  },
-};
-//------------------------------------------config cho bản test ở công ty
 // export const environment = {
 //   production: false,
 //   serverUrl: '/api',
@@ -43,12 +27,28 @@ export const environment = {
 //   auth_api: '/api/auth/',
 //   keycloak: {
 //     // Url of the Identity Provider
-//     issuer: 'http://192.168.18.99:8080/auth/',
+//     issuer: 'http://localhost:8080/auth/',
 //     // Realm
 //     realm: 'jhipster',
-//     clientId: 'web_app',
+//     clientId: 'qms',
 //   },
 // };
+//------------------------------------------config cho bản test ở công ty
+export const environment = {
+  production: false,
+  serverUrl: '/api',
+  title: 'QMS',
+  apiURL: 'http://localhost:8449',
+  api_end_point: 'http://localhost:8449',
+  auth_api: '/api/auth/',
+  keycloak: {
+    // Url of the Identity Provider
+    issuer: 'http://192.168.18.99:8080/auth/',
+    // Realm
+    realm: 'jhipster',
+    clientId: 'web_app',
+  },
+};
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

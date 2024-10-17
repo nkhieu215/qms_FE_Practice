@@ -174,16 +174,8 @@
   </ng-template>
   <ng-template #machine let-modal>
     <div class="lst-machine-popup">
-      <button style="position: relative;
-      left: 97%;
-      width: 35px;
-      height: 35px;
-      margin-top: 12px;
-      background: red;
-      border: red;
-      color: #fff;
-      border-radius: 11px;
-      font-size: 24px;" (click)="modal.dismiss('Cross click')">X</button>
+      <button type="button" class="btn close" (click)="modal.dismiss('Cross click')"><span
+          aria-hidden="true">&times;</span></button>
       <div class="lst-machine-container">
         <div class="lst-machine-container-item1">
           <div class="lst-machine-container-item1-1">
@@ -222,7 +214,7 @@
                   <tr *ngFor="let item of lstMachine;let i = index;">
                     <td>{{item.machineName}}</td>
                     <td>{{item.qrFeederCode}}</td>
-                    <td> <button
+                    <td> <button class="status-display"
                         [ngClass]="{greenClass: item.status === 'Active',redClass:item.status === 'Deactivate'}"
                         (click)="changeStatus(i)">{{item.status}}
                       </button></td>
@@ -456,7 +448,8 @@
               <td>{{ check.material }}</td>
               <td>{{ check.partNumber }}</td>
               <td>
-                <div [ngClass]="{greenClass: check.status === 'Đã scan',redClass:check.status === 'Chưa scan'}">{{
+                <div class="status-display"
+                  [ngClass]="{greenClass: check.status === 'Đã scan',redClass:check.status === 'Chưa scan'}">{{
                   check.status }}</div>
               </td>
               <!-- <td>
