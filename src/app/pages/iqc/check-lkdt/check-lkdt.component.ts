@@ -37,9 +37,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckLkdtComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   rawData: any;
@@ -48,6 +48,8 @@ export class CheckLkdtComponent implements OnInit {
   @Input() itemResult: any;
   itemcode: any;
   iqcElecCompId: any;
+  iqcElecCompCode: any;
+  iqcElecCompname: any;
   //----------------------------------------- autocomplete ---------------------------------------
   testingCriticalGroup: any;
   listOfCriticalGroup: any;
@@ -395,7 +397,7 @@ export class CheckLkdtComponent implements OnInit {
             ? moment(this.form.checkDate).format('DD-MM-YYYY')
             : '';
         this.form.elecCompCode = this.strSelectElec;
-        this.form.elecCompName = this.strSelectElecName;
+        this.form.electCompName = this.strSelectElecName;
         this.form.type = 2;
         let message = '';
         if (buttonType == 'save') {
@@ -501,8 +503,8 @@ export class CheckLkdtComponent implements OnInit {
       this.listOfItem = res;
     })
     // this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
-    this.strSelectElec = this.selectExamination.code;
-    this.strSelectElecName = this.selectExamination.name;
+    this.strSelectElec = this.iqcElecCompCode = this.selectExamination.code;
+    this.strSelectElecName = this.iqcElecCompname = this.selectExamination.name;
     this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
     this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
     this.lstAuditCriteriaParam.forEach(element => {
@@ -605,6 +607,7 @@ export class CheckLkdtComponent implements OnInit {
     this.lstErrorGr?.forEach((element) => {
       if (element.name == name) {
         this.lstError = element.errChild;
+        console.log(this.lstError)
         // this.formErrorChild.errGroup = element.name;
       }
     });
@@ -1039,7 +1042,7 @@ export class CheckLkdtComponent implements OnInit {
     }
   }
   // --------------------------------------------------------------------------- Khai báo lỗi -------------------------------------------------------
-  updateError(id: any) {
+  updateError(id: any, errGroup: any) {
     if (id === null) {
       document.getElementById(`null-input-error-errCode`)!.hidden = false;
       document.getElementById(`null-input-quantity`)!.hidden = false;
@@ -1052,6 +1055,7 @@ export class CheckLkdtComponent implements OnInit {
       document.getElementById(`null-span-error-note`)!.hidden = true;
     } else {
       if (document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden == true) {
+        this.onChangeErrorGroup(errGroup);
         document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-quantity`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-error-errGroup`)!.hidden =
@@ -1094,7 +1098,7 @@ export class CheckLkdtComponent implements OnInit {
         this.http.post<any>(`${this.address}/${this.path}/error/submit`, data).subscribe((res) => {
           this.listOfError[index].id = res[0].id;
           setTimeout(() => {
-            this.updateError(this.listOfError[index].id);
+            this.updateError(this.listOfError[index].id, '');
           }, 50)
           this.listOfItems = [];
           Swal.fire({
@@ -1132,7 +1136,7 @@ export class CheckLkdtComponent implements OnInit {
             setTimeout(() => {
               this.listOfError.forEach((item: any) => {
                 item.itemCode = this.itemCode,
-                  this.updateError(item.id)
+                  this.updateError(item.id, '')
               })
             }, 50)
             this.listOfItems = [];
@@ -1182,7 +1186,7 @@ export class CheckLkdtComponent implements OnInit {
     this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
       // document.getElementById('btn-save-item')!.hidden = false;
-      this.updateError(null);
+      this.updateError(null, '');
     }, 50)
   }
   openPopupError(content: any, item: any) {
@@ -1289,8 +1293,8 @@ export class CheckLkdtComponent implements OnInit {
     })
   }
   mappingErrCode(errName: any, index: any) {
-    var data = this.listErrors.find((item: any) => item.errName === errName);
-    this.listOfError[index].errCode = data.errCode;
+    var data = this.lstError!.find((item: any) => item.name == errName);
+    this.listOfError[index].errCode = data!.description;
   }
   findByCritiCalGroup() {
     this.listOfCriticalName = [];

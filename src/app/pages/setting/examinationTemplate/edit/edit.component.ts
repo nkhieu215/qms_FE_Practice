@@ -26,9 +26,9 @@ import { OitmService } from 'src/app/share/_services/oitmservice';
 })
 export class ExaminationEditComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list tieu chi
   listOfCriticalName: any;

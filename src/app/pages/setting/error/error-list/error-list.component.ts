@@ -32,7 +32,8 @@ export class ErrorListComponent implements OnInit {
     const { name, code } = this.formSearch;
     this.errorService.getAll(this.page, this.pageSize, name, code).subscribe(
       data => {
-        console.log(data)
+        console.log('list error', data)
+        console.log('list error', data)
         this.errorListRes = data;
         this.auditCriteria = data.lstError;
         this.collectionSize = Number(this.errorListRes?.total) * this.pageSize;

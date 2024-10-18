@@ -103,10 +103,9 @@
         <thead>
           <tr class="table-header">
             <th scope="col">#</th>
-            <th scope="col">Tên biên bản</th>
+            <th scope="col">Số biên bản</th>
             <th scope="col">Mã biên bản</th>
-            <th scope="col">Mã linh kiện</th>
-            <th scope="col">Tên linh kiện</th>
+            <th scope="col">Tên biên bản</th>
             <th scope="col">Loại</th>
             <th scope="col">Ngày thực hiện</th>
             <th scope="col">Trạng thái</th>
@@ -117,7 +116,6 @@
         <tbody class="table-row">
           <tr *ngFor="let audit of auditnvl;let i = index;">
             <td>{{ i+1 }}</td>
-            <td>{{ audit.reportCode}}</td>
             <td>{{ audit.reportCode}}</td>
             <td>{{ audit.elecCompCode}}</td>
             <td>{{ audit.electCompName }}</td>
@@ -1295,27 +1293,23 @@
             <tr *ngFor="let item of listOfError;let i = index;">
               <td style="width: 5%;"> {{i+1}}</td>
               <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
-              <td style="text-align: left;width: 9%;"><input [id]="item.id+'-input-error-errGroup'" type="text"
-                  [(ngModel)]="item.errGroup" [ngModelOptions]="{ standalone: true }" [hidden]="true"
-                  style="width: 90%;" list="error-group" (ngModelChange)="getListErrorById(item.errGroup,i)"
-                  [matAutocomplete]="auto33">
-                <mat-autocomplete [panelWidth]="200" #auto33="matAutocomplete" (optionSelected)="getLstErrGroup()">
-                  <mat-option *ngFor="let oitm of listErrorGroup" [value]="oitm.errGroup">
-                    <span>{{ oitm.errGroup }}</span>
-                  </mat-option>
-                </mat-autocomplete>
+              <td style="text-align: left;width: 9%;">
+                <select required class="form-control" #errGroup="ngModel" [id]="item.id+'-input-error-errGroup'"
+                  (change)="onChangeErrorGroup(item.errGroup)" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                  [(ngModel)]="item.errGroup" #type="ngModel">
+                  <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
                 <span [id]="item.id+'-span-error-errGroup'" [hidden]="false">{{item.errGroup}}</span>
               </td>
               <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
-              <td style="text-align: left;width: 21%;"><input [id]="item.id+'-input-error-errCode'" type="text"
-                  [(ngModel)]="item.errName" [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;"
-                  list="error-name" (ngModelChange)="mappingErrCode(item.errName,i)" [matAutocomplete]="auto34">
-                <mat-autocomplete [panelWidth]="300" #auto34="matAutocomplete"
-                  (optionSelected)="getListErrorById(item.errGroup,i)">
-                  <mat-option *ngFor="let oitm of listErrors" [value]="oitm.errName">
-                    <span>{{ oitm.errName }}</span>
-                  </mat-option>
-                </mat-autocomplete>
+              <td style="text-align: left;width: 21%;">
+
+                <select required class="form-control" [id]="item.id+'-input-error-errCode'" [(ngModel)]="item.errName"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true" #type="ngModel" #errName="ngModel"
+                  (ngModelChange)="mappingErrCode(item.errName,i)">
+                  <option [value]="item.errName">{{item.errName}}</option>
+                  <option *ngFor="let error of lstError; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
                 <span [id]="item.id+'-span-error-errCode'" [hidden]="false">{{item.errName}}</span>
               </td>
               <td style="width: 9%;"><input [id]="item.id+'-input-quantity'" type="text" style="width: 90%;"
@@ -1327,7 +1321,7 @@
                 <span [id]="item.id+'-span-error-note'" [hidden]="false">{{item.note}}</span>
               </td>
               <td style="width: 9%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">
-                <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateError(item.id)"><i
+                <button class="btn btn-sm btn-primary" title="Sửa" (click)="updateError(item.id,item.errGroup)"><i
                     class="fa fa-edit"></i></button>
                 <button [id]="item.id+'-button-error'" class="btn btn-sm btn-info" title="Xác nhận" [hidden]="true"
                   (click)="submitError(i)"><i class="fa fa-check"></i></button>

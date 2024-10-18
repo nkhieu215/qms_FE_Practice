@@ -22,6 +22,9 @@ import { ExportExcelService } from 'src/app/share/_services/export-excel.service
 import { PqcDataService } from 'src/app/share/_services/pqcDataService.service';
 import { PqcDrawNvl } from 'src/app/share/_models/pqc_draw_nvl.model';
 import { PqcDrawNvlTest } from 'src/app/share/_models/pqc_draw_nvl_test.model';
+import { ErrorList } from 'src/app/share/_models/errorList.model';
+import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
+import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 type AOA = any[][];
 
 @Component({
@@ -34,13 +37,15 @@ type AOA = any[][];
 export class NvlProductionComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'check-nvl-new';
   @Input() show_check = '';
   @Input() woData: any = null;
   //danh sách khai báo lỗi
+  lstErrorGr?: ErrorList[];
+  lstErrorRes?: ErrorListResponse;
   itemId = 0;
   quantityId = 0;
   quantityValue = 0;
@@ -77,6 +82,7 @@ export class NvlProductionComponent implements OnInit {
     private exportExelService: ExportExcelService,
     private datapqc: PqcDataService,
     protected http: HttpClient,
+    protected errorService: ErrorListService
   ) {
   }
 
@@ -214,6 +220,14 @@ export class NvlProductionComponent implements OnInit {
       this.insertItemName = itemName;
       this.insertItemCode = itemCode;
       this.itemId = id;
+      this.errorService.getAllCategories().subscribe(
+        (data) => {
+          this.lstErrorRes = data;
+          this.lstErrorGr = data.lstError;
+          console.log(this.lstErrorRes);
+        },
+        (err) => { }
+      );
       this.http.get<any>(`${this.address}/${this.path}/get-lst-quantity/${id}`).subscribe(res => {
         this.lstQuantityByItem = res;
       })
@@ -686,22 +700,23 @@ export class NvlProductionComponent implements OnInit {
     }
     this.lstErrorByItem = [item, ...this.lstErrorByItem];
     setTimeout(() => {
-      this.fixError(null);
+      this.fixError(null, '');
     }, 50);
   }
-  fixError(id: any) {
+  fixError(id: any, errGroup: any) {
     if (id === null) {
       document.getElementById(`null-input-error-errorCode`)!.hidden = false;
       document.getElementById(`null-input-error-errorName`)!.hidden = false;
       document.getElementById(`null-input-error-quantity`)!.hidden = false;
       document.getElementById(`null-input-error-note`)!.hidden = false;
-      document.getElementById(`null-error-button`)!.hidden = false;
+      // document.getElementById(`null-error-button`)!.hidden = false;
       document.getElementById(`null-span-error-errorCode`)!.hidden = true;
       document.getElementById(`null-span-error-errorName`)!.hidden = true;
       document.getElementById(`null-span-error-quantity`)!.hidden = true;
       document.getElementById(`null-span-error-note`)!.hidden = true;
     } else {
       if (document.getElementById(`${id.toString()}-input-error-errorCode`)!.hidden == true) {
+        this.onChangeErrorGroup(errGroup);
         document.getElementById(`${id.toString()}-input-error-errorCode`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-error-errorName`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-error-quantity`)!.hidden = false;
@@ -810,5 +825,30 @@ export class NvlProductionComponent implements OnInit {
         this.lstErrorByItem = this.lstErrorByItem.filter((x: any) => x.id != id);
       }
     })
+  }
+  onChangeErrorGroup(idx: any) {
+    this.lstErrorGr?.forEach((element) => {
+      if (element.name == idx) {
+        this.lstError = element.errChild;
+        // this.formErrorChild.errGroup = element.name;
+      }
+    });
+  }
+  sumQuantity() {
+    var sum = 0;
+    this.lstErrorByItem.forEach((element: any) => {
+      sum += Number(element.quantity);
+    });
+    setTimeout(() => {
+      this.lstQuantityByItem.forEach((element: any) => {
+        if (element.id == this.quantityId) {
+          element.totalError = sum;
+        }
+      });
+    }, 50);
+  }
+  mappingErrorName(index: any, errorName: any) {
+    const name = errorName;
+    this.lstErrorByItem[index].errorName = name;
   }
 }

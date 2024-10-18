@@ -551,15 +551,25 @@
               <td style="text-align: center;">{{i+1}}</td>
               <td>{{ bom.itemName }}</td>
               <td>{{ bom.itemCode }}</td>
-              <td><span [id]="bom.id+'-span-error-errorCode'" [hidden]="false">{{bom.errorCode}}</span> <input
-                  class="form-select-header" type="text" [id]="bom.id+'-input-error-errorCode'"
-                  [(ngModel)]="bom.errorCode" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
-              <td><span [id]="bom.id+'-span-error-errorName'" [hidden]="false">{{bom.errorName}}</span> <input
-                  class="form-select-header" type="text" [id]="bom.id+'-input-error-errorName'"
-                  [(ngModel)]="bom.errorName" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+              <td><span [id]="bom.id+'-span-error-errorCode'" [hidden]="false">{{bom.errorCode}}</span>
+                <select required class="form-control" #errGroup="ngModel" [id]="bom.id+'-input-error-errorCode'"
+                  (change)="onChangeErrorGroup(bom.errorCode)" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                  [(ngModel)]="bom.errorCode" #type="ngModel">
+                  <option *ngFor="let error of lstErrorGr; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
+              </td>
+              <td><span [id]="bom.id+'-span-error-errorName'" [hidden]="false">{{bom.errorName}}</span>
+                <select required class="form-control" [id]="bom.id+'-input-error-errorName'" [(ngModel)]="bom.errorName"
+                  [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                  (ngModelChange)="mappingErrorName(i,bom.errorName)">
+                  <option [value]="bom.errorName">{{bom.errorName}}</option>
+                  <option *ngFor="let error of lstError; let idx = index" [value]="error.name">{{error.name}}</option>
+                </select>
+              </td>
               <td><span [id]="bom.id+'-span-error-quantity'" [hidden]="false">{{bom.quantity}}</span> <input
                   class="form-select-header" type="text" [id]="bom.id+'-input-error-quantity'"
-                  [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+                  [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"
+                  (ngModelChange)="sumQuantity()"></td>
               <td>{{ bom.quantity2 }}</td>
               <td>{{ bom.createdAt | date:'dd/MM/YY HH:mm:ss' }}</td>
               <td>{{ bom.updatedAt | date:'dd/MM/YY HH:mm:ss' }}</td>
@@ -567,11 +577,12 @@
                   class="form-select-header" type="text" [id]="bom.id+'-input-error-note'" [(ngModel)]="bom.note"
                   [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
               <td>
-                <button class="btn btn-success" [id]="bom.id+'-error-button'" [hidden]="true" *ngIf="show_work_order"
+                <!-- <button class="btn btn-success" [id]="bom.id+'-error-button'" [hidden]="true" *ngIf="show_work_order"
                   (click)="updateError(i)">
                   <i class="fa fa-check"></i>
-                </button>
-                <button class="btn btn-warning" *ngIf="showBtn == true && show_work_order" (click)="fixError(bom.id)">
+                </button> -->
+                <button class="btn btn-warning" *ngIf="showBtn == true && show_work_order"
+                  (click)="fixError(bom.id,bom.errorCode)">
                   <i class="fa fa-pencil"></i>
                 </button>
                 <button class="btn btn-danger" *ngIf="show_work_order" (click)="deleteError(bom.id)">

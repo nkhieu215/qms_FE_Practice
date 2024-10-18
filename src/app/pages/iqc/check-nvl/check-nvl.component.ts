@@ -33,9 +33,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
@@ -43,6 +43,8 @@ export class CheckNvlComponent implements OnInit {
   @Input() itemResult: any;
   itemcode: any;
   iqcElecCompId: any;
+  iqcElecCompCode: any;
+  iqcElecCompname: any;
   //----------------------------------------- autocomplete ---------------------------------------
   testingCriticalGroup: any;
   listOfCriticalGroup: any;
@@ -125,6 +127,8 @@ export class CheckNvlComponent implements OnInit {
       this.listOfItem = res;
     })
     this.strSelect = this.selectedEx.name + '(' + this.selectedEx.code + ')';
+    this.iqcElecCompCode = this.selectedEx.code;
+    this.iqcElecCompname = this.selectedEx.name;
     this.lstAuditCriteriaNvl = this.selectedEx.lstAuditCriteriaNvl;
     this.lstAuditCriteriaNvl.forEach((element) => {
       element.auditCriteriaId = element.id + '';
@@ -514,7 +518,10 @@ export class CheckNvlComponent implements OnInit {
         this.form.type = Constant.TYPE_ELECTRIC_COMPONENT_NVL;
 
         if (this.typeAction == 'add') {
-          this.form.templateCode = this.selectedEx.code;
+          this.form.templateCode = this.iqcElecCompCode;
+          this.form.elecCompCode = this.iqcElecCompCode;
+          this.form.electCompName = this.iqcElecCompname;
+          console.log('add nvl: ', this.form)
         }
 
         let message = "Thêm mới biên bản thành công.";
@@ -763,7 +770,7 @@ export class CheckNvlComponent implements OnInit {
     }
   }
   // --------------------------------------------------------------------------- Khai báo lỗi -------------------------------------------------------
-  updateError(id: any) {
+  updateError(id: any, errGroup: any) {
     if (id === null) {
       document.getElementById(`null-input-error-errCode`)!.hidden = false;
       document.getElementById(`null-input-quantity`)!.hidden = false;
@@ -776,6 +783,7 @@ export class CheckNvlComponent implements OnInit {
       document.getElementById(`null-span-error-note`)!.hidden = true;
     } else {
       if (document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden == true) {
+        this.onChangeErrorGroup(errGroup);
         document.getElementById(`${id.toString()}-input-error-errCode`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-quantity`)!.hidden = false;
         document.getElementById(`${id.toString()}-input-error-errGroup`)!.hidden =
@@ -815,7 +823,7 @@ export class CheckNvlComponent implements OnInit {
         this.http.post<any>(`${this.address}/${this.path}/error/submit`, data).subscribe((res) => {
           this.listOfError[index].id = res[0].id;
           setTimeout(() => {
-            this.updateError(this.listOfError[index].id);
+            this.updateError(this.listOfError[index].id, '');
           }, 50)
           this.listOfItems = [];
           Swal.fire(
@@ -850,7 +858,7 @@ export class CheckNvlComponent implements OnInit {
             setTimeout(() => {
               this.listOfError.forEach((item: any) => {
                 item.itemCode = this.itemCode,
-                  this.updateError(item.id)
+                  this.updateError(item.id, '')
               })
             }, 50)
             this.listOfItems = [];
@@ -897,7 +905,7 @@ export class CheckNvlComponent implements OnInit {
     this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
       // document.getElementById('btn-save-item')!.hidden = false;
-      this.updateError(null);
+      this.updateError(null, '');
     }, 50)
   }
   openPopupError(content: any, item: any) {
@@ -1015,8 +1023,8 @@ export class CheckNvlComponent implements OnInit {
     })
   }
   mappingErrCode(errName: any, index: any) {
-    var data = this.listErrors.find((item: any) => item.errName === errName);
-    this.listOfError[index].errCode = data.errCode;
+    var data = this.lstError!.find((item: any) => item.name == errName);
+    this.listOfError[index].errCode = data!.description;
   }
   findByCritiCalGroup() {
     this.listOfCriticalName = [];
