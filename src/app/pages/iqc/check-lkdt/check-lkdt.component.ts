@@ -37,9 +37,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckLkdtComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  // address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   rawData: any;
@@ -385,7 +385,6 @@ export class CheckLkdtComponent implements OnInit {
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Đồng ý',
-          timer: 1000
         })
       } else {
         this.form.importDateStr =
