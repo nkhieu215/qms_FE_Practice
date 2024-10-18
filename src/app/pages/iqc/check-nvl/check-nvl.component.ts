@@ -33,9 +33,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  // address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
