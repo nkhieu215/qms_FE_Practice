@@ -682,6 +682,9 @@ export class NvlProductionComponent implements OnInit {
       }
     })
   }
+  saveQuantityInfo(quantity: any) {
+    this.quantityValue = quantity;
+  }
   addNewError() {
     const item = {
       id: null,
@@ -799,7 +802,7 @@ export class NvlProductionComponent implements OnInit {
       }
     }
   }
-  deleteError(id: any) {
+  deleteError(id: any, quantityId: any, quantity: any) {
     Swal.fire({
       title: '',
       text: "Xác nhận xóa",
@@ -812,6 +815,14 @@ export class NvlProductionComponent implements OnInit {
           this.lstErrorByItem = this.lstErrorByItem.filter((x: any) => x.id != id);
         } else {
           this.http.delete(`${this.address}/${this.path}/delete-bom-error/${id}`).subscribe(() => {
+            this.lstQuantityByItem.forEach((x: any) => {
+              if (x.id == quantityId) {
+                x.totalError = x.totalError - Number(quantity);
+                setTimeout(() => {
+                  this.http.post<any>(`${this.address}/${this.path}/update-bom-quantity`, x).subscribe()
+                }, 50);
+              }
+            })
             Swal.fire({
               title: 'Xóa',
               text: 'Xóa thông tin lỗi thành công! ',

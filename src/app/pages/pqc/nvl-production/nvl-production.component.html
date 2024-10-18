@@ -476,7 +476,7 @@
     <div class="mb-2">
       <div class="col-sm-12 table-responsive">
         <button class="btn btn-success btn-add" (click)="addNewQuantity()" *ngIf="show_work_order"><i
-            class="fa fa-plus"></i>Nhập mới</button>
+            class="fa fa-plus"></i>Thêm mới số lượng nhập</button>
         <nz-table #borderedTable nzBordered nzTitle="Thông tin nhập" [nzData]="['']" [nzFrontPagination]="false">
           <thead>
             <tr>
@@ -494,7 +494,8 @@
               <td>{{i+1}}</td>
               <td><span [id]="bom.id+'-span-bom-quantity'" [hidden]="false">{{bom.quantity}}</span> <input
                   class="form-select-header" type="text" *ngIf="show_work_order" [id]="bom.id+'-input-bom-quantity'"
-                  [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }" [hidden]="true"></td>
+                  placeholder="Số lượng thực nhập" [(ngModel)]="bom.quantity" [ngModelOptions]="{ standalone: true }"
+                  [hidden]="true" (ngModelChange)="saveQuantityInfo(bom.quantity)"></td>
               <td>{{ bom.totalError }}</td>
               <td>{{ bom.createdAt | date:'dd/MM/YY HH:mm:ss'}}</td>
               <td>{{ bom.updatedAt | date:'dd/MM/YY HH:mm:ss'}}</td>
@@ -585,7 +586,8 @@
                   (click)="fixError(bom.id,bom.errorCode)">
                   <i class="fa fa-pencil"></i>
                 </button>
-                <button class="btn btn-danger" *ngIf="show_work_order" (click)="deleteError(bom.id)">
+                <button class="btn btn-danger" *ngIf="show_work_order"
+                  (click)="deleteError(bom.id,bom.pqcBomQuantityId,bom.quantity)">
                   <i class="fa fa-trash"></i>
                 </button>
               </td>
