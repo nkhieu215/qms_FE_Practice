@@ -39,7 +39,7 @@ export class AssemblesComponent implements OnInit {
   crud = false;
   create = false;
   edit = false;
-  lstProcess?:any[];
+  lstProcess?: any[];
   constructor(
     private actRoute: ActivatedRoute,
     private pqcService: PQCService,
@@ -48,7 +48,7 @@ export class AssemblesComponent implements OnInit {
     private errorService: ErrorListService,
     private scadaService: ScadaRequestService,
     private assemblesCheckService: PQCAssemblesCheckService,
-    private commonService : CommonService
+    private commonService: CommonService
   ) { }
 
   page = 1;
@@ -95,7 +95,7 @@ export class AssemblesComponent implements OnInit {
     }
 
     if (type == 'add') {
-      this.commonService.getSettingProcess().subscribe(data=>{
+      this.commonService.getSettingProcess().subscribe(data => {
         this.lstProcess = data.lstSettingProcess;
       })
 
@@ -106,7 +106,7 @@ export class AssemblesComponent implements OnInit {
         (data) => {
           this.lstErrorRes = data;
           this.lstErrorGr = data.lstError;
-          console.log(this.lstErrorRes);
+          // console.log(this.lstErrorRes);
         },
         (err) => { }
       );
@@ -117,7 +117,7 @@ export class AssemblesComponent implements OnInit {
       this.lstProductionLine?.forEach(({ name, code }) => {
         this.options.push(`${name} - ${code}`);
       })
-      console.log(this.lstProductionLine);
+      // console.log(this.lstProductionLine);
 
 
 
@@ -158,7 +158,7 @@ export class AssemblesComponent implements OnInit {
           check.conclude = element.conclude;
           check.checkTime = element.checkTime;
           check.note = element.note;
-          check. operators = element.operators;
+          check.operators = element.operators;
           check.ids = Utils.randomString(5);
           check.id = element.id;
           this.lstAssemblesCompCheck?.push(check);
@@ -175,7 +175,7 @@ export class AssemblesComponent implements OnInit {
 
   error = '';
   onSubmit(action: any) {
-    console.log(this.formEx);
+    // console.log(this.formEx);
     this.pqcService
       .addStep(
         this.lstAssemblesCompCheck,
@@ -194,7 +194,7 @@ export class AssemblesComponent implements OnInit {
   }
 
   onAddError() {
-    const {operators, lotNumber, line, checkPerson, processName, quatityPass, quatity, quatityFail, conclude, note, checkTime, ratio,
+    const { operators, lotNumber, line, checkPerson, processName, quatityPass, quatity, quatityFail, conclude, note, checkTime, ratio,
     } = this.formEx;
 
     var check = new AssemblesCheck();
@@ -223,14 +223,14 @@ export class AssemblesComponent implements OnInit {
         )
 
         check.id = data.idCheck;
-        if(this.formEx.id == null){
+        if (this.formEx.id == null) {
           this.lstAssemblesCompCheck?.push(check);
         }
       },
       errot => { }
     )
 
-    console.log(this.lstAssemblesCompCheck);
+    // console.log(this.lstAssemblesCompCheck);
   }
 
   deleteCheck(id: any) {
@@ -238,7 +238,7 @@ export class AssemblesComponent implements OnInit {
       if (element.ids == id) {
         this.lstAssemblesCompCheck?.splice(index, 1);
         this.assemblesCheckService.delete(element.id).subscribe(
-          data=>{
+          data => {
             Swal.fire(
               'Thành công',
               'Bạn đã thực hiện xóa thông tin kiểm tra thành công.',
@@ -268,7 +268,7 @@ export class AssemblesComponent implements OnInit {
   arrErrChild: Array<ErrorElectronicComponent> = [];
 
   onAddErrorChild() {
-    const { serial,errGroup, errName, quantity } = this.formErrorChild;
+    const { serial, errGroup, errName, quantity } = this.formErrorChild;
     var errGrname = null;
     this.lstErrorGr?.forEach((element) => {
       if (element.id == errGroup) {
@@ -278,13 +278,13 @@ export class AssemblesComponent implements OnInit {
       }
     });
 
-    var ratio = ((quantity / (this.totalCheckElement == 0 ? 1 : this.totalCheckElement)) * 100 ).toFixed(2) + '%';
+    var ratio = ((quantity / (this.totalCheckElement == 0 ? 1 : this.totalCheckElement)) * 100).toFixed(2) + '%';
     const errorChild = new ErrorElectronicComponent(errName, errGroup, quantity, ratio, Utils.randomString(5));
     errorChild.dttdCheckId = this.dttdCheckId;
     errorChild.serial = serial;
 
     this.assemblesCheckService.addError(errorChild).subscribe(
-      data=>{
+      data => {
         Swal.fire(
           'Thành công',
           'Bạn đã thực hiện cập nhật thông tin kiểm tra thành công.',
@@ -292,7 +292,7 @@ export class AssemblesComponent implements OnInit {
         )
         this.arrErrChild.push(errorChild);
       },
-      error=>{}
+      error => { }
     )
   }
 
@@ -309,7 +309,7 @@ export class AssemblesComponent implements OnInit {
     this.arrErrChild.forEach((element, index) => {
       if (element.ids == ids) {
         this.assemblesCheckService.deleteError(element.id).subscribe(
-          data=>{
+          data => {
             Swal.fire(
               'Thành công',
               'Bạn đã thực hiệ xóa thông tin lỗi kiểm tra thành công.',
@@ -317,7 +317,7 @@ export class AssemblesComponent implements OnInit {
             )
             this.arrErrChild.splice(index, 1);
           },
-          error=>{}
+          error => { }
         )
 
       }
@@ -325,12 +325,12 @@ export class AssemblesComponent implements OnInit {
   }
 
   totalCheckElement = 0;
-  dttdCheckId?:any
+  dttdCheckId?: any
   open(content: any, idError: any) {
-    this.formEx ={};
+    this.formEx = {};
     this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
     this.formEx.checkPerson = this.tokenStorage.getUsername();
-    console.log(this.formEx.checkTime);
+    // console.log(this.formEx.checkTime);
 
     this.formErrorChild = [];
 
@@ -370,14 +370,14 @@ export class AssemblesComponent implements OnInit {
 
 
   openEdit(content: any, id: any) {
-    this.formEx ={};
-    this.lstAssemblesCompCheck?.forEach(element=>{
-      if(id == element.id){
+    this.formEx = {};
+    this.lstAssemblesCompCheck?.forEach(element => {
+      if (id == element.id) {
         this.formEx = element;
       }
     })
 
-    console.log( this.formEx);
+    // console.log( this.formEx);
 
     this.modalService.open(content, this.modalOptions).result.then(
       (result) => {

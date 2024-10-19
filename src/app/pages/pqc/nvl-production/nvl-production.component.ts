@@ -37,9 +37,9 @@ type AOA = any[][];
 export class NvlProductionComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  // address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'check-nvl-new';
   @Input() show_check = '';
   @Input() woData: any = null;

@@ -116,6 +116,7 @@
             <th>Ngày thực hiện</th>
             <th>Trạng thái</th>
             <th>Số lô</th>
+            <th>Người tạo</th>
             <th [nzRight]="true">Tùy chọn</th>
           </tr>
         </thead>
@@ -137,6 +138,7 @@
               <p *ngIf="audit.status =='REJECT'"> Từ chối</p>
             </td>
             <td>{{ audit.batchNumber}}</td>
+            <td>{{ audit.createBy}}</td>
             <td class="text-center">
               <div class="btn-group">
                 <button class="btn btn-warning  btn-sm" style="color: white;" title="Copy"
@@ -242,15 +244,27 @@
             </mat-form-field>
           </div>
           <div class="col-sm-4">
-            <label>Xuất xứ <i style="color: red;">(*)</i></label>
-            <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" />
+            <label>Xuất xứ </label>
+            <!-- <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" /> -->
+            <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{strSelectOrigin}} name="origin"
+              [matAutocomplete]="origin" [formControl]="searchOriginCtrl" placeholder="Xuất xứ">
+            <mat-autocomplete [panelWidth]="400" #origin="matAutocomplete" (optionSelected)="onSelectedOrigin()"
+              [displayWith]="displayWith">
+              <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
+              <ng-container *ngIf="!isLoadingOrigin">
+                <mat-option *ngFor="let oitm of filteredOrigin.lstOcrd" [value]="oitm">
+                  <span><b>{{oitm.name}}</b> ({{oitm.code}})</span>
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+
           </div>
         </div>
 
         <div class="form-group row">
           <div class="col-sm-4">
-            <label>Mã PO <i style="color: red;">(*)</i></label>
-            <input type="text" class="form-control" placeholder="GRPO" name="grpoNumber"
+            <label>Mã PO </label>
+            <input type="text" class="form-control" placeholder="Mã PO" name="grpoNumber"
               [(ngModel)]="form.grpoNumber" />
           </div>
           <div class="col-sm-4">
@@ -259,7 +273,7 @@
               [(ngModel)]="form.spkphNumber" />
           </div>
           <div class="col-sm-4">
-            <label>Đề nghị <i style="color: red;">(*)</i></label>
+            <label>Đề nghị </label>
 
             <select class="form-control" name="suggestion" [(ngModel)]="form.suggestion" #type="ngModel">
               <option value="Trả lại nhà cung cấp">Trả lại nhà cung cấp</option>
@@ -268,7 +282,7 @@
             </select>
           </div>
           <div class="col-sm-4">
-            <label>Kết luận <i style="color: red;">(*)</i></label>
+            <label>Kết luận </label>
 
             <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
               <option value="Đạt">Đạt</option>
@@ -276,7 +290,7 @@
             </select>
           </div>
           <div class="col-sm-4" style="display: flex;flex-direction: column;">
-            <label>Phiếu SPKPH : <i style="color: red;">(*)</i></label>
+            <label>Phiếu SPKPH</label>
             <input id="cbx" class="hidden-xs-up" checked="" type="checkbox" name="iqcElectType"
               [(ngModel)]="form.iqcElectType" style="width: 30px;height: 28px;">
             <label for="cbx" class="cbx"></label>

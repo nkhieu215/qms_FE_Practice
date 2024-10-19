@@ -106,15 +106,16 @@
         <thead>
           <tr>
             <th scope="col">#</th>
+            <th scope="col">Số biên bản</th>
             <th scope="col">Mã biên bản</th>
-            <th>Loại hàng</th>
-            <th>Loại biên bản</th>
-            <th scope="col">Tên linh kiện</th>
+            <th scope="col">Tên biên bản </th>
             <th scope="col">Loại</th>
+            <th>Loại biên bản</th>
+            <th>Loại hàng</th>
+            <th scope="col">Người tạo</th>
             <th scope="col">Ngày thực hiện</th>
+            <th scope="col">Ngày cập nhật</th>
             <th scope="col">Trạng thái</th>
-            <th scope="col">Mã linh kiện</th>
-            <th scope="col">Số lô</th>
             <th>Nhận xét</th>
             <th scope="col">Tùy chọn</th>
           </tr>
@@ -123,28 +124,21 @@
           <tr *ngFor="let audit of auditnvl; let i = index;">
             <td scope="row">{{ i+1 }}</td>
             <td>{{ audit.reportCode}}</td>
-            <td>
-              {{audit.itemType}}
-            </td>
-            <td>
-              {{audit.type ==1 ? 'NVL/BTP/TP': 'LKDT/BTP'}}
-            </td>
-            <td>
-              {{ audit.electCompName }}
-            </td>
-            <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span *ngIf="audit.iqcElectType == 'true'">Phiếu
-                SPKPH</span> </td>
-            <td>
-              {{ audit.createdAt | date:'dd/MM/YYYY HH:mm'}}
-            </td>
+            <td>{{ audit.elecCompCode}}</td>
+            <td>{{ audit.electCompName }}</td>
+            <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span
+                *ngIf="audit.iqcElectType == 'true'">PhiếuSPKPH</span> </td>
+            <td>{{audit.type ==1 ? 'NVL/BTP/TP': 'LKDT/BTP'}}</td>
+            <td>{{audit.itemType}}</td>
+            <td>{{ audit.createBy}}</td>
+            <td>{{ audit.createdAt | date:'dd/MM/YYYY HH:mm'}}</td>
+            <td>{{ audit.updatedAt | date:'dd/MM/YYYY HH:mm'}}</td>
             <td>
               <p *ngIf="audit.status =='REJECT'"> Từ chối</p>
               <p *ngIf="audit.status =='WAIT_APPROVE'"> Chờ duyệt </p>
               <p *ngIf="audit.status =='APPROVE'"> Đã duyệt </p>
               <p *ngIf="audit.status =='CONCESSIONS'"> Nhân nhượng </p>
             </td>
-            <td>{{ audit.elecCompCode}}</td>
-            <td>{{ audit.batchNumber}}</td>
             <td>{{ audit.approveNote}}</td>
 
             <td class="text-center">
@@ -263,7 +257,7 @@
             </div> -->
             <div class="col-sm-4">
               <label>Mã PO</label>
-              <input type="text" readonly class="form-control" placeholder="GRPO" name="grpoNumber"
+              <input type="text" readonly class="form-control" placeholder="Mã PO" name="grpoNumber"
                 [(ngModel)]="form.grpoNumber" />
             </div>
             <div class="col-sm-4">
@@ -440,15 +434,24 @@
                 [nzFrontPagination]="false">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Chỉ tiêu kiểm tra</th>
-                    <th>Bậc rút nghiệm</th>
-                    <th>Mức chấp nhận</th>
-                    <th>Yêu cầu kỹ thuật</th>
-                    <th>Số lượng</th>
-                    <th>Sai số thực tế</th>
-                    <th style="width: 190px;">Đánh giá</th>
-                    <th>Nội dung đánh giá</th>
+                    <th rowspan="2">#</th>
+                    <th rowspan="2">Chỉ tiêu kiểm tra</th>
+                    <th rowspan="2">Bậc rút nghiệm</th>
+                    <th rowspan="2">Mức chấp nhận</th>
+                    <th colspan="3">Yêu cầu kiểm tra</th>
+                    <th rowspan="2" style="width: 20%">Yêu cầu chi tiết/Lưu ý</th>
+                    <th rowspan="2" style="width: 4%">Số lượng kiểm tra</th>
+                    <th rowspan="2" style="width: 4%">Sai lỗi thực tế</th>
+                    <th colspan="2" style="width: 9%">Kết quả kiểm tra</th>
+                    <th rowspan="2" style="width: 135px;text-align: center;">Đánh giá</th>
+                    <th rowspan="2" style="width: 20%">Ghi chú</th>
+                  </tr>
+                  <tr>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Đơn vị</th>
+                    <th style="text-align: center;">Min</th>
+                    <th style="text-align: center;">Max</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -457,19 +460,26 @@
                     <td>{{ auditLKDT.auditContent }}</td>
                     <td>{{ auditLKDT.regulationLevel }}</td>
                     <td>{{ auditLKDT.acceptanceLevel }}</td>
+                    <td>{{ auditLKDT.min }}</td>
+                    <td>{{ auditLKDT.max }}</td>
+                    <td>{{ auditLKDT.unit }}</td>
                     <td>{{ auditLKDT.technicalRequirement}}</td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
-                        [(ngModel)]="auditLKDT.quantity">
+                        [(ngModel)]="auditLKDT.quantity" readonly>
 
                     </td>
                     <td>
                       <input type="text" placeholder="Sai số" class="form-control" name="inaccuracy[{{i}}]"
-                        [(ngModel)]="auditLKDT.inaccuracy">
+                        [(ngModel)]="auditLKDT.inaccuracy" readonly>
                     </td>
+                    <td> <input type="text" placeholder="Min" class="form-control" name="minAudit[{{i}}]"
+                        [(ngModel)]="auditLKDT.minAudit" readonly></td>
+                    <td><input type="text" placeholder="Max" class="form-control" name="maxAudit[{{i}}]"
+                        [(ngModel)]="auditLKDT.maxAudit" readonly></td>
                     <td>
                       <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
-                        #type="ngModel">
+                        #type="ngModel" disabled>
                         <option value="Đạt">Đạt</option>
                         <option value="Không đạt">Không đạt</option>
                         <option value="Nhân nhượng">Nhân nhượng</option>
@@ -477,7 +487,7 @@
                     </td>
                     <td>
                       <input type="text" placeholder="Ghi chú" class="form-control" name="checkContent[{{i}}]"
-                        [(ngModel)]="auditLKDT.checkContent">
+                        [(ngModel)]="auditLKDT.checkContent" readonly>
                     </td>
                   </tr>
                 </tbody>
@@ -523,60 +533,61 @@
                     <td>{{ auditLKDT.unit }}</td>
                     <td>
                       <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg[{{i}}]"
-                        [(ngModel)]="auditLKDT.auditQAvg">
+                        [(ngModel)]="auditLKDT.auditQAvg" readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="quantity[{{i}}]"
-                        [(ngModel)]="auditLKDT.quantity">
+                        [(ngModel)]="auditLKDT.quantity" readonly>
                     </td>
 
                     <td>
                       <input type="text" placeholder="Min" class="form-control" name="minAudit{{i}}]"
-                        [(ngModel)]="auditLKDT.minAudit">
+                        [(ngModel)]="auditLKDT.minAudit" readonly>
                     </td>
 
                     <td>
                       <input type="text" placeholder="Max" class="form-control" name="maxAudit{{i}}]"
-                        [(ngModel)]="auditLKDT.maxAudit">
+                        [(ngModel)]="auditLKDT.maxAudit" readonly>
                     </td>
 
                     <td>
                       <input type="text" placeholder="Trung bình" class="form-control" name="avgResult[{{i}}]"
-                        [(ngModel)]="auditLKDT.avgResult">
+                        [(ngModel)]="auditLKDT.avgResult" readonly>
                     </td>
 
                     <td>
-                      <input type="text" placeholder="S" class="form-control" name="s[{{i}}]" [(ngModel)]="auditLKDT.s">
+                      <input type="text" placeholder="S" class="form-control" name="s[{{i}}]" [(ngModel)]="auditLKDT.s"
+                        readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="KU" class="form-control" name="ku[{{i}}]"
-                        [(ngModel)]="auditLKDT.ku">
+                        [(ngModel)]="auditLKDT.ku" readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="KL" class="form-control" name="kl[{{i}}]"
-                        [(ngModel)]="auditLKDT.kl">
+                        [(ngModel)]="auditLKDT.kl" readonly>
                     </td>
 
                     <td>
                       <input type="text" placeholder="Kmin" class="form-control" name="kmin[{{i}}]"
-                        [(ngModel)]="auditLKDT.kmin">
+                        [(ngModel)]="auditLKDT.kmin" readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="CPK up" class="form-control" name="cpkUp[{{i}}]"
-                        [(ngModel)]="auditLKDT.cpkUp">
+                        [(ngModel)]="auditLKDT.cpkUp" readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="CPK Low" class="form-control" name="cpkLow[{{i}}]"
-                        [(ngModel)]="auditLKDT.cpkLow">
+                        [(ngModel)]="auditLKDT.cpkLow" readonly>
                     </td>
                     <td>
                       <input type="text" placeholder="CPK" class="form-control" name="cpk[{{i}}]"
-                        [(ngModel)]="auditLKDT.cpk">
+                        [(ngModel)]="auditLKDT.cpk" readonly>
                     </td>
 
                     <td>
                       <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
-                        #type="ngModel">
+                        #type="ngModel" disabled>
                         <option value="Đạt">Đạt</option>
                         <option value="Không đạt">Không đạt</option>
                         <option value="Nhân nhượng">Nhân nhượng</option>
@@ -584,7 +595,7 @@
                     </td>
                     <td>
                       <input type="text" placeholder="Ghi chú" class="form-control" name="content[{{i}}]"
-                        [(ngModel)]="auditLKDT.content">
+                        [(ngModel)]="auditLKDT.content" readonly>
                     </td>
 
                     <td>

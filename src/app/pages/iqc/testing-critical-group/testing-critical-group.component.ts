@@ -20,9 +20,9 @@ import Swal from 'sweetalert2';
 })
 export class TestingCriticalGroupComponent {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  // address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCriticalGroup: any;
   listOfCriticalGroupOrigin: any;
@@ -112,7 +112,7 @@ export class TestingCriticalGroupComponent {
     this.body.status = this.status;
     this.body.itemPerPage = this.itemPerPage;
     this.body.offSet = (this.pageNumber - 1) * this.itemPerPage;
-    console.log('body: ', this.body);
+    // console.log('body: ', this.body);
   }
   nextPage(): void {
     this.pageNumber++;
@@ -170,7 +170,7 @@ export class TestingCriticalGroupComponent {
         this.nextPageBtn = false;
         this.lastPageBtn = false;
       }
-      console.log('total data', res, Math.floor(this.totalData / this.itemPerPage));
+      // console.log('total data', res, Math.floor(this.totalData / this.itemPerPage));
     });
   }
   getTestingCriticalGroupList(): void {
@@ -210,7 +210,7 @@ export class TestingCriticalGroupComponent {
       this.bodyInsert.username = 'admin';
       this.bodyInsert.updateAt = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       this.bodyInsert.status = this.listOfCriticalGroup[index].status;
-      console.log("insert", this.bodyInsert)
+      // console.log("insert", this.bodyInsert)
     } else {
       this.popupTitle = 'Thêm mới nhóm tiêu chí';
       this.bodyInsert.id = null;
@@ -218,7 +218,7 @@ export class TestingCriticalGroupComponent {
       this.bodyInsert.createdAt = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       this.bodyInsert.username = 'admin';
       this.bodyInsert.updateAt = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-      console.log("update", this.bodyInsert)
+      // console.log("update", this.bodyInsert)
     }
     // if(document.getElementById(`${id.toString()}-input`)!.hidden == true){
     //   document.getElementById(`${id.toString()}-input`)!.hidden = false;
@@ -279,7 +279,7 @@ export class TestingCriticalGroupComponent {
         }
       }
       setTimeout(() => {
-        console.log("update", this.check)
+        // console.log("update", this.check)
         if (this.check === false) {
           this.http.post(`${this.address}/${this.path}/group/submit`, this.bodyInsert).subscribe(() => {
             Swal.fire({
@@ -302,7 +302,7 @@ export class TestingCriticalGroupComponent {
   changeStatus(index: any) {
     if (this.listOfCriticalGroup[index].status == 'Active') {
       this.listOfCriticalGroup[index].status = 'Deactivate';
-      console.log('update', this.listOfCriticalGroup[index]);
+      // console.log('update', this.listOfCriticalGroup[index]);
       this.http.post(`${this.address}/${this.path}/group/submit`, this.listOfCriticalGroup[index]).subscribe(() => {
         Swal.fire({
           title: 'Thành công',
@@ -314,7 +314,7 @@ export class TestingCriticalGroupComponent {
       })
     } else {
       this.listOfCriticalGroup[index].status = 'Active';
-      console.log('insert', this.listOfCriticalGroup[index]);
+      // console.log('insert', this.listOfCriticalGroup[index]);
       this.http.post(`${this.address}/${this.path}/group/submit`, this.listOfCriticalGroup[index]).subscribe(() => {
         Swal.fire({
           title: 'Thành công',

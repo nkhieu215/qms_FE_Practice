@@ -37,9 +37,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckLkdtComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  // address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   rawData: any;
@@ -56,6 +56,7 @@ export class CheckLkdtComponent implements OnInit {
   listOfCriticalName: any;
   //------------------------------------------------- list errors ---------------------------------------------
   listOfError: any;
+  listOfErrorWait: any[] = [];
   errorsResult: any;
   auditResultItemId = 0;
   @Input() itemCode = '';
@@ -150,7 +151,7 @@ export class CheckLkdtComponent implements OnInit {
     var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
     this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
       this.listOfParameters = res;
-      console.log(this.listOfParameters)
+      // console.log(this.listOfParameters)
     })
     this.getListError();
     this.getListErrorGroup();
@@ -170,7 +171,7 @@ export class CheckLkdtComponent implements OnInit {
         this.lstErrorRes = data;
         this.lstErrorGr = this.lstErrorRes?.lstError;
         this.lstErrorGr = this.lstErrorRes?.lstError;
-        console.log(this.lstErrorRes);
+        // console.log(this.lstErrorRes);
       },
       (err) => { }
     );
@@ -197,7 +198,7 @@ export class CheckLkdtComponent implements OnInit {
       )
       .subscribe((data: any) => {
         this.filteredExamination = data;
-        console.log(this.filteredExamination);
+        // console.log(this.filteredExamination);
       });
 
     this.searchELectronicCtrl.valueChanges
@@ -276,7 +277,7 @@ export class CheckLkdtComponent implements OnInit {
       this.strSelectElec = data.component.elecCompCode;
       this.strSelectElecName = data.component.elecCompName;
       this.strSelectOrigin = data.component.origin;
-      console.log('check mau bien ban: ', this.form)
+      // console.log('check mau bien ban: ', this.form)
       // check status
       if (this.typeAction == 'edit') {
         if (data.component.status == 'WAIT_APPROVE' || data.component.status == 'APPROVE') {
@@ -340,7 +341,7 @@ export class CheckLkdtComponent implements OnInit {
       invoiceNumber: invoiceNumber
     }
     let data = await this.iqcCheckService.getAll(this.page, this.pageSize, dataSearch, Constant.TYPE_ELECTRIC_COMPONENT_LKDT_BTP, Constant.IQC_TYPE_CREATE)
-    console.log(data);
+    // console.log(data);
     this.auditnvl = data.lst;
     this.collectionSize = Number(data.total) * this.pageSize;
   }
@@ -368,13 +369,11 @@ export class CheckLkdtComponent implements OnInit {
     if (this.file) {
       const body = { iqcElectCompId: this.actRoute.snapshot.params['id'], data: JSON.stringify(this.rawData), createdAt: new Date }
       this.http.post(`${this.address}/store/download-raw-data`, body).subscribe();
-      console.log("Them moi thanh cong", JSON.stringify(this.rawData))
+      // console.log("Them moi thanh cong", JSON.stringify(this.rawData))
     }
     var checkResult = false;
-    if ((this.form.reportCode === '' || this.form.itemType === '' || this.form.origin === '' ||
-      this.form.grpoNumber === '') ||
-      (this.form.reportCode === null || this.form.itemType === null || this.form.origin === null ||
-        this.form.grpoNumber === null)) {
+    if ((this.form.reportCode === '' || this.form.itemType === '') ||
+      (this.form.reportCode === null || this.form.itemType === null)) {
       checkResult = true;
     }
     setTimeout(async () => {
@@ -429,39 +428,74 @@ export class CheckLkdtComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: 'Đồng ý'
           }).then((result) => {
-            if (buttonType == 'send_approve') {
-              //window.location.href = `/iqc/iqc-lkdt-check/${data.id}/show`;
-              this.router.navigate([
-                `/iqc/iqc-lkdt-check/${data.id}/show`,
-                {},
-              ]).then(() => {
+            this.listOfErrorWait.forEach(x => {
+              x.electCompId = data.id;
+            })
+            setTimeout(() => {
+              if (buttonType == 'send_approve') {
+                //window.location.href = `/iqc/iqc-lkdt-check/${data.id}/show`;
                 this.iqcElecCompId = data.id;
                 this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
                 setTimeout(() => {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
-                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
-                  setTimeout(() => {
+                  const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                    // console.log('1', res)
+                    this.listOfErrorWait.forEach(x => {
+                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                      if (result2) {
+                        x.auditResultItemId = result2.id;
+                      }
+                    })
+                    setTimeout(() => {
+                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                      });
+                    }, 300);
+                  });
+                  // setTimeout(() => {
+                  //   window.location.reload();
+                  // }, 100);
+                }, 300);
+                setTimeout(() => {
+                  this.router.navigate([
+                    `/iqc/iqc-lkdt-check/${data.id}/show`,
+                    {},
+                  ]).then(() => {
                     window.location.reload();
-                  }, 100);
-                }, 100);
-              });
-            } else {
-              this.router.navigate([
-                `/iqc/iqc-lkdt-check/${data.id}/edit`,
-                {},
-              ]).then(() => {
+                  });
+                }, 1500);
+              } else {
                 this.iqcElecCompId = data.id;
                 this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
                 setTimeout(() => {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
-                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
-                  setTimeout(() => {
+                  const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                    // console.log('1', res)
+                    this.listOfErrorWait.forEach(x => {
+                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                      if (result2) {
+                        x.auditResultItemId = result2.id;
+                      }
+                    })
+                    setTimeout(() => {
+                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                      });
+                    }, 300);
+                  }
+                  );
+                }, 300);
+                setTimeout(() => {
+                  this.router.navigate([
+                    `/iqc/iqc-lkdt-check/${data.id}/edit`,
+                    {},
+                  ]).then(() => {
                     window.location.reload();
-                  }, 100);
-                }, 100);
-              });
-              // window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
-            }
+                  });
+                }, 1500);
+                // window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
+              }
+            }, 300)
           })
 
 
@@ -473,7 +507,7 @@ export class CheckLkdtComponent implements OnInit {
   open(content: any) {
     var data = { type: 'LKDT' }
     this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
-      console.log("check list: ", res)
+      // console.log("check list: ", res)
       this.listOfCriticalGroup = res;
     })
     this.modalService.open(content, this.modalOptions).result.then(
@@ -497,7 +531,7 @@ export class CheckLkdtComponent implements OnInit {
   }
 
   onSelected() {
-    console.log('hello', this.selectExamination);
+    // console.log('hello', this.selectExamination);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectExamination.id}`).subscribe(res => {
       this.listOfItem = res;
     })
@@ -519,8 +553,8 @@ export class CheckLkdtComponent implements OnInit {
       element.ids = Utils.randomString(5);
     })
 
-    console.log(this.lstAuditCriteriaParam);
-    console.log(this.lstAuditCriteriaLKDT)
+    // console.log(this.lstAuditCriteriaParam);
+    // console.log(this.lstAuditCriteriaLKDT)
 
   }
 
@@ -550,16 +584,16 @@ export class CheckLkdtComponent implements OnInit {
         this.listOfItems = [];
       }
     }, 50);
-    console.log(this.selectedElectronic);
+    // console.log(this.selectedElectronic);
     //this.strSelectElec = this.selectedElectronic.itemCode;
     this.form.electCompName = this.selectedElectronic.itemName;
   }
 
   onSelectedOrigin() {
-    console.log(this.selectedOrigin);
+    // console.log(this.selectedOrigin);
     this.strSelectOrigin = this.selectedOrigin.name;
     this.form.origin = this.selectedOrigin.name;
-    console.log(this.strSelectOrigin);
+    // console.log(this.strSelectOrigin);
 
   }
 
@@ -606,7 +640,7 @@ export class CheckLkdtComponent implements OnInit {
     this.lstErrorGr?.forEach((element) => {
       if (element.name == name) {
         this.lstError = element.errChild;
-        console.log(this.lstError)
+        // console.log(this.lstError)
         // this.formErrorChild.errGroup = element.name;
       }
     });
@@ -637,7 +671,7 @@ export class CheckLkdtComponent implements OnInit {
     fileReader.readAsArrayBuffer(this.file);
     fileReader.onload = (e) => {
       this.arrayBuffer = fileReader.result;
-      console.log("event", this.arrayBuffer)
+      // console.log("event", this.arrayBuffer)
       var data = new Uint8Array(this.arrayBuffer);
       var arr = new Array();
       for (var i = 0; i != data.length; ++i)
@@ -656,7 +690,7 @@ export class CheckLkdtComponent implements OnInit {
         } else break;
       }
 
-      console.log(filteredData);
+      // console.log(filteredData);
       this.rawData = filteredData;
       function getValueByCol(col: number, type: string) {
         var arr = filteredData.map(item => item[col]).filter(Number);
@@ -954,13 +988,14 @@ export class CheckLkdtComponent implements OnInit {
     if (value.length > 5) {
       this.oitmService.searchBycode(value).subscribe((data: any) => {
         this.listOfItems = data.lstOitm;
-        console.log('hello', this.listOfItems);
+        // console.log('hello', this.listOfItems);
       });
     }
   }
   submit(index: any) {
     if (index === null) {
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, this.listOfItem).subscribe(res => {
+      const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
         Swal.fire({
           title: 'Thêm mới',
           text: 'Thành công thêm mới thông tin sản phẩm  ! ',
@@ -980,8 +1015,8 @@ export class CheckLkdtComponent implements OnInit {
         }, 100);
       })
     } else {
-      var data = [this.listOfItem[index]];
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe(res => {
+      const body2 = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body2).subscribe(res => {
         Swal.fire({
           title: 'Thêm mới',
           text: 'Thành công thêm mới thông tin sản phẩm ! ',
@@ -1022,8 +1057,8 @@ export class CheckLkdtComponent implements OnInit {
         timer: 5000
       })
     } else {
-      var data = [this.listOfItem[index]]
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe((res) => {
+      const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe((res) => {
         this.listOfItem[index].id = res[0].id;
         setTimeout(() => {
           this.updateItem(this.listOfItem[index].id);
@@ -1089,13 +1124,15 @@ export class CheckLkdtComponent implements OnInit {
       })
     } else {
       var item = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[index].itemCode);
-      console.log('submit', item);
-      this.listOfError[index].electCompId = this.id;
+      // console.log('submit', item);
+      this.listOfError[index].electCompId = this.iqcElecCompId;
       setTimeout(() => {
         this.listOfError[index].auditResultItemId = item.id;
         var data = [this.listOfError[index]]
         this.http.post<any>(`${this.address}/${this.path}/error/submit`, data).subscribe((res) => {
           this.listOfError[index].id = res[0].id;
+          this.listOfErrorWait.push(this.listOfError[index]);
+          // console.log('list error', this.listOfErrorWait);
           setTimeout(() => {
             this.updateError(this.listOfError[index].id, '');
           }, 50)
@@ -1115,7 +1152,7 @@ export class CheckLkdtComponent implements OnInit {
   submitErrors() {
     var item1 = this.listOfError.find((item2: any) => item2.errCode === '');
     var auditResultItemId = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[0].itemCode);
-    console.log({ code1: item1, code2: this.listOfError[0] })
+    // console.log({ code1: item1, code2: this.listOfError[0] })
     setTimeout(() => {
       if (item1) {
         Swal.fire(
@@ -1125,7 +1162,7 @@ export class CheckLkdtComponent implements OnInit {
         )
       } else {
         this.listOfError.forEach((item: any) => {
-          item.electCompId = this.id,
+          item.electCompId = this.iqcElecCompId,
             item.auditResultItemId = auditResultItemId.id
         })
         setTimeout(() => {
@@ -1168,25 +1205,30 @@ export class CheckLkdtComponent implements OnInit {
   }
   addNewError() {
     var date = new Date
-    var item = {
-      id: null,
-      itemCode: this.itemCode,
-      errCode: '',
-      errGroup: '',
-      errName: '',
-      quantity: 0,
-      ratio: 0,
-      electCompId: this.iqcElecCompId,
-      auditResultItemId: this.auditResultItemId,
-      createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
-      username: 'admin',
-      note: '',
+    if (this.iqcElecCompId == 0) {
+      this.iqcElecCompId = 1;
     }
-    this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
-      // document.getElementById('btn-save-item')!.hidden = false;
-      this.updateError(null, '');
-    }, 50)
+      var item = {
+        id: null,
+        itemCode: this.itemCode,
+        errCode: '',
+        errGroup: '',
+        errName: '',
+        quantity: 0,
+        ratio: 0,
+        electCompId: this.iqcElecCompId,
+        auditResultItemId: this.auditResultItemId,
+        createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+        username: 'admin',
+        note: '',
+      }
+      this.listOfError = [item, ... this.listOfError];
+      setTimeout(() => {
+        // document.getElementById('btn-save-item')!.hidden = false;
+        this.updateError(null, '');
+      }, 50)
+    }, 100);
   }
   openPopupError(content: any, item: any) {
     this.errCode = '';
@@ -1217,7 +1259,7 @@ export class CheckLkdtComponent implements OnInit {
     const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode, electCompId: this.id };
     this.http.post<any>(`${this.address}/${this.path}/errors/search`, data).subscribe(res => {
       this.listOfError = res;
-      console.log('list errors: ', res, this.id);
+      // console.log('list errors: ', res, this.id);
     })
   }
   getLstItemCode() {
@@ -1279,7 +1321,7 @@ export class CheckLkdtComponent implements OnInit {
   getListErrorById(errGroup: any, index: any) {
     var data = this.listErrorGroup.find((item: any) => item.errGroup === errGroup);
     this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all/${data.id}`).subscribe(res => {
-      console.log("check result", res)
+      // console.log("check result", res)
       this.listErrors = res;
       setTimeout(() => {
         if (this.listErrors.length === 0) {
@@ -1300,7 +1342,7 @@ export class CheckLkdtComponent implements OnInit {
     var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'LKDT' }
     this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data).subscribe(res => {
       this.listOfCriticalName = res;
-      console.log(this.listOfCriticalName)
+      // console.log(this.listOfCriticalName)
 
     })
     // }else if(this.examinationType === '3'){

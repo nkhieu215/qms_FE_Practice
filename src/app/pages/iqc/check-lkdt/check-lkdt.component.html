@@ -110,6 +110,7 @@
             <th scope="col">Ngày thực hiện</th>
             <th scope="col">Trạng thái</th>
             <th scope="col">Số lô</th>
+            <th scope="col">Người tạo</th>
             <th scope="col">Tùy chọn</th>
           </tr>
         </thead>
@@ -131,6 +132,7 @@
             </td>
 
             <td>{{ audit.batchNumber}}</td>
+            <td>{{ audit.createBy}}</td>
 
 
             <td class="text-center">
@@ -425,8 +427,20 @@
                   (ngModelChange)="form.checkDate = $event" />
               </div>
               <div class="col-sm-4">
-                <label>Xuất xứ <i style="color: red;">(*)</i></label>
-                <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" />
+                <label>Xuất xứ </label>
+                <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{strSelectOrigin}}
+                  name="origin" [matAutocomplete]="origin" [formControl]="searchOriginCtrl" placeholder="Xuất xứ">
+
+                <mat-autocomplete [panelWidth]="400" #origin="matAutocomplete" (optionSelected)="onSelectedOrigin()"
+                  [displayWith]="displayWith">
+                  <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
+                  <ng-container *ngIf="!isLoadingOrigin">
+                    <mat-option *ngFor="let oitm of filteredOrigin.lstOcrd" [value]="oitm">
+                      <span><b>{{oitm.name}}</b> ({{oitm.code}})</span>
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+
               </div>
             </div>
 
@@ -454,8 +468,8 @@
       name="checkingQuantity" [(ngModel)]="form.checkingQuantity" />
   </div> -->
               <div class="col-sm-4">
-                <label>Mã PO <i style="color: red;">(*)</i></label>
-                <input type="text" class="form-control" placeholder="GRPO" name="grpoNumber"
+                <label>Mã PO </label>
+                <input type="text" class="form-control" placeholder="Mã PO" name="grpoNumber"
                   [(ngModel)]="form.grpoNumber" />
               </div>
               <div class="col-sm-4">
@@ -464,7 +478,7 @@
                   [(ngModel)]="form.spkphNumber" />
               </div>
               <div class="col-sm-4">
-                <label>Đề nghị <i style="color: red;">(*)</i></label>
+                <label>Đề nghị </label>
 
                 <select class="form-control" name="suggestion" [(ngModel)]="form.suggestion" #type="ngModel">
                   <option value="Trả lại nhà cung cấp">Trả lại nhà cung cấp</option>
@@ -473,7 +487,7 @@
                 </select>
               </div>
               <div class="col-sm-4">
-                <label>Kết luận <i style="color: red;">(*)</i></label>
+                <label>Kết luận</label>
 
                 <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
                   <option value="Đạt">Đạt</option>
@@ -481,7 +495,7 @@
                 </select>
               </div>
               <div class="col-sm-4" style="display: flex;flex-direction: column;">
-                <label>Phiếu SPKPH : <i style="color: red;">(*)</i></label>
+                <label>Phiếu SPKPH </label>
                 <input id="cbx" class="hidden-xs-up" checked="" type="checkbox" name="iqcElectType"
                   [(ngModel)]="form.iqcElectType" style="width: 30px;height: 28px;">
                 <label for="cbx" class="cbx"></label>
@@ -612,16 +626,25 @@
                 [nzFrontPagination]="false">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Chỉ tiêu kiểm tra</th>
-                    <th>Bậc rút nghiệm</th>
-                    <th>Mức chấp nhận</th>
-                    <th>Yêu cầu kỹ thuật</th>
-                    <th>Số lượng kiểm tra</th>
-                    <th>Sai số thực tế</th>
-                    <th style="width: 190px;">Đánh giá</th>
-                    <th>Nội dung đánh giá</th>
-                    <th>Tùy chọn</th>
+                    <th rowspan="2">#</th>
+                    <th rowspan="2">Chỉ tiêu kiểm tra</th>
+                    <th rowspan="2">Bậc rút nghiệm</th>
+                    <th rowspan="2">Mức chấp nhận</th>
+                    <th colspan="3">Yêu cầu kiểm tra</th>
+                    <th rowspan="2" style="width: 20%">Yêu cầu chi tiết/Lưu ý</th>
+                    <th rowspan="2" style="width: 4%">Số lượng kiểm tra</th>
+                    <th rowspan="2" style="width: 4%">Sai lỗi thực tế</th>
+                    <th colspan="2" style="width: 9%">Kết quả kiểm tra</th>
+                    <th rowspan="2" style="width: 135px;text-align: center;">Đánh giá</th>
+                    <th rowspan="2" style="width: 20%">Ghi chú</th>
+                    <th rowspan="2">Tùy chọn</th>
+                  </tr>
+                  <tr>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Đơn vị</th>
+                    <th style="text-align: center;">Min</th>
+                    <th style="text-align: center;">Max</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -630,6 +653,9 @@
                     <td>{{ auditLKDT.auditContent }}</td>
                     <td>{{ auditLKDT.regulationLevel }}</td>
                     <td>{{ auditLKDT.acceptanceLevel }}</td>
+                    <td>{{ auditLKDT.min }}</td>
+                    <td>{{ auditLKDT.max }}</td>
+                    <td>{{ auditLKDT.unit }}</td>
                     <td>{{ auditLKDT.technicalRequirement}}</td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
@@ -640,6 +666,10 @@
                       <input type="text" placeholder="Sai số" class="form-control" name="inaccuracy[{{i}}]"
                         [(ngModel)]="auditLKDT.inaccuracy">
                     </td>
+                    <td> <input type="text" placeholder="Min" class="form-control" name="minAudit[{{i}}]"
+                        [(ngModel)]="auditLKDT.minAudit"></td>
+                    <td><input type="text" placeholder="Max" class="form-control" name="maxAudit[{{i}}]"
+                        [(ngModel)]="auditLKDT.maxAudit"></td>
                     <td>
                       <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
                         #type="ngModel">
@@ -982,9 +1012,9 @@
       <div class="row">
         <div class="col-sm-6">
           <div class="form-group">
-            <label>Yêu cầu kỹ thuật</label>
+            <label>Yêu cầu chi tiết/Lưu ý</label>
             <input required="" type="text" class="form-control" name="technicalRequirement"
-              [(ngModel)]="formAuditCriteriaLKDT.technicalRequirement" placeholder="Yêu cầu kỹ thuật" />
+              [(ngModel)]="formAuditCriteriaLKDT.technicalRequirement" placeholder="Yêu cầu chi tiết/Lưu ý" />
           </div>
         </div>
 

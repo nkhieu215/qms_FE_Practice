@@ -24,6 +24,7 @@ import Utils from 'src/app/share/_utils/utils';
 import { Constant } from 'src/app/share/_services/constant';
 import * as moment from 'moment';
 import { HttpClient } from '@angular/common/http';
+import { StoreCheckService } from 'src/app/share/_services/store_check.service';
 
 @Component({
   selector: 'app-check-nvl',
@@ -33,16 +34,16 @@ import { HttpClient } from '@angular/common/http';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  // address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
   listOfItems: any;
   @Input() itemResult: any;
   itemcode: any;
-  iqcElecCompId: any;
+  iqcElecCompId = 0;
   iqcElecCompCode: any;
   iqcElecCompname: any;
   //----------------------------------------- autocomplete ---------------------------------------
@@ -51,6 +52,7 @@ export class CheckNvlComponent implements OnInit {
   listOfCriticalName: any;
   //------------------------------------------------- list errors ---------------------------------------------
   listOfError: any;
+  listOfErrorWait: any[] = [];
   errorsResult: any;
   auditResultItemId = 0;
   @Input() itemCode = '';
@@ -74,7 +76,10 @@ export class CheckNvlComponent implements OnInit {
   examiantionRes?: IqcComponentNVLResponse;
   formSearch: any = {
   };
+
   lstview = true;
+  isLoadingOrigin = false;
+  filteredOrigin = new OitmResponse();
   id: any;
   searchExaminationCtrl = new FormControl();
   searchELectronicCtrl = new FormControl();
@@ -85,8 +90,12 @@ export class CheckNvlComponent implements OnInit {
   errorMsg!: string;
   minLengthTerm = 3;
   minLengthElectronic = 6;
+  minLengthOrigin = 2;
   selectedEx: any = '';
   selectedElectronic: any = '';
+  strSelectOrigin: any = '';
+  selectedOrigin: any = '';
+  searchOriginCtrl = new FormControl();
   strSelect: any = '';
   strSelectElec: any = '';
   lstAuditCriteriaNvl: AuditCriteriaNvl[] = [];
@@ -116,13 +125,14 @@ export class CheckNvlComponent implements OnInit {
     private router: Router,
     private tokenStorage: KeycloakService,
     private iqcCheckService: IqcCheckService,
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected storeCheckService: StoreCheckService
 
   ) {
   }
 
   onSelected() {
-    console.log('select', this.selectedEx);
+    // console.log('select', this.selectedEx);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectedEx.id}`).subscribe(res => {
       this.listOfItem = res;
     })
@@ -168,7 +178,7 @@ export class CheckNvlComponent implements OnInit {
         this.listOfItems = [];
       }
     }, 50);
-    console.log("check lk", this.selectedElectronic);
+    // console.log("check lk", this.selectedElectronic);
     this.strSelectElec = this.selectedElectronic.itemCode;
     this.lstElectronic = this.selectedElectronic.lstAuditCriteriaNvl;
     this.form.electCompName = this.selectedElectronic.itemName;
@@ -197,15 +207,38 @@ export class CheckNvlComponent implements OnInit {
       invoiceNumber: invoiceNumber
     }
     let data = await this.iqcCheckService.getAll(this.page, this.pageSize, dataSearch, Constant.TYPE_ELECTRIC_COMPONENT_NVL, Constant.IQC_TYPE_CREATE)
-    console.log(data);
+    // console.log(data);
     this.auditnvl = data.lst;
     this.collectionSize = Number(data.total) * this.pageSize;
   }
 
   ngOnInit(): void {
+    this.searchOriginCtrl.valueChanges
+      .pipe(
+        filter((res) => {
+          return res !== null && res.length >= this.minLengthOrigin;
+        }),
+        distinctUntilChanged(),
+        debounceTime(1000),
+        tap(() => {
+          this.errorMsg = '';
+
+          this.isLoadingOrigin = true;
+        }),
+        switchMap((value) =>
+          this.storeCheckService.searchBycode(value).pipe(
+            finalize(() => {
+              this.isLoadingOrigin = false;
+            })
+          )
+        )
+      )
+      .subscribe((data: any) => {
+        this.filteredOrigin = data;
+      });
     this.typeAction = this.actRoute.snapshot.params['type']
     this.id = this.actRoute.snapshot.params['id'];
-    console.log(this.typeAction);
+    // console.log(this.typeAction);
     this.getListError();
     this.getListErrorGroup();
     if (this.typeAction) {
@@ -330,7 +363,7 @@ export class CheckNvlComponent implements OnInit {
   open(content: any) {
     var data = { type: 'NVL' }
     this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
-      console.log("check list: ", res)
+      // console.log("check list: ", res)
       this.listOfCriticalGroup = res;
     })
     this.modalService.open(content, this.modalOptions).result.then(
@@ -381,7 +414,7 @@ export class CheckNvlComponent implements OnInit {
             (element.quantity / (checkQuantity == 0 ? 1 : checkQuantity)) *
             100
           ).toFixed(2) + '%';
-        console.log(ratio);
+        // console.log(ratio);
         element.ratio = ratio;
       });
     }
@@ -414,7 +447,7 @@ export class CheckNvlComponent implements OnInit {
       } else {
         this.form.iqcElectType = true;
       }
-      console.log("check data :", data)
+      // console.log("check data :", data)
       this.selectedEx = this.form.templateCode = data.component.templateCode;
       this.form.checkDate = new Date(this.form.checkDate);
       this.form.importDate = new Date(this.form.importDate);
@@ -426,6 +459,7 @@ export class CheckNvlComponent implements OnInit {
       this.form.templateCode = data.component.templateCode;
       this.form.elecCompCode = data.component.elecCompCode;
       this.arrErrChild = [];
+      this.strSelectOrigin = data.component.origin;
     }
 
 
@@ -434,7 +468,7 @@ export class CheckNvlComponent implements OnInit {
       (data) => {
         this.lstErrorRes = data;
         this.lstErrorGr = data.lstError;
-        console.log(this.lstErrorRes);
+        // console.log(this.lstErrorRes);
       },
       (err) => { }
     );
@@ -461,7 +495,7 @@ export class CheckNvlComponent implements OnInit {
       )
       .subscribe((data: any) => {
         this.filteredExamination = data;
-        console.log(this.filteredExamination);
+        // console.log(this.filteredExamination);
       });
 
     this.searchELectronicCtrl.valueChanges
@@ -485,7 +519,7 @@ export class CheckNvlComponent implements OnInit {
       )
       .subscribe((data: any) => {
         this.filteredOitm = data;
-        console.log('hello', this.filteredOitm);
+        // console.log('hello', this.filteredOitm);
       });
   }
 
@@ -494,23 +528,21 @@ export class CheckNvlComponent implements OnInit {
    */
   async onSubmit(buttonType: any) {
     var checkResult = false;
-    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === '' || this.form.origin === '' ||
-      this.form.grpoNumber === '') ||
-      (this.selectedEx === null || this.form.reportCode === null || this.form.itemType === null || this.form.origin === null ||
-        this.form.grpoNumber === null)) {
+    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === '') ||
+      (this.selectedEx === null || this.form.reportCode === null || this.form.itemType === null)) {
       checkResult = true;
     }
-    setTimeout(async () => {
-      if (checkResult === true) {
-        Swal.fire({
-          title: 'Cảnh báo',
-          text: 'Vui lòng điền đầy đủ thông tin biên bản !',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Đồng ý',
-        })
-      } else {
+    if (checkResult === true) {
+      Swal.fire({
+        title: 'Cảnh báo',
+        text: 'Vui lòng điền đầy đủ thông tin biên bản !',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Đồng ý',
+      })
+    } else {
 
+      setTimeout(async () => {
         this.form.importDateStr =
           this.form.importDate != null ? moment(this.form.importDate).format('DD-MM-YYYY') : '';
         this.form.checkDateStr = this.form.checkDate != null ? moment(this.form.checkDate).format('DD-MM-YYYY') : '';
@@ -521,7 +553,7 @@ export class CheckNvlComponent implements OnInit {
           this.form.templateCode = this.iqcElecCompCode;
           this.form.elecCompCode = this.iqcElecCompCode;
           this.form.electCompName = this.iqcElecCompname;
-          console.log('add nvl: ', this.form)
+          // console.log('add nvl: ', this.form)
         }
 
         let message = "Thêm mới biên bản thành công.";
@@ -536,6 +568,7 @@ export class CheckNvlComponent implements OnInit {
 
         // let data = await this.iqcCheckService.create(this.form, this.lstAuditCriteriaNvl, null, null, this.arrErrChild, 'ADD');
         let data = await this.iqcCheckService.create(this.form, this.lstAuditCriteriaNvl, null, null, 'ADD');
+        // console.log(data)
         if (data && data.result.responseCode == '00') {
           Swal.fire('Thành công', message, 'success')
           Swal.fire({
@@ -545,39 +578,72 @@ export class CheckNvlComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: 'Đồng ý',
           }).then(async (result) => {
-            if (showPage) {
-              this.router.navigate([`/iqc/iqc-nvl-check/${data.id}/show`, {},]).then(() => {
-                this.iqcElecCompId = data.id;
-                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
-                setTimeout(() => {
-                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
-                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 100);
-                }, 100);
-              });
-            } else {
-              this.router.navigate([
-                `/iqc/iqc-nvl-check/${data.id}/edit`,
-                {},
-              ]).then(() => {
-                this.iqcElecCompId = data.id;
-                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
-                setTimeout(() => {
-                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
-                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, result).subscribe();
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 100);
-                }, 100);
-              });
+            this.listOfErrorWait.forEach(x => {
+              x.electCompId = data.id;
+            })
 
-            }
+            setTimeout(() => {
+              if (buttonType == 'send_approve') {
+                this.iqcElecCompId = data.id;
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                setTimeout(() => {
+                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
+                  const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                  // console.log(body)
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                    // console.log('1', res)
+                    this.listOfErrorWait.forEach(x => {
+                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                      if (result2) {
+                        x.auditResultItemId = result2.id;
+                      }
+                    })
+                    setTimeout(() => {
+                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                      });
+                    }, 300);
+                  });
+                }, 300);
+                setTimeout(() => {
+                  this.router.navigate([`/iqc/iqc-nvl-check/${data.id}/show`, {},]).then(() => {
+                    window.location.reload();
+                  })
+                }, 1500);
+              } else {
+                this.iqcElecCompId = data.id;
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                setTimeout(() => {
+                  var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
+                  const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                    console.log('1', res)
+                    this.listOfErrorWait.forEach(x => {
+                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                      if (result2) {
+                        x.auditResultItemId = result2.id;
+                      }
+                    })
+                    setTimeout(() => {
+                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                      });
+                    }, 300);
+                  }
+                  );
+                }, 300);
+                setTimeout(() => {
+                  this.router.navigate([
+                    `/iqc/iqc-nvl-check/${data.id}/edit`,
+                    {},
+                  ]).then(() => {
+                    window.location.reload();
+                  });
+                }, 1500);
+              }
+            }, 300);
           })
         }
-      }
-    }, 100);
+      }, 100);
+    }
   }
 
 
@@ -698,13 +764,14 @@ export class CheckNvlComponent implements OnInit {
     if (value.length > 5) {
       this.oitmService.searchBycode(value).subscribe((data: any) => {
         this.listOfItems = data.lstOitm;
-        console.log('hello', this.listOfItems);
+        // console.log('hello', this.listOfItems);
       });
     }
   }
   submit(index: any) {
     if (index === null) {
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, this.listOfItem).subscribe(res => {
+      const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
         Swal.fire(
           'Thêm mới',
           'Thành công thêm mới thông tin sản phẩm .',
@@ -721,8 +788,8 @@ export class CheckNvlComponent implements OnInit {
         }, 100);
       })
     } else {
-      var data = [this.listOfItem[index]];
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe(res => {
+      const body2 = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body2).subscribe(res => {
         Swal.fire(
           'Thêm mới',
           'Thành công thêm mới thông tin sản phẩm .',
@@ -754,8 +821,8 @@ export class CheckNvlComponent implements OnInit {
         'warning'
       )
     } else {
-      var data = [this.listOfItem[index]]
-      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, data).subscribe((res) => {
+      const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
+      this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe((res) => {
         this.listOfItem[index].id = res[0].id;
         setTimeout(() => {
           this.updateItem(this.listOfItem[index].id);
@@ -815,13 +882,15 @@ export class CheckNvlComponent implements OnInit {
       )
     } else {
       var item = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[index].itemCode);
-      console.log('submit', item);
-      this.listOfError[index].electCompId = this.id;
+      // console.log('submit', item);
+      this.listOfError[index].electCompId = this.iqcElecCompId;
       setTimeout(() => {
         this.listOfError[index].auditResultItemId = item.id;
         var data = [this.listOfError[index]]
         this.http.post<any>(`${this.address}/${this.path}/error/submit`, data).subscribe((res) => {
           this.listOfError[index].id = res[0].id;
+          this.listOfErrorWait.push(this.listOfError[index]);
+          // console.log('list error', this.listOfErrorWait);
           setTimeout(() => {
             this.updateError(this.listOfError[index].id, '');
           }, 50)
@@ -838,7 +907,7 @@ export class CheckNvlComponent implements OnInit {
   submitErrors() {
     var item1 = this.listOfError.find((item2: any) => item2.errCode === '');
     var auditResultItemId = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[0].itemCode);
-    console.log({ code1: auditResultItemId, code2: this.listOfError[0] })
+    // console.log({ code1: auditResultItemId, code2: this.listOfError[0] })
     setTimeout(() => {
       if (item1) {
         Swal.fire(
@@ -848,7 +917,7 @@ export class CheckNvlComponent implements OnInit {
         )
       } else {
         this.listOfError.forEach((item: any) => {
-          item.electCompId = this.id,
+          item.electCompId = this.iqcElecCompId,
             item.auditResultItemId = auditResultItemId.id
         })
         setTimeout(() => {
@@ -888,25 +957,30 @@ export class CheckNvlComponent implements OnInit {
   }
   addNewError() {
     var date = new Date
-    var item = {
-      id: null,
-      itemCode: this.itemCode,
-      errCode: '',
-      errGroup: '',
-      errName: '',
-      quantity: 0,
-      ratio: 0,
-      electCompId: this.iqcElecCompId,
-      auditResultItemId: this.auditResultItemId,
-      createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
-      username: 'admin',
-      note: '',
+    if (this.iqcElecCompId == 0) {
+      this.iqcElecCompId = 1;
     }
-    this.listOfError = [item, ... this.listOfError];
     setTimeout(() => {
-      // document.getElementById('btn-save-item')!.hidden = false;
-      this.updateError(null, '');
-    }, 50)
+      var item = {
+        id: null,
+        itemCode: this.itemCode,
+        errCode: '',
+        errGroup: '',
+        errName: '',
+        quantity: 0,
+        ratio: 0,
+        electCompId: this.iqcElecCompId,
+        auditResultItemId: this.auditResultItemId,
+        createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
+        username: 'admin',
+        note: '',
+      }
+      this.listOfError = [item, ... this.listOfError];
+      setTimeout(() => {
+        // document.getElementById('btn-save-item')!.hidden = false;
+        this.updateError(null, '');
+      }, 50)
+    }, 100);
   }
   openPopupError(content: any, item: any) {
     this.errCode = '';
@@ -915,7 +989,7 @@ export class CheckNvlComponent implements OnInit {
     if (item === null) {
       this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
         this.listOfError = res;
-        console.log('list errors:1 ', res, this.id);
+        // console.log('list errors:1 ', res, this.id);
 
       })
     } else {
@@ -923,7 +997,7 @@ export class CheckNvlComponent implements OnInit {
       this.http.get<any>(`${this.address}/${this.path}/errors/audit-result-item-id/${item.id}`).subscribe(res => {
         this.listOfError = res;
         this.getLstItemCode();
-        console.log('list errors:2 ', res, this.id);
+        // console.log('list errors:2 ', res, this.id);
 
       })
     }
@@ -941,7 +1015,7 @@ export class CheckNvlComponent implements OnInit {
     const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode, electCompId: this.id };
     this.http.post<any>(`${this.address}/${this.path}/errors/search`, data).subscribe(res => {
       this.listOfError = res;
-      console.log('list errors: ', res, this.id);
+      // console.log('list errors: ', res, this.id);
     })
   }
   getLstItemCode() {
@@ -993,7 +1067,7 @@ export class CheckNvlComponent implements OnInit {
   getListErrorGroup() {
     this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all`).subscribe(res => {
       this.listErrorGroup = res;
-      console.log("check result group error", res)
+      // console.log("check result group error", res)
     })
   }
   getListError() {
@@ -1010,7 +1084,7 @@ export class CheckNvlComponent implements OnInit {
   getListErrorById(errGroup: any, index: any) {
     var data = this.listErrorGroup.find((item: any) => item.errGroup === errGroup);
     this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all/${data.id}`).subscribe(res => {
-      console.log("check result", res)
+      // console.log("check result", res)
       this.listErrors = res;
       setTimeout(() => {
         if (this.listErrors.length === 0) {
@@ -1031,7 +1105,14 @@ export class CheckNvlComponent implements OnInit {
     var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'NVL' }
     this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data).subscribe(res => {
       this.listOfCriticalName = res;
-      console.log(this.listOfCriticalName)
+      // console.log(this.listOfCriticalName)
     })
+  }
+  onSelectedOrigin() {
+    // console.log(this.selectedOrigin);
+    this.strSelectOrigin = this.selectedOrigin.name;
+    this.form.origin = this.selectedOrigin.name;
+    // console.log(this.form.origin);
+
   }
 }

@@ -347,7 +347,7 @@ export class ExaminationAddComponent implements OnInit {
               timer: 5000
             })
           } else {
-            const examinationType = this.examinationType === '1' ? 1 : 0;
+            // const examinationType = this.examinationType === '1' ? 1 : 0;
             const { name, status, description, code } = this.form;
             const auditForm = new AuditCriteria(name, this.examinationType, code, description, status, 0);
             console.log("thêm mới: ", this.arrayAudit)
@@ -364,7 +364,8 @@ export class ExaminationAddComponent implements OnInit {
                     showConfirmButton: false,
                     timer: 5000
                   })
-                  const data1 = { code: code, type: examinationType }
+                  const data1 = { code: code, type: Number(this.examinationType) }
+                  console.log('data', data1)
                   this.http.post<any>(`${this.address}/${this.path}/examinations/check/code`, data1).subscribe(res => {
                     this.id = res[0].id;
                     this.listOfItem.forEach((item: any) => {
@@ -395,12 +396,15 @@ export class ExaminationAddComponent implements OnInit {
 
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel } = this.formAuditLKDT2;
+      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel, min, max, unit } = this.formAuditLKDT2;
       var lkdt1 = new AuditCriteriaLKDT2();
       lkdt1.auditContent = this.testingName;
       lkdt1.regulationLevel = regulationLevel;
       lkdt1.technicalRequirement = technicalRequirement;
       lkdt1.acceptanceLevel = acceptanceLevel;
+      lkdt1.min = min;
+      lkdt1.max = max;
+      lkdt1.unit = unit;
       lkdt1.ids = Utils.randomString(5);
       if (action == 'ADD') {
         this.arrayAuditLKDT2.push(lkdt1);
@@ -563,6 +567,7 @@ export class ExaminationAddComponent implements OnInit {
 
   onChangeType(type: any) {
     this.examinationType = type;
+    console.log('check type', this.examinationType);
     this.getListTestingGroupByType();
   }
   getListTestingGroupByType() {

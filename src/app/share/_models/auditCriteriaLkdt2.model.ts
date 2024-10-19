@@ -17,4 +17,10 @@ export class AuditCriteriaLKDT2 {
   auditCriteriaLKDT: any;
   auditCritetiaLkdtId: any;
   auditCriteriaLkdt: any;
+  min: any;
+  max: any;
+  unit: any;
+  minAudit: any;
+  maxAudit: any;
+  unitAudit: any;
 }

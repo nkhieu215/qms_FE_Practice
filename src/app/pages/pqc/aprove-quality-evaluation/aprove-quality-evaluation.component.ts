@@ -88,7 +88,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
 
 
   changeWo(data: any) {
-    console.log(data);
+    // console.log(data);
     if (data.status == 'CREATE' || data.status == 'REJECT' || data.status == 'WAIT_APPROVE') {
 
     } else {

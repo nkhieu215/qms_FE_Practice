@@ -32,7 +32,8 @@ export class ExaminationEditComponent implements OnInit {
   path = 'api/testing-critical';
   //list tieu chi
   listOfCriticalName: any;
-  listOfCriticalGroup: any;
+  listOfParameters: any;
+  listOfCriticalGroup: any[] = [];
   //Biến hiển thị cho NVL
   @Input() testingName = '';
   //list item
@@ -224,6 +225,7 @@ export class ExaminationEditComponent implements OnInit {
   ngOnInit(): void {
     this.getinfor();
     console.log("checsk type:", this.examinationType, this.form.type)
+    this.getListTestingGroupByType();
   }
 
   /**
@@ -305,13 +307,16 @@ export class ExaminationEditComponent implements OnInit {
   onAddAudit(type: any, even: any) {
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel } =
+      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel, min, max, unit } =
         this.formAuditLKDT2;
       var lkdt = new AuditCriteriaLKDT2();
       lkdt.auditContent = auditContent;
       lkdt.regulationLevel = regulationLevel;
       lkdt.technicalRequirement = technicalRequirement;
       lkdt.acceptanceLevel = acceptanceLevel;
+      lkdt.min = min;
+      lkdt.max = max;
+      lkdt.unit = unit;
       lkdt.ids = Utils.randomString(5);
       lkdt.templateId = this.id;
       if (even == 'EDIT') {
@@ -539,6 +544,7 @@ export class ExaminationEditComponent implements OnInit {
   }
 
   open(content: any, id: any, type: any, testingName: any) {
+    console.log('group:::::::::', this.listOfCriticalGroup)
     this.testingCriticalGroup = '';
     this.testingName = '';
     if (testingName !== null) {
@@ -547,6 +553,13 @@ export class ExaminationEditComponent implements OnInit {
       this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
         this.testingCriticalGroup = res.testingCriticalGroup;
         console.log("group name: ", res)
+      })
+    }
+    if (!this.listOfParameters) {
+      var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
+      this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
+        this.listOfParameters = res;
+        console.log(this.listOfParameters)
       })
     }
     console.log(id);
@@ -608,14 +621,16 @@ export class ExaminationEditComponent implements OnInit {
   }
 
   onChangeType(type: any) {
-    this.getListTestingGroupByType();
-    console.log(type);
     if (type == '1') {
       this.examinationTypeNvl = true;
     } else {
       this.examinationTypeNvl = false;
     }
     this.examinationType = type;
+    setTimeout(() => {
+      this.getListTestingGroupByType();
+    }, 100);
+    console.log("check type", type, this.listOfCriticalGroup);
   }
 
   getinfor() {
@@ -687,16 +702,19 @@ export class ExaminationEditComponent implements OnInit {
       var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'NVL' }
       this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
         this.listOfCriticalGroup = res;
+        console.log("check nhom tieu chi 1", this.listOfCriticalGroup);
       })
     } else if (this.examinationType === '2') {
       var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'LKDT' }
       this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
         this.listOfCriticalGroup = res;
+        console.log("check nhom tieu chi 2", this.listOfCriticalGroup);
       })
     } else if (this.examinationType === '3') {
       var data = { testingCriticalGroup: this.testingCriticalGroup, type: 'Đánh giá CL SP' }
       this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
         this.listOfCriticalGroup = res;
+        console.log("check nhom tieu chi 3", this.listOfCriticalGroup);
       })
     }
   }

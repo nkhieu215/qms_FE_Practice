@@ -34,9 +34,9 @@ import Swal from 'sweetalert2';
 })
 export class TestingCriticalComponent {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  // address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCritical: any;
   listOfCriticalGroup: any;
@@ -158,7 +158,7 @@ export class TestingCriticalComponent {
     this.body.itemPerPage = this.itemPerPage;
     this.body.testingName = this.testingName;
     this.body.offSet = (this.pageNumber - 1) * this.itemPerPage;
-    console.log('body: ', this.body);
+    // console.log('body: ', this.body);
   }
   nextPage(): void {
     this.pageNumber++;
@@ -216,7 +216,7 @@ export class TestingCriticalComponent {
         this.nextPageBtn = false;
         this.lastPageBtn = false;
       }
-      console.log('total data', res, Math.floor(this.totalData / this.itemPerPage));
+      // console.log('total data', res, Math.floor(this.totalData / this.itemPerPage));
     });
   }
   getTestingCriticalListPg(): void {
@@ -225,13 +225,13 @@ export class TestingCriticalComponent {
       for (let i = 0; i < this.listOfCritical.length; i++) {
         this.listOfCritical[i].typeList = this.listOfCritical[i].type.split(',');
       }
-      console.log("tieu chi: ", this.listOfCritical);
+      // console.log("tieu chi: ", this.listOfCritical);
     })
   }
   getTestingCriticalGroupList(): void {
     this.http.get<any>(`${this.address}/${this.path}/group/get-all`).subscribe(res => {
       this.listOfCriticalGroup = res;
-      console.log("nhom tieu chi", this.listOfCriticalGroup)
+      // console.log("nhom tieu chi", this.listOfCriticalGroup)
     })
   }
   getTestingCriticalList(): void {
@@ -245,7 +245,7 @@ export class TestingCriticalComponent {
       if (this.testingCriticalGroup === this.listOfCriticalGroup[i].testingCriticalGroup) {
         this.testingGroupId = this.listOfCriticalGroup[i].id;
         this.listOfCriticalFilter = this.listOfCriticalOrigin.filter((item: any) => item.testingGroupId === this.testingGroupId);
-        console.log("filter tieu chi", this.listOfCriticalFilter)
+        // console.log("filter tieu chi", this.listOfCriticalFilter)
       }
     }
   }
@@ -303,7 +303,7 @@ export class TestingCriticalComponent {
     this.testingName = this.listOfCritical[index].testingName;
     this.bodyUpdate.updateAt = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     this.bodyUpdate.status = this.listOfCritical[index].status;
-    console.log("insert", this.bodyUpdate)
+    // console.log("insert", this.bodyUpdate)
   }
   close() {
     this.updatePopup = false;
@@ -342,7 +342,7 @@ export class TestingCriticalComponent {
         typeResult.push('NVL')
       }
       this.bodyUpdate.type = typeResult.join(',')
-      console.log("update:", this.bodyUpdate)
+      // console.log("update:", this.bodyUpdate)
       this.http.post(`${this.address}/${this.path}/update`, this.bodyUpdate).subscribe(() => {
         this.popupSubmit('Thành công')
       })
@@ -360,7 +360,7 @@ export class TestingCriticalComponent {
             typeResult.push('NVL')
           }
           this.bodyUpdate.type = typeResult.join(',')
-          console.log("update:", this.bodyUpdate)
+          // console.log("update:", this.bodyUpdate)
           this.http.post(`${this.address}/${this.path}/update`, this.bodyUpdate).subscribe(() => {
             this.popupSubmit('Thành công')
           })
@@ -374,13 +374,13 @@ export class TestingCriticalComponent {
   changeStatus(index: any) {
     if (this.listOfCritical[index].status == 'Active') {
       this.listOfCritical[index].status = 'Deactivate';
-      console.log('update', this.listOfCritical[index]);
+      // console.log('update', this.listOfCritical[index]);
       this.http.post(`${this.address}/${this.path}/update`, this.listOfCritical[index]).subscribe(() => {
         this.popupConfirm('Cập nhật thành công');
       })
     } else {
       this.listOfCritical[index].status = 'Active';
-      console.log('insert', this.listOfCritical[index]);
+      // console.log('insert', this.listOfCritical[index]);
       this.http.post(`${this.address}/${this.path}/update`, this.listOfCritical[index]).subscribe(() => {
         this.popupConfirm('Cập nhật thành công');
       })
@@ -393,7 +393,7 @@ export class TestingCriticalComponent {
         this.testingGroupId = this.listOfCriticalGroup[i].id;
       }
     }
-    console.log("check id:", this.testingGroupId)
+    // console.log("check id:", this.testingGroupId)
   }
   saveInfor() {
     if (this.testingCriticalGroup === '') {

@@ -152,7 +152,7 @@ export class ApproveStoreSapComponent implements OnInit {
       })
     }
 
-    if(type =='show'){
+    if (type == 'show') {
       this.lstview = false;
       this.show_work_order = false;
     }
@@ -248,7 +248,7 @@ export class ApproveStoreSapComponent implements OnInit {
       this.optionsKhoBh = data.lstKhoBhDTOS
       this.optionsOwhs = data.lstOwhsDTOS
       this.form.dateApproveSap = new Date();
-      console.log(this.optionsKhoBh);
+      // console.log(this.optionsKhoBh);
     })
 
 
@@ -306,7 +306,7 @@ export class ApproveStoreSapComponent implements OnInit {
 
   onApprove(approve: any) {
 
-    console.log(this.dataApprove);
+    // console.log(this.dataApprove);
     this.dataApprove.storeId = this.approveId;
     this.dataApprove.action = approve;
     this.dataApprove.id = this.id;

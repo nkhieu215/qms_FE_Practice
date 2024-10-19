@@ -104,7 +104,7 @@ export class ApproveRequestComponent implements OnInit {
     }
 
     let data = await this.iqcService.getAll(this.page, this.pageSize, dataSearch, '', Constant.IQC_TYPE_APPROVE)
-    console.log(data)
+    // console.log(data)
     this.examiantionRes = data;
     this.auditnvl = data.lst;
     this.collectionSize = Number(this.examiantionRes?.total) * this.pageSize;
@@ -160,7 +160,7 @@ export class ApproveRequestComponent implements OnInit {
     this.form.templateCode = data.component.templateCode;
     this.form.elecCompCode = data.component.elecCompCode;
     this.arrErrChild = data.component.resultError
-    console.log('check result : ', this.form)
+    // console.log('check result : ', this.form)
   }
 
   delete(id?: any) {
@@ -283,7 +283,7 @@ export class ApproveRequestComponent implements OnInit {
     const data = { errCode: this.errCode, errName: this.errName, errGroup: this.errGroup, itemCode: this.itemCode, electCompId: this.id };
     this.http.post<any>(`${this.address}/${this.path}/errors/search`, data).subscribe(res => {
       this.listOfError = res;
-      console.log('list errors: ', res, this.id);
+      // console.log('list errors: ', res, this.id);
     })
   }
   getLstItemCode() {
@@ -351,7 +351,7 @@ export class ApproveRequestComponent implements OnInit {
   getListErrorById(errGroup: any, index: any) {
     var data = this.listErrorGroup.find((item: any) => item.errGroup === errGroup);
     this.http.get<any>(`${this.address}/${this.path}/errors/group/get-all/${data.id}`).subscribe(res => {
-      console.log("check result", res)
+      // console.log("check result", res)
       this.listErrors = res;
       setTimeout(() => {
         if (this.listErrors.length === 0) {

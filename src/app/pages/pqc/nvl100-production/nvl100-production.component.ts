@@ -1051,12 +1051,13 @@ export class Nvl100ProductionComponent implements OnInit {
               const data = { partNumber: y.name, material: z.materialId, status: 'Chưa scan' };
               this.totalNotScan++;
               this.lstMaterialScanOrigin.push(data);
-              this.lstMaterialScan.push(data);
             }
           })
         })
       })
-
+      setTimeout(() => {
+        this.lstMaterialScan = this.lstMaterialScanOrigin.sort((a: any, b: any) => a.status.localeCompare(b.status));
+      }, 1000);
       console.log(this.lstMaterialScan)
     }
   }
