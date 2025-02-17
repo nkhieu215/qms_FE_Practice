@@ -1,21 +1,27 @@
 import { Injectable } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
+  CanActivateChild,
   Router,
-  RouterStateSnapshot
+  RouterStateSnapshot,
+  UrlTree
 } from '@angular/router';
 import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
+import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard extends KeycloakAuthGuard {
+export class AuthGuard extends KeycloakAuthGuard implements CanActivateChild {
   constructor(
     protected override readonly router: Router,
     protected readonly keycloak: KeycloakService
   ) {
     super(router, keycloak);
+  }
+  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return this.isAccessAllowed(childRoute, state);
   }
 
   public async isAccessAllowed(
@@ -40,13 +46,13 @@ export class AuthGuard extends KeycloakAuthGuard {
     console.log();
     // Allow the user to proceed if all the required roles are present.
     let check = false;
-    requiredRoles.forEach(role=>{
-      if(this.roles.includes(role)){
+    requiredRoles.forEach(role => {
+      if (this.roles.includes(role)) {
         check = true;
         return;
       }
     })
-    requiredRoles.every( (role) => this.roles.includes(role) );
+    requiredRoles.every((role) => this.roles.includes(role));
     console.log("check role ::" + check + " | requiredRoles ::" + requiredRoles + " | roles :: " + this.roles);
 
     if (!check) {

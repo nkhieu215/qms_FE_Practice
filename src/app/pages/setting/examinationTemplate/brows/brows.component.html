@@ -75,14 +75,14 @@
         </td>
         <td>{{ examination.code}}</td>
         <td>
-           <p *ngIf="examination.status ==1" [ngClass]="{greenClass: examination.status ===1}"> Active </p>
+          <p *ngIf="examination.status ==1" [ngClass]="{greenClass: examination.status ===1}"> Active </p>
           <p *ngIf="examination.status ==0" [ngClass]="{redClass:examination.status === 0}"> Deactivate </p>
         </td>
         <td>
           <p *ngIf="examination.type ==1"> NVL / BTP/ TP</p>
           <p *ngIf="examination.type ==2"> LKDT/BTP</p>
         </td>
-        <td>{{ examination.createdAt | date:'dd/MM/YYYY hh:ss'}}</td>
+        <td>{{ examination.createdAt | date:'dd/MM/yyyy hh:ss'}}</td>
         <td class="text-center">
           <div class="btn-group">
             <button class="btn btn-sm btn-success" (click)="copy(examination.id)" title="Copy mẫu biên bản">

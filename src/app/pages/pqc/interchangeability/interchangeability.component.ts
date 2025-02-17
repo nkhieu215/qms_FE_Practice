@@ -19,6 +19,7 @@ import { InterchangeabilityService } from 'src/app/share/_services/interchangeab
 import { ScadaRequestService } from 'src/app/share/_services/scada-request.service';
 import { Interchangeability } from 'src/app/share/_models/interchangeability.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-interchangeability',
@@ -43,7 +44,8 @@ export class InterchangeabilityComponent implements OnInit {
     private errorService: ErrorListService,
     private interchangeabilityService: InterchangeabilityService,
     private scadaService: ScadaRequestService,
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -78,7 +80,7 @@ export class InterchangeabilityComponent implements OnInit {
   lstErrorGr?: ErrorList[];
   lstErrorRes?: ErrorListResponse;
   ngOnInit(): void {
-
+    // this.autoLogout.autoLogout(0);
     this.getInfo();
 
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -135,7 +137,7 @@ export class InterchangeabilityComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if(id){
+    if (id) {
       this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
         this.form = data.pqcWorkOrder;
         this.lstInterchangeabilityCompCheckResponse = data.pqcWorkOrder.lstInter;
@@ -154,6 +156,8 @@ export class InterchangeabilityComponent implements OnInit {
             check.line = element.line;
             check.checkPerson = element.checkPerson;
             check.checkTime = element.checkTime;
+            check.createdAt = element.createdAt;
+            check.updatedAt = element.updatedAt;
             check.quatity = element.quatity;
             check.conclude = element.conclude;
             check.note = element.note;
@@ -161,6 +165,10 @@ export class InterchangeabilityComponent implements OnInit {
             check.id = element.id;
             this.lstInterchangeabilityompCheck.push(check);
           });
+        setTimeout(() => {
+          this.lstInterchangeabilityompCheck.sort((a: any, b: any) => b.createdAt - a.createdAt);
+        }, 300);
+        console.log(this.lstInterchangeabilityCompCheckResponse)
       });
     }
 
@@ -226,7 +234,8 @@ export class InterchangeabilityComponent implements OnInit {
       powMin,
       quatity,
       total,
-      operators
+      operators,
+      createdAt
     } = this.formEx;
 
     var check = new Interchangeability();
@@ -241,6 +250,8 @@ export class InterchangeabilityComponent implements OnInit {
     check.line = line;
     check.checkPerson = checkPerson;
     check.checkTime = checkTime;
+    check.createdAt = createdAt;
+    check.updatedAt = new Date();
     check.quatity = quatity;
     check.conclude = conclude;
     check.workOrderId = this.actRoute.snapshot.params['id'];
@@ -249,13 +260,13 @@ export class InterchangeabilityComponent implements OnInit {
     check.id = id;
     this.interchangeabilityService.createUpdate(check).toPromise().then(
       data => {
-        if(id){
+        if (id) {
           Swal.fire(
             'Thành công',
             'Bạn đã thực hiện cập nhật thông tin kiểm tra thành công.',
             'success'
           )
-        }else{
+        } else {
           Swal.fire(
             'Thêm mới thông tin',
             'Bạn đã thực hiện thêm mới thông tin kiểm tra thành công.',
@@ -272,7 +283,7 @@ export class InterchangeabilityComponent implements OnInit {
     )
 
 
-    // console.log(this.lstInterchangeabilityompCheck);
+    console.log(check);
   }
 
   deleteCheck(id: any) {
@@ -340,10 +351,11 @@ export class InterchangeabilityComponent implements OnInit {
 
     this.formEx = {};
     this.formEx.checkPerson = this.tokenStorage.getUsername();
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.onEditCheck(idError);
     let found = this.lstInterchangeabilityompCheck?.find((element) => (element.ids == idError));
     this.formEx.id = found?.id;
+    this.formEx.createdAt = found?.createdAt;
     console.log(this.formEx)
     this.totalCheckElement = Number(found?.quatity);
 

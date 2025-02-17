@@ -30,6 +30,7 @@
                   <th>Người thực hiện</th>
                   <th>Số lượng kiểm tra</th>
                   <th>Thời gian thực hiện</th>
+                  <th>Thời gian cập nhật</th>
                   <th>Kết luận</th>
                   <th>Ghi chú</th>
                   <th>Tùy chọn</th>
@@ -40,7 +41,8 @@
                   <td>{{i +1 }}</td>
                   <td>{{check.createdBy}}</td>
                   <td>{{check.quantity}}</td>
-                  <td>{{check.createdAt | date:'dd/MM/YYYY hh:ss' }}</td>
+                  <td>{{check.createdAt | date:'dd/MM/yyyy hh:ss' }}</td>
+                  <td>{{check.updatedAt | date:'dd/MM/yyyy hh:ss' }}</td>
                   <td>{{check.conclude}}</td>
                   <td>{{check.note}}</td>
                   <td>

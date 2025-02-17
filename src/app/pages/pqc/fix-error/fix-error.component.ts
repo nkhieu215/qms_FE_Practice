@@ -21,6 +21,7 @@ import { FixError } from 'src/app/share/_models/fix_error.model';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { FormControl } from '@angular/forms';
 import { Observable, map, startWith } from 'rxjs';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-fix-error',
   templateUrl: './fix-error.component.html',
@@ -28,13 +29,13 @@ import { Observable, map, startWith } from 'rxjs';
 })
 export class FixErrorComponent implements OnInit {
   @Input() show_check = '';
-  @Input() woData: any ;
+  @Input() woData: any;
   idWorkOrder?: string;
   show_work_order = true;
-  lstProcess ?:any[];
+  lstProcess?: any[];
   errorNameForm = new FormControl('');
   filteredError?: Observable<string[]>;
-  wo:any;
+  wo: any;
   lstview = true;
   crud = false;
   create = false;
@@ -46,7 +47,8 @@ export class FixErrorComponent implements OnInit {
     private tokenStorage: KeycloakService,
     private fixErrorService: PQCFixErrService,
     private errorService: ErrorListService,
-    private commonservice: CommonService
+    private commonservice: CommonService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -68,6 +70,7 @@ export class FixErrorComponent implements OnInit {
 
   formErrorChild: any = {};
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.getInfo();
   }
 
@@ -81,7 +84,7 @@ export class FixErrorComponent implements OnInit {
     }
 
     if (type == 'add') {
-      this.commonservice.getSettingProcess().subscribe(data=>{
+      this.commonservice.getSettingProcess().subscribe(data => {
         this.lstProcess = data.lstSettingProcess;
       })
 
@@ -118,18 +121,18 @@ export class FixErrorComponent implements OnInit {
 
     if (type == 'add' || type == 'show' || type == 'edit') {
       console.log("wo ::" + this.wo)
-      if(this.wo == null){
+      if (this.wo == null) {
         this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
           this.form = data.pqcWorkOrder;
           this.lstErrorFix = data.pqcWorkOrder.lstFixErr;
-          this.lstErrorFix.forEach(element=>{
+          this.lstErrorFix.forEach(element => {
             element.ids = Utils.randomString(5);
           })
         });
-      }else{
-        this.form =  this.wo.pqcWorkOrder;
-        this.lstErrorFix =  this.wo.pqcWorkOrder.lstFixErr;
-        this.lstErrorFix.forEach(element=>{
+      } else {
+        this.form = this.wo.pqcWorkOrder;
+        this.lstErrorFix = this.wo.pqcWorkOrder.lstFixErr;
+        this.lstErrorFix.forEach(element => {
           element.ids = Utils.randomString(5);
         })
       }
@@ -173,7 +176,7 @@ export class FixErrorComponent implements OnInit {
 
   lstErrorFix: FixError[] = [];
   onAddError() {
-    const {quantity,quantityErr, errGr,errName,serial,ratio, note,lotNumber,conclude,materials,stage } = this.formEx;
+    const { quantity, quantityErr, errGr, errName, serial, ratio, note, lotNumber, conclude, materials, stage } = this.formEx;
 
     var check = new FixError();
     check.errGr = errGr;
@@ -202,7 +205,7 @@ export class FixErrorComponent implements OnInit {
       this.lstErrorFix.push(check);
       this.formEx = {};
     },
-    (error) => { })
+      (error) => { })
   }
 
   deleteCheck(id: any) {
@@ -226,7 +229,7 @@ export class FixErrorComponent implements OnInit {
               )
               this.lstErrorFix?.splice(index, 1);
             },
-            (error) => { })
+              (error) => { })
           }
         });
       } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -250,7 +253,7 @@ export class FixErrorComponent implements OnInit {
         this.formEx.quantityErr = element.quantityErr;
         this.formEx.note = element.note;
         this.formEx.id = element.id;
-        this.formEx.materials = element.materials ;
+        this.formEx.materials = element.materials;
         this.formEx.stage = element.stage;
       }
     });
@@ -281,7 +284,7 @@ export class FixErrorComponent implements OnInit {
           this.modalService.dismissAll();
           this.formEx = {};
         },
-        (error) => { })
+          (error) => { })
 
 
       }
@@ -343,7 +346,7 @@ export class FixErrorComponent implements OnInit {
       }
     });
 
-    this.lstError.forEach(element=>{
+    this.lstError.forEach(element => {
       this.optionsError.push(element.name)
     })
 
@@ -368,14 +371,14 @@ export class FixErrorComponent implements OnInit {
   open(content: any, idError: any) {
     this.formEx = {};
     console.log(idError);
-    if(idError != ''){
+    if (idError != '') {
       this.editCheck(idError);
-    }else{
+    } else {
       this.formEx.lotNumber = this.wo.lotNumber
     }
 
 
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.modalService.open(content, this.modalOptions).result.then(
       (result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -404,7 +407,7 @@ export class FixErrorComponent implements OnInit {
     this.formEx.ratio = number.toFixed(2) + '%';
   }
 
-  changeWo(data:any){
+  changeWo(data: any) {
     this.wo = data;
     console.log("wo ::" + this.wo)
   }

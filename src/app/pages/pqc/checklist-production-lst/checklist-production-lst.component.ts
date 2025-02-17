@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import Utils from 'src/app/share/_utils/utils';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-checklist-production-lst',
@@ -11,9 +12,11 @@ import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcP
 })
 export class ChecklistProductionLstComponent implements OnInit {
 
-  constructor(private pqcService: PQCService) { }
+  constructor(private pqcService: PQCService,
+    protected autoLogout: AuthService) { }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.refreshPage();
   }
   page = 1;
@@ -29,8 +32,8 @@ export class ChecklistProductionLstComponent implements OnInit {
   };
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status, workOrderCode } = this.formSearch;
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "CREATE", startDate, endDate, sap, woCode, status, '', '', workOrderCode).subscribe(
+    const { name, code, lot, startDate, endDate, sap, woCode, status, workOrderCode, version } = this.formSearch;
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "CREATE", startDate, endDate, sap, woCode, status, '', '', workOrderCode, version).subscribe(
       data => {
         var productionLst = new PQCPEndingOrderResponse();
         productionLst = data;

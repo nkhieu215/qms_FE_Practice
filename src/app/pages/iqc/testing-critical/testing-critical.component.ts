@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-testing-critical',
@@ -34,9 +35,9 @@ import Swal from 'sweetalert2';
 })
 export class TestingCriticalComponent {
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCritical: any;
   listOfCriticalGroup: any;
@@ -141,6 +142,7 @@ export class TestingCriticalComponent {
   constructor(
     protected http: HttpClient,
     private modalService: NgbModal,
+    protected autoLogout: AuthService
   ) { }
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -250,6 +252,7 @@ export class TestingCriticalComponent {
     }
   }
   ngOnInit() {
+    this.autoLogout.autoLogout(0, 'testing critical');
     this.getTestingCriticalListPg();
     this.getTotalData();
     this.getTestingCriticalGroupList();

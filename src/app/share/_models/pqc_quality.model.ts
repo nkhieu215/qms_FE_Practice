@@ -4,11 +4,12 @@ export class PqcQuality {
   workOrderId?: string;
   note?: string;
   createdAtClient?: any;
-  createdAt?:string;
+  createdAt?: string;
+  updatedAt?: string;
   conclude?: string;
-  lstCheck:Array<AuditCriteriaQuality> =  [];
+  lstCheck: Array<AuditCriteriaQuality> = [];
   id?: string;
-  ids?:string;
+  ids?: string;
   quantity?: number;
-  checked?:string;
+  checked?: any;
 }

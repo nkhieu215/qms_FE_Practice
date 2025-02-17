@@ -8,6 +8,7 @@ import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
 import Utils from 'src/app/share/_utils/utils';
 import { ErrorScadaResponse } from 'src/app/share/response/examination/ErrorScadaResponse';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-error-edit',
@@ -17,9 +18,11 @@ import { ErrorScadaResponse } from 'src/app/share/response/examination/ErrorScad
 export class ErrorEditComponent implements OnInit {
 
 
-  constructor(private errorService: ErrorListService, private modalService: NgbModal, private exampleService: ExaminationService) { }
+  constructor(private errorService: ErrorListService, private modalService: NgbModal, private exampleService: ExaminationService,
+    protected autoLogout: AuthService) { }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.searchExaminationCtrl.valueChanges
       .pipe(
         filter((res) => {
@@ -111,9 +114,9 @@ export class ErrorEditComponent implements OnInit {
     console.log(this.selectExamination);
     var nameSelect = "";
 
-    if(this.isString(this.selectExamination)){
+    if (this.isString(this.selectExamination)) {
       nameSelect = this.selectExamination;
-    }else{
+    } else {
       nameSelect = this.selectExamination.name
     }
 
@@ -121,10 +124,10 @@ export class ErrorEditComponent implements OnInit {
     this.arrErrChild.push(errorChild);
 
     this.formErrorChild = {};
-    this.check=false;
+    this.check = false;
   }
 
-  isString(value:any) {
+  isString(value: any) {
     return typeof value === 'string' || value instanceof String;
   }
 
@@ -170,6 +173,6 @@ export class ErrorEditComponent implements OnInit {
   onSelected() {
     console.log(this.selectExamination);
     this.strSelect = this.selectExamination.name;
-   this.formErrorChild.errorCode = this.selectExamination.label
+    this.formErrorChild.errorCode = this.selectExamination.label
   }
 }

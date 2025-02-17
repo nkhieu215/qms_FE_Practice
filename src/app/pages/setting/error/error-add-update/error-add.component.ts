@@ -8,6 +8,7 @@ import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import Utils from 'src/app/share/_utils/utils';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorScadaResponse } from 'src/app/share/response/examination/ErrorScadaResponse';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-error-add',
@@ -20,9 +21,11 @@ export class ErrorAddComponent implements OnInit {
     private errorService: ErrorListService,
     private modalService: NgbModal,
     private actRoute: ActivatedRoute,
-    private route: Router) { }
+    private route: Router,
+    protected autoLogout: AuthService) { }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.searchExaminationCtrl.valueChanges
       .pipe(
         filter((res) => {
@@ -48,24 +51,24 @@ export class ErrorAddComponent implements OnInit {
         console.log(this.filterError.lstError);
       });
 
-      var id = this.actRoute.snapshot.params['id'];
-      if(id == 0){
+    var id = this.actRoute.snapshot.params['id'];
+    if (id == 0) {
 
-      }else{
+    } else {
 
-        this.errorService.getInfo(id).toPromise().then(
-          data=>{
-              this.form = data.error
-              this.arrErrChild = data.error.errChild
-              this.arrErrChild.forEach(element=>{
-                element.ids = Utils.randomString(5);
-              })
-          },error=>{}
-        )
+      this.errorService.getInfo(id).toPromise().then(
+        data => {
+          this.form = data.error
+          this.arrErrChild = data.error.errChild
+          this.arrErrChild.forEach(element => {
+            element.ids = Utils.randomString(5);
+          })
+        }, error => { }
+      )
 
-        this.form.id = id;
+      this.form.id = id;
 
-      }
+    }
   }
 
 
@@ -116,7 +119,7 @@ export class ErrorAddComponent implements OnInit {
             'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
             'success'
           )
-          this.route.navigate(['error-add-edit/'+data.id]);
+          this.route.navigate(['error-add-edit/' + data.id]);
         } else {
           Swal.fire(
             'Lỗi',
@@ -140,16 +143,16 @@ export class ErrorAddComponent implements OnInit {
     console.log(this.selectExamination);
     var nameSelect = "";
 
-    if(this.isString(this.selectExamination)){
+    if (this.isString(this.selectExamination)) {
       nameSelect = this.selectExamination;
-    }else{
+    } else {
       nameSelect = this.selectExamination.name
     }
     const errorChild = new ErrorList(nameSelect, description, errorCode, [], Utils.randomString(5));
     this.form.id = this.form.id ?? '';
-    if(this.form.id != '' ){
+    if (this.form.id != '') {
       errorChild.parentId = this.form.id;
-      this.errorService.createOne(errorChild).toPromise().then(data=>{
+      this.errorService.createOne(errorChild).toPromise().then(data => {
         Swal.fire(
           'Thành công',
           'Thêm mới thông tin thành công.',
@@ -157,16 +160,16 @@ export class ErrorAddComponent implements OnInit {
         )
 
         errorChild.id = data.id;
-      }, error=>{})
+      }, error => { })
     }
 
     this.arrErrChild.push(errorChild);
 
     this.formErrorChild = {};
-    this.check=false;
+    this.check = false;
   }
 
-  isString(value:any) {
+  isString(value: any) {
     return typeof value === 'string' || value instanceof String;
   }
 
@@ -175,7 +178,7 @@ export class ErrorAddComponent implements OnInit {
     this.arrErrChild.forEach((element, index) => {
       if (element.ids == ids) {
         this.errorService.delete(element.id).toPromise().then(
-          data=>{
+          data => {
             Swal.fire(
               'Thành công',
               'Xóa thông tin thành công.',
@@ -183,7 +186,7 @@ export class ErrorAddComponent implements OnInit {
             )
             this.arrErrChild.splice(index, 1);
           },
-          error=>{}
+          error => { }
         )
 
       }
@@ -229,6 +232,6 @@ export class ErrorAddComponent implements OnInit {
   onSelected() {
     console.log(this.selectExamination);
     this.strSelect = this.selectExamination.name;
-   this.formErrorChild.errorCode = this.selectExamination.label
+    this.formErrorChild.errorCode = this.selectExamination.label
   }
 }

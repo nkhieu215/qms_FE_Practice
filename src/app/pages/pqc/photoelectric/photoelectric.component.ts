@@ -21,6 +21,7 @@ import { AuditCriteriaParam } from 'src/app/share/_models/auditCriteriaParam.mod
 import { ExaminationResponse } from 'src/app/share/response/examination/ExaminationResponse';
 import { AuditCriteriaLKDT2 } from 'src/app/share/_models/auditCriteriaLkdt2.model';
 import { PqcPhotoelectric } from 'src/app/share/_models/pqc_photoelectric.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-photoelectric',
   templateUrl: './photoelectric.component.html',
@@ -44,6 +45,7 @@ export class PhotoelectricComponent implements OnInit {
     private exampleService: ExaminationService,
     private photoelectricService: PQCPhotoelectricService,
     private exportExelService: ExportExcelService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -75,6 +77,7 @@ export class PhotoelectricComponent implements OnInit {
   lstCheck?: any[] = [];
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.checkPerson = this.tokenStorage.getUsername();
     this.getInfo();
     // auto search
@@ -148,6 +151,9 @@ export class PhotoelectricComponent implements OnInit {
         this.lstCheck?.forEach(element => {
           element.ids = Utils.randomString(5)
         })
+        setTimeout(() => {
+          this.lstCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
+        }, 300);
       });
     }
   }
@@ -256,9 +262,9 @@ export class PhotoelectricComponent implements OnInit {
       function getValueByCol(col: number, type: string) {
         var arr = filteredData.map(item => item[col]);
 
-        arr =  arr.filter(function( element ) {
+        arr = arr.filter(function (element) {
           return Number.isFinite(element);
-       });
+        });
 
         if (type == 'min') {
           const min = Math.min(...arr);
@@ -266,7 +272,7 @@ export class PhotoelectricComponent implements OnInit {
         }
         if (type == 'max') {
           const max = Math.max(...arr);
-          return   Number.isFinite(max) ? max : 0;
+          return Number.isFinite(max) ? max : 0;
         }
         if (type == 'avg') {
           const sum = arr.reduce((a, b) => a + b, 0);
@@ -286,25 +292,25 @@ export class PhotoelectricComponent implements OnInit {
         element.s = this.checkS(element.data, element.avgResult);
 
         element.maxAudit = element.maxAudit ?? '';
-        element.minAudit =  element.minAudit ?? '';
+        element.minAudit = element.minAudit ?? '';
 
         element.ku = this.checkKu(element.maxAudit, element.avgResult, element.s);
         element.kl = this.checkKl(element.minAudit, element.avgResult, element.s);
         element.cpkUp = this.checkCpkUp(element.maxAudit, element.avgResult, element.s);
         element.cpkLow = this.checkCpkLow(element.minAudit, element.avgResult, element.s);
 
-        if(element.maxAudit && element.minAudit){
+        if (element.maxAudit && element.minAudit) {
           element.kmin = Math.min(element.ku, element.kl);
           element.cpk = Math.min(element.cpkUp, element.cpkLow);
         }
-        else if(element.maxAudit && !element.minAudit){
+        else if (element.maxAudit && !element.minAudit) {
           element.kmin = element.ku;
           element.cpk = element.cpkUp;
         }
-        else if(!element.maxAudit && element.minAudit){
+        else if (!element.maxAudit && element.minAudit) {
           element.kmin = element.kl;
           element.cpk = element.cpkLow;
-        }else{
+        } else {
           element.kmin = '';
           element.cpk = '';
         }
@@ -346,7 +352,7 @@ export class PhotoelectricComponent implements OnInit {
 
   checkCpkUp(maxAudit: any, avg: any, s: any) {
     if (maxAudit && Number(maxAudit) != 0) {
-      return ((maxAudit - avg) / (3* s)).toFixed(4);
+      return ((maxAudit - avg) / (3 * s)).toFixed(4);
     } else {
       return '';
     }
@@ -355,7 +361,7 @@ export class PhotoelectricComponent implements OnInit {
 
   checkCpkLow(minAudit: any, avg: any, s: any) {
     if (minAudit && Number(minAudit) != 0) {
-      return ((avg - minAudit) / (3*s)).toFixed(4);
+      return ((avg - minAudit) / (3 * s)).toFixed(4);
     } else {
       return '';
     }

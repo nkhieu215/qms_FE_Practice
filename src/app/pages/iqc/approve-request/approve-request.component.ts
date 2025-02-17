@@ -16,6 +16,11 @@ import { CommonService } from 'src/app/share/_services/common.service';
 import { Constant } from 'src/app/share/_services/constant';
 import Utils from 'src/app/share/_utils/utils';
 import { HttpClient } from '@angular/common/http';
+import { FormControl } from '@angular/forms';
+import { OitmResponse } from 'src/app/share/response/oitm/OitmResponse';
+import { debounceTime, distinctUntilChanged, filter, finalize, switchMap, tap } from 'rxjs';
+import { StoreCheckService } from 'src/app/share/_services/store_check.service';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-approve-request',
   templateUrl: './approve-request.component.html',
@@ -24,9 +29,9 @@ import { HttpClient } from '@angular/common/http';
 export class ApproveRequestComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
@@ -74,43 +79,111 @@ export class ApproveRequestComponent implements OnInit {
   typeAction?: any;
   statusStr?: string;
   arrErrChild: Array<ErrorElectronicComponent> = [];
-
+  selectedOrigin: any = '';
+  searchOriginCtrl = new FormControl();
+  displayWith(value: any) {
+    return value?.Title;
+  }
+  isLoadingOrigin = false;
+  filteredOrigin = new OitmResponse();
+  strSelectOrigin: any = '';
+  minLengthOrigin = 2;
+  errorMsg!: string;
+  openList = '';
   constructor(
     private iqcService: IqcCheckService,
     private tokenStorage: KeycloakService,
-    private actRoute: ActivatedRoute,
+    protected actRoute: ActivatedRoute,
     private modalService: NgbModal,
     private commonService: CommonService,
     private router: Router,
-    protected http: HttpClient
-
+    protected http: HttpClient,
+    protected storeCheckService: StoreCheckService,
+    protected autoLogout: AuthService
   ) {
     this.refreshExamination();
   }
   async refreshExamination() {
 
-    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType, type } = this.formSearch;
+    if (this.actRoute.snapshot.params['list'] != undefined) {
+      this.openList = this.actRoute.snapshot.params['list'];
+    }
+    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType, type, origin, createBy, grpoNumber } = this.formSearch;
     const dataSearch = {
       name: name,
       code: code,
       iqcCode: iqcCode,
       reportCode: reportCode,
-      startDate: startDate ? startDate + " 00:00:00" : null,
-      endDate: endDate ? endDate + " 23:59:59" : null,
+      // startDate: startDate ? startDate + " 00:00:00" : null,
+      // endDate: endDate ? endDate + " 23:59:59" : null,
+      startDate: startDate ? startDate : null,
+      endDate: endDate ? endDate : null,
       status: status,
       itemType: itemType,
       invoiceNumber: invoiceNumber,
-      type: type
+      type: type,
+      origin: origin,
+      createBy: createBy,
+      grpoNumber: grpoNumber
     }
-
-    let data = await this.iqcService.getAll(this.page, this.pageSize, dataSearch, '', Constant.IQC_TYPE_APPROVE)
-    // console.log(data)
-    this.examiantionRes = data;
-    this.auditnvl = data.lst;
-    this.collectionSize = Number(this.examiantionRes?.total) * this.pageSize;
+    if (this.actRoute.snapshot.params['list'] == 'show') {
+      let data = await this.iqcService.getAll(this.page, this.pageSize, dataSearch, '10', Constant.IQC_TYPE_APPROVE)
+      console.log(data)
+      this.examiantionRes = data;
+      this.auditnvl = data.lst;
+      this.collectionSize = Number(this.examiantionRes?.total) * this.pageSize;
+    } else {
+      let data = await this.iqcService.getAll(this.page, this.pageSize, dataSearch, '', Constant.IQC_TYPE_APPROVE)
+      console.log(data)
+      this.examiantionRes = data;
+      this.auditnvl = data.lst;
+      this.collectionSize = Number(this.examiantionRes?.total) * this.pageSize;
+    }
   }
-
+  exportFile() {
+    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType, type, origin } = this.formSearch;
+    const dataSearch = {
+      name: name ? name : '',
+      code: code ? code : '',
+      iqcCode: iqcCode ? iqcCode : '',
+      reportCode: reportCode ? reportCode : '',
+      startDate: startDate ? startDate + " 00:00:00" : null,
+      endDate: endDate ? endDate + " 23:59:59" : null,
+      status: status ? status : '',
+      itemType: itemType ? itemType : '',
+      invoiceNumber: invoiceNumber ? invoiceNumber : '',
+      type: type ? type : '',
+      origin: origin ? origin : ''
+    }
+    let fileName = "Report_IQC_" + this.tokenStorage.getUsername() + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx"
+    this.iqcService.downloadfile(0, fileName, { param: dataSearch });
+    console.log("check result", dataSearch)
+  }
   ngOnInit(): void {
+    this.autoLogout.autoLogout(0, 'approve iqc');
+    this.searchOriginCtrl.valueChanges
+      .pipe(
+        filter((res) => {
+          return res !== null && res.length >= this.minLengthOrigin;
+        }),
+        distinctUntilChanged(),
+        debounceTime(1000),
+        tap(() => {
+          this.errorMsg = '';
+
+          this.isLoadingOrigin = true;
+        }),
+        switchMap((value) =>
+          this.storeCheckService.searchBycode(value).pipe(
+            finalize(() => {
+              this.isLoadingOrigin = false;
+            })
+          )
+        )
+      )
+      .subscribe((data: any) => {
+        this.filteredOrigin = data;
+      });
     this.typeAction = this.actRoute.snapshot.params['type'];
     this.id = this.actRoute.snapshot.params['id'];
     if (this.typeAction && (this.typeAction == 'approve' || this.typeAction == 'show')) {
@@ -119,13 +192,20 @@ export class ApproveRequestComponent implements OnInit {
 
     }
   }
-
+  sortList(type: any) {
+    if (type == 1) {
+      this.lstAuditCriteriaNvl = this.lstAuditCriteriaNvl.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    } else {
+      this.lstAuditCriteriaLKDT = this.lstAuditCriteriaLKDT.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    }
+  }
   async loadInfo() {
     var id = this.actRoute.snapshot.params['id'];
     this.http.get<any>(`${this.address}/${this.path}/iqc/get-all/${this.id}`).subscribe(res => {
       this.listOfItem = res;
       setTimeout(() => {
         if (this.listOfItem.length > 5) {
+          this.listOfItem.filter(x => String(x.name))
           document.getElementById('table-body')!.style.width = '99.9%';
         } else {
           document.getElementById('table-body')!.style.width = '99%';
@@ -137,6 +217,7 @@ export class ApproveRequestComponent implements OnInit {
 
     })
     let data = await this.iqcService.detail(id);
+    console.log('check data', data)
     if (data.component.status != 'WAIT_APPROVE' && this.typeAction == 'approve') {
       Swal.fire(
         'Lỗi',
@@ -159,8 +240,11 @@ export class ApproveRequestComponent implements OnInit {
     this.form.id = id;
     this.form.templateCode = data.component.templateCode;
     this.form.elecCompCode = data.component.elecCompCode;
+    this.form.suggestion = data.component.suggestion;
+    this.form.iqcElectType = data.component.iqcElectType == "false" ? false : true;
     this.arrErrChild = data.component.resultError
-    // console.log('check result : ', this.form)
+    console.log('check result : ', data)
+    this.sortList(this.form.type);
   }
 
   delete(id?: any) {
@@ -375,4 +459,10 @@ export class ApproveRequestComponent implements OnInit {
   //       console.log(this.listOfCriticalName)
   //    })
   // }
+  onSelectedOriginS() {
+    this.strSelectOrigin = this.selectedOrigin.name;
+    this.formSearch.origin = this.selectedOrigin.name;
+    console.log(this.formSearch.origin);
+
+  }
 }

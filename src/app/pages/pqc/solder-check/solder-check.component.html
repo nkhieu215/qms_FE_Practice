@@ -29,11 +29,13 @@
                       <th>Tên máy</th>
                       <th>Người kiểm tra</th>
                       <th>Vận hành</th>
-                      <th>Thời gian</th>
+                      <th>Thời gian kiểm tra</th>
                       <th>Số lượng ktra</th>
                       <th>Tổng lỗi</th>
                       <th>Kết luận</th>
                       <th>Ghi chú</th>
+                      <th>Thời gian tạo</th>
+                      <th>Thời gian cập nhật</th>
                       <th>Tùy chọn</th>
                     </tr>
                   </thead>
@@ -48,6 +50,8 @@
                       <td>{{ check.errTotal }}</td>
                       <td>{{ check.conclude }}</td>
                       <td>{{ check.note }}</td>
+                      <td>{{ check.createdAt|date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>{{ check.updatedAt|date:'dd/MM/yyyy HH:mm' }}</td>
                       <td>
                         <button (click)="open(myModalError, check.ids, '')" class="btn btn-primary btn-sm"
                           style="margin-right: 5px;" title="Thêm thông tin lỗi">
@@ -138,17 +142,19 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group">
-                <label>Thời gian</label>
-                <input [(ngModel)]="formEx.checkTime" type="text" class="form-control  {{ !checkTime.valid ? 'is-invalid' :''}}" #checkTime="ngModel"   name="checkTime" required
-                  placeholder="dd/mm/yyyy" />
+                <label>Thời gian kiểm tra</label>
+                <input [(ngModel)]="formEx.checkTime" type="text"
+                  class="form-control  {{ !checkTime.valid ? 'is-invalid' :''}}" #checkTime="ngModel" name="checkTime"
+                  required placeholder="dd/mm/yyyy" />
               </div>
             </div>
 
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Số lượng kiểm tra</label>
-                <input [(ngModel)]="formEx.quatity" type="number" class="form-control  {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel"  name="quatity" required
-                  placeholder="Số lượng kiểm tra" />
+                <input [(ngModel)]="formEx.quatity" type="number"
+                  class="form-control  {{ !quatity.valid ? 'is-invalid' :''}}" #quatity="ngModel" name="quatity"
+                  required placeholder="Số lượng kiểm tra" />
               </div>
             </div>
           </div>
@@ -157,15 +163,17 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Tổng lỗi</label>
-                <input [(ngModel)]="formEx.errTotal" type="number" class="form-control {{ !errTotal.valid ? 'is-invalid' :''}}" #errTotal="ngModel" name="errTotal" required
-                  placeholder="Tổng lỗi" />
+                <input [(ngModel)]="formEx.errTotal" type="number"
+                  class="form-control {{ !errTotal.valid ? 'is-invalid' :''}}" #errTotal="ngModel" name="errTotal"
+                  required placeholder="Tổng lỗi" />
               </div>
             </div>
 
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Kết luận</label>
-                <select [(ngModel)]="formEx.conclude" class="form-control {{ !conclude.valid ? 'is-invalid' :''}}" name="conclude" required #conclude="ngModel">
+                <select [(ngModel)]="formEx.conclude" class="form-control {{ !conclude.valid ? 'is-invalid' :''}}"
+                  name="conclude" required #conclude="ngModel">
                   <option value="Đạt">Đạt</option>
                   <option value="Không đạt">Không đạt</option>
                 </select>
@@ -176,8 +184,9 @@
           <div class="row">
             <div class="form-group">
               <label>Người vận hành</label>
-              <input [(ngModel)]="formEx.operators" type="text" class="form-control {{ !operators.valid ? 'is-invalid' :''}}" name="operators" required
-                placeholder="Người vận hành" #operators="ngModel"/>
+              <input [(ngModel)]="formEx.operators" type="text"
+                class="form-control {{ !operators.valid ? 'is-invalid' :''}}" name="operators" required
+                placeholder="Người vận hành" #operators="ngModel" />
             </div>
           </div>
 
@@ -185,8 +194,8 @@
             <div class="form-group">
               <label>Ghi chú</label>
               <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
-              <input [(ngModel)]="formEx.dttdSolderCheckId" type="hidden" class="form-control" name="dttdSolderCheckId"
-                 />
+              <input [(ngModel)]="formEx.dttdSolderCheckId" type="hidden" class="form-control"
+                name="dttdSolderCheckId" />
             </div>
           </div>
 

@@ -13,7 +13,7 @@ export class AuditCriteriaLKDT2 {
   inaccuracy: any
   checkResult: any
   checkContent: any
-
+  positionNumber: any
   auditCriteriaLKDT: any;
   auditCritetiaLkdtId: any;
   auditCriteriaLkdt: any;

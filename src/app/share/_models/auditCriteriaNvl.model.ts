@@ -24,6 +24,7 @@ export class AuditCriteriaNvl {
   itemTypeAudit?: string;
   approveStatusAudit?: string;
   ortherRequerementAudit?: string;
+  positionNumber?: number;
 
   auditCriteriaNvl: any;
   electCompId?: number;

@@ -17,7 +17,7 @@ export class TinCheckSerialService {
   path: string;
 
   constructor(private http: HttpClient) {
-    this.path =  environment.api_end_point + '/pqc-tin-check';
+    this.path = environment.api_end_point + '/pqc-tin-check';
   }
 
   createUpdateCheckSerial(
@@ -31,7 +31,7 @@ export class TinCheckSerialService {
     workOrderId: number,
     checkTime: any,
     note: any,
-    operators:any
+    operators: any
 
   ): Observable<any> {
     return this.http.post(
@@ -47,7 +47,7 @@ export class TinCheckSerialService {
         workOrderId: workOrderId,
         checkTime: checkTime,
         note: note,
-        operators:operators
+        operators: operators
       },
       httpOptions
     );
@@ -70,7 +70,9 @@ export class TinCheckSerialService {
     knifeCode: any,
     gridCode: any,
     workOrderId: any,
-    operators:any
+    operators: any,
+    createdAt: any,
+    updatedAt: any
   ): Observable<any> {
     return this.http.post(
       this.path + '/add-new-tin-check',
@@ -90,7 +92,9 @@ export class TinCheckSerialService {
         machineCode: machineCode,
         knifeCode: knifeCode,
         gridCode: gridCode,
-        operators:operators
+        operators: operators,
+        createdAt: createdAt,
+        updatedAt: updatedAt
       },
       httpOptions
     );
@@ -109,17 +113,17 @@ export class TinCheckSerialService {
 
 
   deleteError(id: any): Observable<any> {
-    return this.http.delete<any>( environment.api_end_point + '/pqc-tin-check/remove-eror/' + id, httpOptions);
+    return this.http.delete<any>(environment.api_end_point + '/pqc-tin-check/remove-eror/' + id, httpOptions);
   }
 
   addError(data: any): Observable<any> {
-    return this.http.post<any>( environment.api_end_point + '/pqc-tin-check/add-error', {
+    return this.http.post<any>(environment.api_end_point + '/pqc-tin-check/add-error', {
       data
     }, httpOptions);
   }
 
   getDetail(id: any): Observable<any> {
-    return this.http.post<any>( environment.api_end_point + '/pqc-tin-check/detail-check/'+ id, httpOptions);
+    return this.http.post<any>(environment.api_end_point + '/pqc-tin-check/detail-check/' + id, httpOptions);
   }
 
 }

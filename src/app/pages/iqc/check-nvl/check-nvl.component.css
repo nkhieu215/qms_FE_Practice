@@ -271,3 +271,8 @@
 ::ng-deep .ant-table-tbody>tr.table-row .table-button:hover {
   color: #0056b3;
 }
+
+.set-color-background {
+  background-color: #dddddd;
+  border: #dddddd solid 1px;
+}

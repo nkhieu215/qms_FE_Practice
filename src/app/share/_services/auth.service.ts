@@ -5,6 +5,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { KeycloakService } from 'keycloak-angular';
+import Swal from 'sweetalert2';
 
 const AUTH_API = '/api/auth/';
 
@@ -17,7 +18,8 @@ const httpOptions = {
 })
 export class AuthService {
   // path: string;
-  constructor(private http: HttpClient,public router: Router, private tokenService:KeycloakService) {
+
+  constructor(private http: HttpClient, public router: Router, private tokenService: KeycloakService) {
 
     // this.path =  environment.api_end_point + '/api/auth'
   }
@@ -36,7 +38,6 @@ export class AuthService {
   //     password
   //   }, httpOptions);
   // }
-
 
   getToken() {
 
@@ -65,7 +66,24 @@ export class AuthService {
     }
     return throwError(msg);
   }
+  autoLogout(time: number, name: string) {
+    if (sessionStorage.getItem(this.tokenService.getUsername()) == null) {
+      // sau 30p sẽ tự động load lại trang
+      var elapsedTime = time;
+      window.onfocus = function () { elapsedTime = 0 }
+      window.onclick = function () { elapsedTime = 0 }
 
+      var frequency = setInterval(() => {
+        elapsedTime++;
+        sessionStorage.setItem(this.tokenService.getUsername(), this.tokenService.getUsername());
+        console.log("count time ", elapsedTime)
+        if (elapsedTime > 1800) { // 30 mins timeout
+          clearInterval(frequency)
+          this.doLogout();
+        }
+      }, 1000)
+    }
+  }
   refreshToken(token: string) {
 
   }

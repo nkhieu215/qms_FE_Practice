@@ -26,7 +26,7 @@
                     <tr>
                       <th>Người kiểm tra</th>
                       <th>Người vận hành</th>
-                      <th>Thời gian</th>
+                      <th>Thời gian kiểm tra</th>
                       <th>Số lượng</th>
                       <th>Chủng loại</th>
                       <th>Lực căng lưới</th>
@@ -36,6 +36,8 @@
                       <th>Tổng lỗi</th>
                       <th>Kết luận</th>
                       <th>Ghi chú</th>
+                      <th>Thời gian tạo</th>
+                      <th>Thời gian cập nhật</th>
                       <th>Tùy chọn</th>
                     </tr>
                   </thead>
@@ -53,6 +55,8 @@
                       <td>{{ check.errTotal }}</td>
                       <td>{{ check.conclude }}</td>
                       <td>{{ check.note }}</td>
+                      <td>{{ check.createdAt|date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>{{ check.updatedAt|date:'dd/MM/yyyy HH:mm' }}</td>
                       <td>
                         <div class="btn-group">
 
@@ -150,24 +154,23 @@
             <div class="col-sm-4">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Mã máy</nz-form-label>
-                <input [(ngModel)]="formEx.machineCode" type="text" class="form-control" name="machineCode" required #machineCode="ngModel"
-                   />
+                <input [(ngModel)]="formEx.machineCode" type="text" class="form-control" name="machineCode" required
+                  #machineCode="ngModel" />
               </div>
             </div>
             <div class="col-sm-4">
               <div class="form-group">
                 <nz-form-label nzLabelAlign="left" [nzNoColon]="true">Mã dao</nz-form-label>
 
-                <input [(ngModel)]="formEx.knifeCode" type="text" class="form-control" name="knifeCode"
-                   />
+                <input [(ngModel)]="formEx.knifeCode" type="text" class="form-control" name="knifeCode" />
               </div>
             </div>
             <div class="col-sm-4">
               <div class="form-group">
 
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Mã lưới in</nz-form-label>
-                <input [(ngModel)]="formEx.gridCode" type="text" class="form-control" name="gridCode" required #gridCode="ngModel"
-                  />
+                <input [(ngModel)]="formEx.gridCode" type="text" class="form-control" name="gridCode" required
+                  #gridCode="ngModel" />
               </div>
             </div>
           </div>
@@ -175,16 +178,16 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group">
-                <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Thời gian</nz-form-label>
-                <input [(ngModel)]="formEx.checkTime" type="text" class="form-control" name="checkTime" required #checkTime="ngModel"
-                  placeholder="dd/mm/yyyy" />
+                <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Thời gian kiểm tra</nz-form-label>
+                <input [(ngModel)]="formEx.checkTime" type="text" class="form-control" name="checkTime" required
+                  #checkTime="ngModel" placeholder="dd/mm/yyyy" />
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Chủng loại</nz-form-label>
-                <input [(ngModel)]="formEx.classify" type="text" class="form-control" name="classify" required  #classify="ngModel"
-                   />
+                <input [(ngModel)]="formEx.classify" type="text" class="form-control" name="classify" required
+                  #classify="ngModel" />
               </div>
             </div>
           </div>
@@ -193,15 +196,14 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Lực căng lưới</nz-form-label>
-                <input [(ngModel)]="formEx.expiryDate" type="text" class="form-control" name="expiryDate"
-                   />
+                <input [(ngModel)]="formEx.expiryDate" type="text" class="form-control" name="expiryDate" />
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Số lượng kiểm tra</nz-form-label>
-                <input [(ngModel)]="formEx.quatity" type="number" class="form-control" name="quatity" required  #quatity="ngModel"
-                   />
+                <input [(ngModel)]="formEx.quatity" type="number" class="form-control" name="quatity" required
+                  #quatity="ngModel" />
               </div>
             </div>
           </div>
@@ -210,15 +212,15 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Tổng lỗi</nz-form-label>
-                <input [(ngModel)]="formEx.errTotal" type="number" class="form-control" name="errTotal" required #errTotal="ngModel"
-                   />
+                <input [(ngModel)]="formEx.errTotal" type="number" class="form-control" name="errTotal" required
+                  #errTotal="ngModel" />
               </div>
             </div>
 
             <div class="col-sm-6">
               <div class="form-group">
                 <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Kết luận</nz-form-label>
-                <select [(ngModel)]="formEx.conclude" class="form-control" name="conclude" required  #conclude="ngModel" >
+                <select [(ngModel)]="formEx.conclude" class="form-control" name="conclude" required #conclude="ngModel">
                   <option value="Đạt">Đạt</option>
                   <option value="Không đạt">Không đạt</option>
                 </select>
@@ -229,8 +231,8 @@
           <div class="row">
             <div class="form-group">
               <nz-form-label nzRequired nzLabelAlign="left" [nzNoColon]="true">Người vận hành</nz-form-label>
-              <input [(ngModel)]="formEx.operators" type="text" class="form-control" name="operators" required #operators="ngModel"
-                />
+              <input [(ngModel)]="formEx.operators" type="text" class="form-control" name="operators" required
+                #operators="ngModel" />
             </div>
           </div>
           <div class="row">
@@ -241,11 +243,13 @@
           </div>
           <div class="row">
             <div class="form-group">
-              <button (click)="onAddError()" class="btn btn-success" type="submit" *ngIf="formEx.dttdCheckId == null"  [disabled]="!f.form.valid">
+              <button (click)="onAddError()" class="btn btn-success" type="submit" *ngIf="formEx.dttdCheckId == null"
+                [disabled]="!f.form.valid">
                 <i class="fa fa-plus"></i> Thêm mới
               </button>
 
-              <button (click)="onAddError()" class="btn btn-primary" type="submit" *ngIf="formEx.dttdCheckId != null"  [disabled]="!f.form.valid">
+              <button (click)="onAddError()" class="btn btn-primary" type="submit" *ngIf="formEx.dttdCheckId != null"
+                [disabled]="!f.form.valid">
                 <i class="fa fa-edit"></i> Cập nhật
               </button>
 
@@ -400,7 +404,7 @@
     <h4 class="modal-title" id="modal-basic-title">
       Thêm mới thông tin kiểm tra
     </h4>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm" novalidate>

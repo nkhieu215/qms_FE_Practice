@@ -135,14 +135,14 @@
       <div *ngIf="examinationType == '1'" class="col-xs-9 col-sm-9 col-md-9" style="width: 100%;">
         <div class="table-responsive ">
           <div class="float-right" style="margin-bottom: 10px;">
-            <button class="btn  btn-success" (click)="open(mymodal,'','',null)"><i class="fa fa-plus"></i> Thêm tiêu
-              chí</button>
+            <button class="btn  btn-success" (click)="open(mymodal,'','NVL',null,null)"><i class="fa fa-plus"></i>
+              Thêm tiêu chí</button>
           </div>
           <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAudit"
             [nzFrontPagination]="false">
             <thead>
               <tr>
-                <th rowspan="2">#</th>
+                <th rowspan="2">STT</th>
                 <!-- <th colspan="3">Chỉ tiêu kiểm tra</th> -->
                 <th rowspan="2">Chỉ tiêu kiểm tra</th>
                 <th rowspan="2">Bậc rút nghiệm</th>
@@ -159,18 +159,18 @@
             </thead>
             <tbody>
               <tr *ngFor="let audit of arrayAudit let i=index">
-                <td>{{ i+1}}</td>
+                <td>{{ audit.positionNumber }}</td>
                 <td>{{ audit.criteriaName }}</td>
                 <td>{{ audit.regulationLevel }}</td>
                 <td>{{ audit.acceptanceLevel }}</td>
-                <td>{{ audit.min | number }}</td>
-                <td>{{ audit.max | number }}</td>
+                <td>{{ audit.min}}</td>
+                <td>{{ audit.max}}</td>
                 <td>{{ audit.unit }}</td>
                 <td>{{ audit.note }}</td>
                 <td class="text-center">
 
                   <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
-                    (click)="open(mymodal, audit.id,'NVL',audit.criteriaName )">Sửa</button>
+                    (click)="open(mymodal, audit.id,'NVL',audit.criteriaName,i )">Sửa</button>
                   <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'NVL')">
                     Xóa
                   </button>
@@ -187,7 +187,8 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
           <div class="table-responsive">
             <div class="float-right">
-              <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','',null)"><i class="fa fa-plus"></i>
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_lkdt,'','LKDT1',null,null)"><i
+                  class="fa fa-plus"></i>
                 Thông
                 tin kiểm tra</button>
             </div>
@@ -195,7 +196,7 @@
               [nzFrontPagination]="false">
               <thead>
                 <tr>
-                  <th rowspan="2">#</th>
+                  <th rowspan="2">STT</th>
                   <!-- <th colspan="3">Chỉ tiêu kiểm tra</th> -->
                   <th rowspan="2">Chỉ tiêu kiểm tra</th>
                   <th rowspan="2">Bậc rút nghiệm</th>
@@ -212,7 +213,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let audit of arrayAuditLKDT2  let i=index;">
-                  <td>{{++i}}</td>
+                  <td>{{ audit.positionNumber }}</td>
                   <td>{{ audit.auditContent }}</td>
                   <td>{{ audit.regulationLevel }}</td>
                   <td>{{ audit.acceptanceLevel }}</td>
@@ -224,7 +225,7 @@
                   <td class="text-center">
                     <div class="btn-group">
                       <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
-                        (click)="open(mymodal_lkdt, audit.id,'LKDT1',audit.auditContent)">Sửa</button>
+                        (click)="open(mymodal_lkdt, audit.id,'LKDT1',audit.auditContent,i)">Sửa</button>
                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.ids,'LKDT1')">Xóa</button>
                     </div>
                   </td>
@@ -235,7 +236,7 @@
 
           <div class="table-responsive" style="width: 100%;">
             <div class="float-right">
-              <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','',null)"><i
+              <button class="btn btn-sm btn-success" (click)="open(mymodal_parameter,'','LKDT2',null,null)"><i
                   class="fa fa-plus"></i>
                 Thông tin kiểm tra</button>
             </div>
@@ -243,7 +244,7 @@
               [nzFrontPagination]="false">
               <thead>
                 <tr>
-                  <th rowspan="2">#</th>
+                  <th rowspan="2">STT</th>
                   <th rowspan="2">Thông số kiểm tra</th>
                   <th rowspan="2">Điều kiện kiểm tra</th>
                   <th colspan="3">Tiêu chuẩn kiểm tra</th>
@@ -257,7 +258,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let audit of arrayAuditParam let i= index">
-                  <td>{{ ++i }}</td>
+                  <td>{{ audit.positionNumber }}</td>
                   <td>{{ audit.parameterName }}</td>
                   <td>{{ audit.conditions }}</td>
                   <td>{{ audit.min | number }}</td>
@@ -266,7 +267,7 @@
                   <td class="text-center">
                     <div class="btn-group">
                       <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
-                        (click)="open(mymodal_parameter, audit.id,'LKDT2',null)">Sửa</button>
+                        (click)="open(mymodal_parameter, audit.id,'LKDT2',null,i)">Sửa</button>
                       <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'LKDT2')">Xóa</button>
                     </div>
                   </td>
@@ -280,7 +281,8 @@
       <div class="" *ngIf="examinationType == '3'" class="col-xs-9 col-sm-9 col-md-9" style="width: 100%;">
         <div class="table-responsive col-xs-12 col-sm-12 col-md-12">
           <div class="float-right">
-            <button class="btn btn-success" (click)="open(mymodal_clsp,'','',null)"><i class="fa fa-plus"></i> Thông tin
+            <button class="btn btn-success" (click)="open(mymodal_clsp,'','',null,null)"><i class="fa fa-plus"></i>
+              Thông tin
               kiểm tra</button>
           </div>
           <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="arrayAuditCLSP"
@@ -304,7 +306,7 @@
                 <td class="text-center">
                   <div class="btn-group">
                     <button *ngIf="audit.id != null" class="btn btn-sm btn-primary"
-                      (click)="open(mymodal_clsp, audit.id,'CLSP',audit.auditContent)">Sửa</button>
+                      (click)="open(mymodal_clsp, audit.id,'CLSP',audit.auditContent,null)">Sửa</button>
                     <button class="btn btn-sm btn-danger" (click)="deleteAuditRow(audit.id,'CLSP')">Delete</button>
 
                   </div>
@@ -326,7 +328,13 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+    <form name="form" (ngSubmit)="f.form.valid " #formPow="ngForm" novalidate>
+      <div class="form-group ">
+        <label>Số thứ tự</label>
+        <input type="text" class="form-control {{ !positionNumber.valid ? 'is-invalid' :''}}"
+          [(ngModel)]="formAudit.positionNumber" #positionNumber="ngModel" [ngModelOptions]="{ standalone: true }"
+          required placeholder="Số thứ tự" (change)="checkDuplicateNumber('NVL')" />
+      </div>
       <div class="form-group">
         <label>Nhóm tiêu chí</label>
         <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
@@ -342,9 +350,9 @@
         <label>Tiêu chí kiểm tra</label>
         <!-- <input type="text" class="form-control" name="criteriaName" [(ngModel)]="formAudit.criteriaName" required
           #criteriaName="ngModel" placeholder="Tên tiêu chí" /> -->
-        <input type="text" list="auto355" class="form-control" [(ngModel)]="testingName"
-          [ngModelOptions]="{ standalone: true }" required #criteriaName="ngModel" placeholder="Tên tiêu chí"
-          list="auto355" />
+        <input type="text" list="auto355" class="form-control {{ !testingName.valid ? 'is-invalid' :''}}"
+          [(ngModel)]="formAudit.testingName" #testingName="ngModel" [ngModelOptions]="{ standalone: true }" required
+          #criteriaName="ngModel" placeholder="Tên tiêu chí" list="auto355" />
         <datalist id="auto355">
           <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
             <span>{{ item.testingName }}</span>
@@ -357,12 +365,13 @@
 
       <div class="form-group">
         <label>Bậc rút nghiệm</label>
-        <input type="text" class="form-control" name="regulationNevel" [(ngModel)]="formAudit.regulationLevel" required
-          #level="ngModel" placeholder="Định mức quy định" />
+        <input type="text" class="form-control {{ !regulationLevel.valid ? 'is-invalid' :''}}" name="regulationNevel"
+          [(ngModel)]="formAudit.regulationLevel" required #level="ngModel" placeholder="Định mức quy định"
+          #regulationLevel="ngModel" />
       </div>
       <div class="form-group">
         <label>Mức chấp nhận</label>
-        <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAudit.acceptanceLevel" required
+        <input type="text" class="form-control" name="acceptanceLevel" [(ngModel)]="formAudit.acceptanceLevel"
           #level="ngModel" placeholder="Định mức quy định" />
       </div>
       <div class="form-group">
@@ -382,13 +391,13 @@
       </div>
       <div class="form-group">
         <label>Ghi chú</label>
-        <textarea class="form-control" name="note" [(ngModel)]="formAudit.note" required #note="ngModel"></textarea>
+        <textarea class="form-control" name="note" [(ngModel)]="formAudit.note" #note="ngModel"></textarea>
       </div>
       <div class="form-group">
-        <button *ngIf="formAudit.id == null" (click)="onAddAudit('NVL','ADD')" class="btn btn-success"
-          type="submit">Thêm mới</button>
-        <button *ngIf="formAudit.id != null" (click)="onAddAudit('NVL','EDIT')" class="btn btn-primary"
-          type="submit">Cập nhật</button>
+        <button *ngIf="formAudit.id == null" (click)="onAddAudit('NVL','ADD')" class="btn btn-success" type="submit"
+          [disabled]="!(formPow.form.valid) ">Thêm mới</button>
+        <button *ngIf="formAudit.id != null" (click)="onAddAudit('NVL','EDIT')" class="btn btn-primary" type="submit"
+          [disabled]="!(formPow.form.valid) ">Cập nhật</button>
       </div>
     </form>
   </div>
@@ -402,6 +411,12 @@
   </div>
   <div class="modal-body">
     <form name="form" (ngSubmit)="f.form.valid" #f="ngForm" novalidate>
+      <div class="form-group pb-3">
+        <label>Số thứ tự</label>
+        <input type="text" class="form-control {{ !positionNumber.valid ? 'is-invalid' :''}}"
+          [(ngModel)]="formAuditLKDT2.positionNumber" [ngModelOptions]="{ standalone: true }" required
+          placeholder="Số thứ tự" #positionNumber="ngModel" (change)="checkDuplicateNumber('LKDT1')" />
+      </div>
       <div class="form-group pb-3">
         <label>Nhóm tiêu chí</label>
         <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
@@ -417,23 +432,24 @@
         <label>Chỉ tiêu kiểm tra</label>
         <!-- <input type="text" class="form-control" name="auditContent" [(ngModel)]="formAuditLKDT2.auditContent"
           #content="ngModel" placeholder="Chỉ tiêu kiểm tra" /> -->
-        <input type="text" class="form-control" [(ngModel)]="formAuditLKDT2.auditContent"
-          [ngModelOptions]="{ standalone: true }" required #content="ngModel" placeholder="Chỉ tiêu kiểm tra"
-          list="auto37" />
+        <input type="text" class="form-control {{ !auditContent.valid ? 'is-invalid' :''}}"
+          [(ngModel)]="formAuditLKDT2.auditContent" [ngModelOptions]="{ standalone: true }" required
+          #auditContent="ngModel" placeholder="Chỉ tiêu kiểm tra" list="auto37" />
         <datalist id="auto37">
           <option *ngFor="let oitm of listOfCriticalName" [value]="oitm.testingName">
             <span>{{ oitm.testingName }}</span>
           </option>
         </datalist>
-        <div class="alert-danger" *ngIf="content.errors && f.submitted">
+        <!-- <div class="alert-danger" *ngIf="content.errors && f.submitted">
           <div *ngIf="content.errors['required']">Tên biên tiêu chí không được để trống</div>
-        </div>
+        </div> -->
       </div>
 
       <div class="form-group">
         <label>Bậc rút nghiệm</label>
-        <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAuditLKDT2.regulationLevel"
-          #level="ngModel" placeholder="Định mức quy định" />
+        <input type="text" class="form-control {{ !regulationLevel.valid ? 'is-invalid' :''}}" name="regulationLevel"
+          [(ngModel)]="formAuditLKDT2.regulationLevel" #regulationLevel="ngModel" #level="ngModel" required
+          placeholder="Định mức quy định" />
       </div>
       <div class="form-group">
         <label>Mức chấp nhận</label>
@@ -462,9 +478,9 @@
       </div>
       <div class="form-group">
         <button *ngIf="formAuditLKDT2.id == null" (click)="onAddAudit('LKDT1','ADD')" class="btn btn-success"
-          type="submit">Thêm mới</button>
+          type="submit" [disabled]="!(f.form.valid) ">Thêm mới</button>
         <button *ngIf="formAuditLKDT2.id != null" (click)="onAddAudit('LKDT1','EDIT')" class="btn btn-primary"
-          type="submit">Cập nhật</button>
+          type="submit" [disabled]="!(f.form.valid) ">Cập nhật</button>
       </div>
     </form>
   </div>
@@ -477,12 +493,18 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+    <form name="form" (ngSubmit)="f.form.valid " #f1="ngForm" novalidate>
+      <div class="form-group">
+        <label>Số thứ tự</label>
+        <input type="text" class="form-control {{ !positionNumber1.valid ? 'is-invalid' :''}}"
+          [(ngModel)]="formAuditParam.positionNumber" [ngModelOptions]="{ standalone: true }" required
+          placeholder="Số thứ tự" #positionNumber1="ngModel" (change)="checkDuplicateNumber('LKDT2')" />
+      </div>
       <div class="form-group">
         <label>Thông số kiểm tra</label>
-        <input type="text" class="form-control" [(ngModel)]="formAuditParam.parameterName"
-          [ngModelOptions]="{ standalone: true }" required minlength="1" #name="ngModel" placeholder="Tên tiêu chí"
-          list="parameter" />
+        <input type="text" class="form-control {{ !parameterName.valid ? 'is-invalid' :''}}" #parameterName="ngModel"
+          [(ngModel)]="formAuditParam.parameterName" [ngModelOptions]="{ standalone: true }" required
+          placeholder="Tên tiêu chí" list="parameter" />
         <datalist id="parameter">
           <option *ngFor="let oitm of listOfParameters" [value]="oitm.testingName">
             <span>{{ oitm.testingName }}</span>
@@ -514,9 +536,9 @@
 
       <div class="form-group">
         <button *ngIf="formAuditParam.id == null" (click)="onAddAudit('LKDT2','ADD')" class="btn btn-success"
-          type="submit">Thêm mới</button>
+          type="submit" [disabled]="!(f1.form.valid) ">Thêm mới</button>
         <button *ngIf="formAuditParam.id != null" (click)="onAddAudit('LKDT2','EDIT')" class="btn btn-primary"
-          type="submit">Cập nhật</button>
+          type="submit" [disabled]="!(f1.form.valid) ">Cập nhật</button>
       </div>
     </form>
   </div>

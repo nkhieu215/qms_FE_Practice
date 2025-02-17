@@ -116,7 +116,7 @@
               <tbody>
                 <tr *ngFor="let check of lstCheck; let i = index">
                   <td>{{check.checkPerson}}</td>
-                  <td>{{check.createdAt | date: 'dd/MM/YYYY HH:mm'}}</td>
+                  <td>{{check.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
                   <td>{{check.conclude}}</td>
                   <td>{{check.note}}</td>
                   <td>
@@ -226,7 +226,7 @@
                   <th rowspan="2">Tên vật tư</th>
                   <th rowspan="2">Mã</th>
                   <th rowspan="2">Partnumber</th>
-                  <th rowspan="2">Số mẫu thử</th>
+                  <th rowspan="2">Số mẫu kiểm tra</th>
                   <th rowspan="2">Ngày ktra</th>
                   <th colspan="3">Kiểm tra rút nghiệm</th>
                   <!-- <th colspan="9">Ngoại quan thông số</th> -->
@@ -236,8 +236,8 @@
                 </tr>
                 <tr>
                   <th>Quy định KT</th>
-                  <th>Kết quả cho phép</th>
-                  <th>Thực tế</th>
+                  <th>Số lỗi cho phép</th>
+                  <th>Số lỗi thực tế</th>
                   <!-- <td>Số mẫu thử</td>
               <td>Ngoại quan</td>
               <td colspan="2">Công suất</td>

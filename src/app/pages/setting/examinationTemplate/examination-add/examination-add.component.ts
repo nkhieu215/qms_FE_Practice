@@ -12,6 +12,7 @@ import { OitmService } from 'src/app/share/_services/oitmservice';
 import { TokenStorageService } from 'src/app/share/_services/token-storage.service';
 import Utils from 'src/app/share/_utils/utils';
 import { timer } from 'rxjs';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-examination-add',
   templateUrl: './examination-add.component.html',
@@ -20,9 +21,9 @@ import { timer } from 'rxjs';
 export class ExaminationAddComponent implements OnInit {
 
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
@@ -51,15 +52,18 @@ export class ExaminationAddComponent implements OnInit {
   };
 
   arrayAudit: Array<AuditCriteriaNvl> = []
+  arrayAuditCheckDup: Array<AuditCriteriaNvl> = []
   arrayAuditCLSP: Array<AuditCriteriaLKDT2> = []
   form: any = {};
 
   formAudit: any = {}
 
   arrayAuditParam: Array<AuditCriteriaParam> = [];
+  arrayAuditParamCheckDup: Array<AuditCriteriaParam> = [];
   formAuditParam: any = {}
 
   arrayAuditLKDT2: Array<AuditCriteriaLKDT2> = [];
+  arrayAuditLKDT2CheckDup: Array<AuditCriteriaLKDT2> = [];
   formAuditLKDT2: any = {
     auditContent: null,
     regulationLevel: null,
@@ -67,8 +71,87 @@ export class ExaminationAddComponent implements OnInit {
   }
 
   constructor(private examinationService: ExaminationService, private modalService: NgbModal, private tokenStorage: TokenStorageService, private oitmService: OitmService,
-    protected http: HttpClient) {
+    protected http: HttpClient,
+    protected autoLogout: AuthService) {
 
+  }
+  sortList(type: any) {
+    if (type == 'NVL') {
+      this.arrayAudit = this.arrayAudit.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    } else if (type == 'LKDT1') {
+      this.arrayAuditLKDT2 = this.arrayAuditLKDT2.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    } else if (type == 'LKDT2') {
+      this.arrayAuditParam = this.arrayAuditParam.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    }
+  }
+  checkDuplicateNumber(type: any) {
+    if (type == 'NVL') {
+      var result = this.arrayAuditCheckDup.find(x => x.positionNumber == this.formAudit.positionNumber);
+      if (result) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAudit.length == 0) {
+          this.formAudit.positionNumber = 1;
+        } else {
+          this.formAudit.positionNumber = 0;
+          this.arrayAudit.forEach(x => {
+            if (x.positionNumber! >= this.formAudit.positionNumber) {
+              const i = x.positionNumber!
+              this.formAudit.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT1') {
+      var result1 = this.arrayAuditLKDT2CheckDup.find(x => x.positionNumber == this.formAuditLKDT2.positionNumber);
+      if (result1) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAuditLKDT2.length == 0) {
+          this.formAuditLKDT2.positionNumber = 1;
+        } else {
+          this.formAuditLKDT2.positionNumber = 0;
+          this.arrayAuditLKDT2.forEach(x => {
+            if (x.positionNumber! >= this.formAuditLKDT2.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditLKDT2.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT2') {
+      var result2 = this.arrayAuditParamCheckDup.find(x => x.positionNumber == this.formAuditParam.positionNumber);
+      if (result2) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAuditParam.length == 0) {
+          this.formAuditParam.positionNumber = 1;
+        } else {
+          this.formAuditParam.positionNumber = 0;
+          this.arrayAuditParam.forEach(x => {
+            if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditParam.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
   }
   // ----------------------------------------------------------- Danh sách sản phẩm áp dụng mẫu biên bản --------------------------------------------
   getListOfItems(value: any) {
@@ -316,6 +399,7 @@ export class ExaminationAddComponent implements OnInit {
   }
   // --------------------------------------------------------------------------------------------------------------------------------------------------------
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.code = 'RDQC' + formatDate(new Date(), 'yyMMdd_HHmm', 'en_US')
     this.getListTestingGroupByType();
   }
@@ -353,7 +437,7 @@ export class ExaminationAddComponent implements OnInit {
             console.log("thêm mới: ", this.arrayAudit)
             this.examinationService.create(auditForm, this.arrayAudit, this.arrayAuditLKDT2, this.arrayAuditParam, this.arrayAuditCLSP, "ADD").subscribe(
               data => {
-                console.log("result", name, this.examinationType);
+                console.log("result", data, this.examinationType);
                 if (data.result.responseCode == '00') {
                   this.error = "Thêm mới mẫu biên bản thành công";
                   Swal.fire({
@@ -374,6 +458,7 @@ export class ExaminationAddComponent implements OnInit {
                     console.log('list item;', this.listOfItem);
                   })
                   this.classError = "alert alert-success alert-dismissible fade show";
+
                 } else {
                   this.error = data.result.message;
                   this.classError = "alert alert-danger alert-dismissible fade show";
@@ -396,23 +481,27 @@ export class ExaminationAddComponent implements OnInit {
 
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel, min, max, unit } = this.formAuditLKDT2;
+      const { auditContent, regulationLevel, technicalRequirement, acceptanceLevel, min, max, unit, positionNumber } = this.formAuditLKDT2;
       var lkdt1 = new AuditCriteriaLKDT2();
-      lkdt1.auditContent = this.testingName;
+      lkdt1.auditContent = auditContent;
       lkdt1.regulationLevel = regulationLevel;
       lkdt1.technicalRequirement = technicalRequirement;
       lkdt1.acceptanceLevel = acceptanceLevel;
       lkdt1.min = min;
       lkdt1.max = max;
       lkdt1.unit = unit;
+      lkdt1.positionNumber = positionNumber;
       lkdt1.ids = Utils.randomString(5);
+      this.sortList('LKDT1');
       if (action == 'ADD') {
         this.arrayAuditLKDT2.push(lkdt1);
+        this.sortList('LKDT1');
       }
     }
     else if (type == 'LKDT2') {
-      const { parameterName, conditions, min, max, unit } = this.formAuditParam;
+      const { parameterName, conditions, min, max, unit, positionNumber } = this.formAuditParam;
       var lkdt2 = new AuditCriteriaParam();
+      lkdt2.positionNumber = positionNumber;
       lkdt2.parameterName = parameterName;
       lkdt2.conditions = conditions;
       lkdt2.min = min;
@@ -437,8 +526,8 @@ export class ExaminationAddComponent implements OnInit {
 
     else if (type == 'NVL') {
       //const testingName = this.testingName;
-      const { regulationLevel, min, max, unit, note, acceptanceLevel } = this.formAudit;
-      const criteriaName = this.testingName
+      const { regulationLevel, min, max, unit, note, acceptanceLevel, positionNumber } = this.formAudit;
+      const criteriaName = this.formAudit.testingName
       const audit: AuditCriteriaNvl = new AuditCriteriaNvl();
       audit.criteriaName = criteriaName;
       audit.regulationLevel = regulationLevel;
@@ -447,10 +536,13 @@ export class ExaminationAddComponent implements OnInit {
       audit.unit = unit;
       audit.note = note;
       audit.acceptanceLevel = acceptanceLevel;
+      audit.positionNumber = positionNumber;
       audit.ids = Utils.randomString(5);
       if (action == 'ADD') {
         this.arrayAudit.push(audit);
+        this.sortList('NVL');
       }
+      this.sortList('NVL');
     }
 
     this.modalService.dismissAll();
@@ -486,17 +578,9 @@ export class ExaminationAddComponent implements OnInit {
     }
   }
 
-  open(content: any, ids: any, type: string, testingName: any) {
+  open(content: any, ids: any, type: string, testingName: any, index: any) {
     this.testingCriticalGroup = '';
     this.testingName = '';
-    if (testingName !== null) {
-      this.testingName = testingName;
-      var data = { testingName: testingName }
-      this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
-        this.testingCriticalGroup = res.testingCriticalGroup;
-        console.log("group name: ", res)
-      })
-    }
     if (!this.listOfParameters) {
       var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
       this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
@@ -517,6 +601,29 @@ export class ExaminationAddComponent implements OnInit {
         }
       })
     }
+    if (type == 'NVL') {
+      if (this.arrayAudit.length == 0) {
+        this.formAudit.positionNumber = 1;
+      } else {
+        this.arrayAuditCheckDup = [];
+        if (index != null) {
+          const list = this.arrayAudit;
+          this.arrayAuditCheckDup = list.filter(x => x.positionNumber != list[index].positionNumber);
+          console.log("update", this.arrayAuditCheckDup);
+        } else {
+          const list1 = this.arrayAudit;
+          this.arrayAuditCheckDup = list1;
+          console.log("insert", this.arrayAuditCheckDup);
+          this.formAudit.positionNumber = 0;
+          this.arrayAudit.forEach(x => {
+            if (x.positionNumber! >= this.formAudit.positionNumber) {
+              const i = x.positionNumber!
+              this.formAudit.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
 
 
     if (type == 'LKDT1' && ids != '') {
@@ -526,6 +633,26 @@ export class ExaminationAddComponent implements OnInit {
         }
       })
     }
+    if (type == 'LKDT1') {
+      if (this.arrayAuditLKDT2.length == 0) {
+        this.formAuditLKDT2.positionNumber = 1;
+      } else {
+        if (index != null) {
+          const list2 = this.arrayAuditLKDT2;
+          this.arrayAuditLKDT2CheckDup = list2.filter(x => x.positionNumber != list2[index].positionNumber);
+        } else {
+          const list3 = this.arrayAuditLKDT2
+          this.arrayAuditLKDT2CheckDup = list3;
+          this.formAuditLKDT2.positionNumber = 0;
+          this.arrayAuditLKDT2.forEach(x => {
+            if (x.positionNumber! >= this.formAuditLKDT2.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditLKDT2.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
 
     if (type == 'LKDT2' && ids != '') {
       this.arrayAuditParam.forEach(element => {
@@ -534,7 +661,26 @@ export class ExaminationAddComponent implements OnInit {
         }
       })
     }
-
+    if (type == 'LKDT2') {
+      if (this.arrayAuditParam.length == 0) {
+        this.formAuditParam.positionNumber = 1;
+      } else {
+        if (index != null) {
+          const list5 = this.arrayAuditParam;
+          this.arrayAuditParamCheckDup = list5.filter(x => x.positionNumber != list5[index].positionNumber);
+        } else {
+          const list6 = this.arrayAuditParam
+          this.arrayAuditParamCheckDup = list6;
+          this.formAuditParam.positionNumber = 0;
+          this.arrayAuditParam.forEach(x => {
+            if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditParam.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
 
     if (type == 'CLSP' && ids != '') {
       this.arrayAuditCLSP.forEach(element => {
@@ -552,6 +698,14 @@ export class ExaminationAddComponent implements OnInit {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     }
     );
+    if (testingName !== null) {
+      this.testingName = testingName;
+      var data = { testingName: testingName }
+      this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
+        this.testingCriticalGroup = res.testingCriticalGroup;
+        console.log("group name: ", res)
+      })
+    }
   }
 
   private getDismissReason(reason: any): string {

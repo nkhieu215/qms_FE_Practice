@@ -9,30 +9,49 @@
     <form (ngSubmit)="refreshExamination()">
 
       <div class="row">
-        <div class="col-md-3">
+        <div nz-col class="col-md-3" style="width: 12.5%;">
           <div class="form-group">
-            <label>Tên nguyên vật liệu</label>
-            <input nz-input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name"
-              #name="ngModel" />
+            <label>Từ ngày</label>
+            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+              placeholder="Từ ngày" />
           </div>
         </div>
-
+        <div nz-col class="col-md-3" style="width: 12.5%;">
+          <div class="form-group">
+            <label>Tới ngày</label>
+            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+              placeholder="Tới ngày" />
+          </div>
+        </div>
         <div class="col-md-3">
           <div class="form-group">
-            <label>Mã NVL</label>
-            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
-              placeholder="Mã nguyên vật liệu" />
+            <label>Tên biên bản</label>
+            <input nz-input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+              placeholder="Tên biên bản" />
           </div>
         </div>
 
         <div class="col-md-3">
           <div class="form-group">
             <label>Mã biên bản</label>
-            <input type="text" class="form-control" name="reportCode" [(ngModel)]="formSearch.reportCode"
-              #name="ngModel" placeholder="Mã biên bản" />
+            <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
+              placeholder="Mã biên bản" />
           </div>
         </div>
 
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Số biên bản</label>
+            <input type="text" class="form-control" name="reportCode" [(ngModel)]="formSearch.reportCode"
+              #name="ngModel" placeholder="Số biên bản" />
+          </div>
+        </div>
+
+
+
+      </div>
+      <br />
+      <div class="row">
 
         <div nz-col class="col-md-3">
           <div class="form-group">
@@ -42,45 +61,51 @@
           </div>
         </div>
 
-      </div>
-      <br />
-      <div class="row">
-        <div nz-col class="col-md-3">
-          <div class="form-group">
-            <label>Từ ngày</label>
-            <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
-              placeholder="Từ ngày" />
-          </div>
-        </div>
-        <div nz-col class="col-md-3">
-          <div class="form-group">
-            <label>Tới ngày</label>
-            <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
-              placeholder="Tới ngày" />
-          </div>
-        </div>
-
         <div class="col-md-3">
           <div class="form-group">
             <label>Trạng thái</label>
-            <select class="form-control" name="type" [(ngModel)]="formSearch.status" #type="ngModel">
+            <select class="form-control" name="type" [(ngModel)]="formSearch.status" #type="ngModel"
+              style="height: 40px;">
+              <option selected value="">Tất cả</option>
               <option selected value="DRAFF">Nháp</option>
               <option value="WAIT_APPROVE">Chờ duyệt</option>
               <option value="APPROVE">Đã duyệt</option>
               <option value="CONCESSIONS">Nhân nhượng</option>
               <option value="REJECT">Từ chối</option>
+              <option value="CANCEL">Hủy</option>
             </select>
           </div>
         </div>
 
         <div class="col-md-3">
           <div class="form-group">
-            <label>Xuất xứ</label>
-            <select class="form-control" name="itemType" [(ngModel)]="formSearch.itemType" #type="ngModel">
+            <label>Loại hàng</label>
+            <select class="form-control" name="itemType" [(ngModel)]="formSearch.itemType" #type="ngModel"
+              style="height: 40px;">
               <option value="">Tất cả</option>
               <option value="Hàng nhập">Hàng nhập</option>
               <option value="Hàng mẫu">Hàng mẫu</option>
             </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Nhà cung cấp</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{formSearch.origin}}
+              name="origin" [matAutocomplete]="originS" [formControl]="searchOriginCtrl" placeholder="Nhà cung cấp"
+              style="height: 40px;">
+            <mat-autocomplete #originS="matAutocomplete" (optionSelected)="onSelectedOriginS()"
+              [displayWith]="displayWith">
+              <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
+              <ng-container *ngIf="!isLoadingOrigin">
+                <mat-option value="">
+                  <span>Tất cả</span>
+                </mat-option>
+                <mat-option *ngFor="let oitm of filteredOrigin.lstOcrd" [value]="oitm">
+                  <span><b>{{oitm.name}}</b> ({{oitm.code}})</span>
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
           </div>
         </div>
       </div>
@@ -91,7 +116,8 @@
             <i class="fa fa-search"></i> Tìm kiếm
           </button>
 
-          <button class="btn btn-success ml-1" routerLink="/iqc/iqc-nvl-check/0/add">
+          <!-- <button class="btn btn-success ml-1" routerLink="/iqc/iqc-nvl-check/0/add"> -->
+          <button class="btn btn-success" (click)="createReport()">
             <i class="fa fa-plus"></i> Thêm biên bản
           </button>
         </div>
@@ -109,14 +135,17 @@
         <thead>
           <tr class="table-header">
             <th>#</th>
-            <th>Số biên bản</th>
-            <th>Mã biên bản</th>
-            <th>Tên biên bản</th>
+            <th scope="col" style="width: 10.2%;">Số biên bản</th>
+            <th scope="col" style="width: 11%;">Mã biên bản</th>
+            <th style="width: 11%;">Tên biên bản</th>
+            <th style="width: 11%;">Nhà cung cấp</th>
             <th>Loại</th>
+            <th>Ngày nhận hàng</th>
             <th>Ngày thực hiện</th>
+            <th>Ngày cập nhật</th>
             <th>Trạng thái</th>
-            <th>Số lô</th>
             <th>Người tạo</th>
+            <th style="width: 13%;">Nhận xét</th>
             <th [nzRight]="true">Tùy chọn</th>
           </tr>
         </thead>
@@ -126,34 +155,40 @@
             <td>{{ audit.reportCode}}</td>
             <td>{{ audit.elecCompCode}}</td>
             <td> {{ audit.electCompName }} </td>
+            <td> {{ audit.origin }} </td>
             <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span *ngIf="audit.iqcElectType == 'true'">Phiếu
                 SPKPH</span> </td>
-            <td> {{ audit.createdAt| date:'dd/MM/YYYY HH:mm:ss'}}
-            </td>
+            <td> {{ audit.importDate| date:'dd/MM/yyyy'}}</td>
+            <td> {{ audit.createdAt| date:'dd/MM/yyyy HH:mm:ss'}}</td>
+            <td>{{ audit.updatedAt | date:'dd/MM/yyyy HH:mm:ss'}}</td>
             <td>
               <p *ngIf="audit.status =='DRAFF'"> Nháp</p>
               <p *ngIf="audit.status =='WAIT_APPROVE'"> Chờ duyệt </p>
               <p *ngIf="audit.status =='APPROVE'"> Đã duyệt </p>
               <p *ngIf="audit.status =='CONCESSIONS'"> Nhân nhượng</p>
               <p *ngIf="audit.status =='REJECT'"> Từ chối</p>
+              <p *ngIf="audit.status =='CANCEL'"> Hủy</p>
             </td>
-            <td>{{ audit.batchNumber}}</td>
             <td>{{ audit.createBy}}</td>
+            <td>{{ audit.approveNote}}</td>
             <td class="text-center">
               <div class="btn-group">
-                <button class="btn btn-warning  btn-sm" style="color: white;" title="Copy"
-                  (click)="copyCheckNvl(audit.id, 'NVL')"><i class="fa fa-copy"></i></button>
-                <button *ngIf="audit.status =='DRAFF' || audit.status =='REJECT'" class="btn btn-sm btn-primary"
-                  title="Sửa" routerLink="/iqc/iqc-nvl-check/{{audit.id}}/edit"><i class="fa fa-edit"></i></button>
+                <a class="btn btn-warning  btn-sm" style="color: white;margin: auto;" title="Copy"
+                  (click)="copyCheckNvl(audit.id, 'NVL')"><i class="fa fa-copy"></i></a>
+                <a *ngIf="audit.status =='DRAFF' || audit.status =='REJECT'" class="btn btn-sm btn-primary" title="Sửa"
+                  routerLink="/iqc/iqc-nvl-check/{{audit.id}}/edit" style="color: white;margin: auto;"
+                  target="_blank"><i class="fa fa-edit"></i></a>
                 <button *ngIf="audit.status =='DRAFF' || audit.status =='REJECT' || audit.status ==''"
-                  class="btn btn-sm btn-danger" title="Xóa" (click)="delete(audit.id)"><i
-                    class="fa fa-trash"></i></button>
-                <button class="btn btn-sm btn-info" routerLink="/iqc/iqc-nvl-check/{{audit.id}}/show"
-                  title="Chi tiết"><i class="fa fa-eye"></i></button>
-                <button class="btn btn-sm btn-success" (click)="report(audit.id, audit.reportCode)"
-                  title="Xuất file báo cáo"><i class="fa fa-download"></i></button>
+                  class="btn btn-sm btn-danger" title="Xóa" (click)="delete(audit.id)"
+                  style="color: white;margin: auto;"><i class="fa fa-trash"></i></button>
+                <a class="btn btn-sm btn-info" routerLink="/iqc/iqc-nvl-check/{{audit.id}}/show" title="Chi tiết"
+                  style="color: white;margin: auto;" target="_blank"><i class="fa fa-eye"></i></a>
+                <button class="btn btn-sm btn-danger" (click)="report(audit.id, audit.reportCode)"
+                  title="Xuất file báo cáo"
+                  style="color: white;margin: auto;background-color: #198754; border:#198754 solid 1px"><i
+                    class="fa fa-download"></i></button>
               </div>
-
+            </td>
           </tr>
         </tbody>
       </nz-table>
@@ -180,16 +215,15 @@
       <form name="form" (ngSubmit)="(f.form.valid)" #f="ngForm">
         <!-- Row 1 -->
         <div class="form-group row">
-          <div class="col-sm-4">
+          <div class="col-md-3">
             <label>Mẫu biên bản <i style="color: red;">(*)</i></label>
-            <input *ngIf="typeAction =='add'" type="text" class="form-control" [(ngModel)]="selectedEx"
-              value="{{ strSelect }}" name="templateName" [matAutocomplete]="auto" class="form-control"
-              [formControl]="searchExaminationCtrl" placeholder="Mã mẫu biên bản" />
+            <input *ngIf="typeAction =='edit' || typeAction =='add'" type="text" class="form-control"
+              [(ngModel)]="selectedEx" value="{{ strSelect }}" name="templateName" [matAutocomplete]="auto"
+              class="form-control" [formControl]="searchExaminationCtrl" placeholder="Mã mẫu biên bản" />
 
-            <input *ngIf="typeAction =='edit' || typeAction == 'show'" readonly type="text" class="form-control"
-              placeholder="Tên linh kiện" name="templateCode" [(ngModel)]="form.templateCode" />
-            <mat-autocomplete [panelWidth]="400" #auto="matAutocomplete" (optionSelected)="onSelected()"
-              [displayWith]="displayWith">
+            <input *ngIf="typeAction == 'show'" readonly type="text" class="form-control" placeholder="Tên linh kiện"
+              name="templateCode" [(ngModel)]="form.templateCode" />
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelected()" [displayWith]="displayWith">
               <mat-option *ngIf="isLoading" class="is-loading">Loading...</mat-option>
               <ng-container *ngIf="!isLoading">
                 <mat-option *ngFor="
@@ -205,22 +239,32 @@
 
 
           </div>
-          <div class="col-sm-4">
+          <div class="col-md-3">
+            <label>Tên biên bản</label>
+            <input type="text" class="form-control" placeholder="Số biên bản" name="electCompName"
+              [(ngModel)]="form.electCompName" readonly />
+          </div>
+          <div class="col-md-3">
+            <label>Mã biên bản</label>
+            <input type="text" class="form-control" placeholder="Số biên bản" name="elecCompCode"
+              [(ngModel)]="form.elecCompCode" readonly />
+          </div>
+          <div class="col-md-3">
             <label>Số biên bản <i style="color: red;">(*)</i></label>
             <input type="text" class="form-control" placeholder="Số biên bản" name="reportCode"
               [(ngModel)]="form.reportCode" />
           </div>
-          <div class="col-sm-4">
+        </div>
+        <!-- Row 2 -->
+        <div class="form-group row">
+          <div class="col-md-3">
             <label>Loại hàng <i style="color: red;">(*)</i></label>
             <select class="form-control" name="itemType" [(ngModel)]="form.itemType" #type="ngModel">
               <option value="Hàng nhập">Hàng nhập</option>
               <option value="Hàng mẫu">Hàng mẫu</option>
             </select>
           </div>
-        </div>
-        <!-- Row 2 -->
-        <div class="form-group row">
-          <div class="col-sm-4">
+          <div class="col-md-3" style="width: 12.5%;">
             <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%">
               <mat-label>Ngày nhận hàng <i style="color: red;">(*)</i></mat-label>
               <!-- #docregion toggle -->
@@ -232,7 +276,7 @@
             </mat-form-field>
           </div>
 
-          <div class="col-sm-4">
+          <div class="col-md-3" style="width: 12.5%;">
             <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%">
               <mat-label>Ngày kiểm <i style="color: red;">(*)</i></mat-label>
               <!-- #docregion toggle -->
@@ -243,12 +287,12 @@
               <!-- #enddocregion toggle -->
             </mat-form-field>
           </div>
-          <div class="col-sm-4">
-            <label>Xuất xứ </label>
+          <div class="col-md-3">
+            <label>Nhà cung cấp</label>
             <!-- <input type="text" class="form-control" placeholder="Xuất xứ" name="origin" [(ngModel)]="form.origin" /> -->
             <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{strSelectOrigin}} name="origin"
-              [matAutocomplete]="origin" [formControl]="searchOriginCtrl" placeholder="Xuất xứ">
-            <mat-autocomplete [panelWidth]="400" #origin="matAutocomplete" (optionSelected)="onSelectedOrigin()"
+              [matAutocomplete]="origin" [formControl]="searchOriginCtrl" placeholder="Nhà cung cấp">
+            <mat-autocomplete #origin="matAutocomplete" (optionSelected)="onSelectedOrigin()"
               [displayWith]="displayWith">
               <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
               <ng-container *ngIf="!isLoadingOrigin">
@@ -257,22 +301,21 @@
                 </mat-option>
               </ng-container>
             </mat-autocomplete>
-
           </div>
-        </div>
-
-        <div class="form-group row">
-          <div class="col-sm-4">
+          <div class="col-md-3">
             <label>Mã PO </label>
             <input type="text" class="form-control" placeholder="Mã PO" name="grpoNumber"
               [(ngModel)]="form.grpoNumber" />
           </div>
-          <div class="col-sm-4">
+        </div>
+
+        <div class="form-group row">
+          <div class="col-md-3">
             <label>Lập phiếu SPKPH </label>
             <input type="text" class="form-control" placeholder="SPKPH" name="spkphNumber"
               [(ngModel)]="form.spkphNumber" />
           </div>
-          <div class="col-sm-4">
+          <div class="col-md-3">
             <label>Đề nghị </label>
 
             <select class="form-control" name="suggestion" [(ngModel)]="form.suggestion" #type="ngModel">
@@ -281,15 +324,16 @@
               <option value="Nhập kho có điều kiện">Nhập kho có điều kiện</option>
             </select>
           </div>
-          <div class="col-sm-4">
+          <div class="col-md-3">
             <label>Kết luận </label>
 
             <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
-              <option value="Đạt">Đạt</option>
-              <option value="Không đạt">Không đạt</option>
+              <option value="Đạt nhập kho">Đạt nhập kho</option>
+              <option value="Không đạt trả về">Không đạt trả về</option>
+              <option value="Nhập kho nhân nhượng">Nhập kho nhân nhượng</option>
             </select>
           </div>
-          <div class="col-sm-4" style="display: flex;flex-direction: column;">
+          <div class="col-md-3" style="display: flex;flex-direction: column;">
             <label>Phiếu SPKPH</label>
             <input id="cbx" class="hidden-xs-up" checked="" type="checkbox" name="iqcElectType"
               [(ngModel)]="form.iqcElectType" style="width: 30px;height: 28px;">
@@ -311,7 +355,7 @@
 
             <div class="float-right" style="margin-bottom: 10px;">
               <button class="btn  btn-success" (click)="addNewItem()"
-                *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm sản phẩm</button>
+                *ngIf="typeAction == 'edit' || typeAction == 'add'"><i class="fa fa-plus"></i> Thêm hàng hóa</button>
               <!-- <button id="btn-save-item" class="btn  btn-success" style="background-color: #0d6efd;margin-left: 10px;border: #0d6efd solid 1px;"  [hidden]="true"><i class="fa fa-save" ></i> Lưu</button> -->
             </div>
             <div style="margin-left: 7px;">
@@ -320,12 +364,12 @@
                   <thead>
                     <tr>
                       <th style="width: 4%;">STT</th>
-                      <th style="width: 10%;">Mã sản phẩm</th>
-                      <th style="width: 29%;">Tên sản phẩm</th>
+                      <th style="width: 10%;">Mã hàng hóa</th>
+                      <th style="width: 29%;">Tên hàng hóa</th>
                       <th style="width: 7%;">Số lượng lô hàng</th>
                       <th style="width: 7%;">Số lô</th>
                       <th style="width: 7%;">Số hóa đơn</th>
-                      <th style="width: 7%;">Số lượng kiểm tra</th>
+                      <th style="width: 7%;">Số lượng kiểm tra ngoại quan</th>
                       <th style="width: 6%;">Thông tin lỗi</th>
                       <th style="width: 15%;">Ghi chú</th>
                       <th style="width: 10%;" *ngIf="typeAction == 'edit' || typeAction == 'add'">Tùy chọn</th>
@@ -402,102 +446,132 @@
 
         <!-- thong tin kiem tra nvl -->
 
-        <div class="table-responsive">
-          <div class="row">
-            <div class="col-md-12">
-              <button class="btn  btn-success" *ngIf=" typeAction == 'edit'||  typeAction == 'add'"
-                style="margin-right: 10px;" (click)="open(mymodal)"><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
-                tra</button>
+        <div class="row">
+          <div class="col-md-12">
+            <button class="btn  btn-success" *ngIf=" typeAction == 'edit'||  typeAction == 'add'"
+              style="margin-right: 10px;" (click)="open(mymodal,'','')"><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
+              tra</button>
 
-              <button class="btn btn-danger" (click)="open(myModalError)" style="margin-right: 10px;height: 40px;"
-                [hidden]="true">
-                <i class="fa fa-plus"></i> Thông tin lỗi
-              </button>
-              <button class="btn  btn-danger"
-                *ngIf=" typeAction == 'edit'||  typeAction == 'add'||  typeAction == 'show'"
-                style="margin-right: 10px;height: 40px;" (click)="openPopupError(listErrorView,null)"><i
-                  class="fa fa-list"></i> Danh sách lỗi</button>
-              <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()" type="submit">
-                <i class="fa fa-download"></i> Xuất excel
-              </button>
-            </div>
+            <button class="btn btn-danger" (click)="open(myModalError,'','')" style="margin-right: 10px;height: 40px;"
+              [hidden]="true">
+              <i class="fa fa-plus"></i> Thông tin lỗi
+            </button>
+            <button class="btn  btn-danger" *ngIf=" typeAction == 'edit'||  typeAction == 'add'||  typeAction == 'show'"
+              style="margin-right: 10px;height: 40px;" (click)="openPopupError(listErrorView,null)"><i
+                class="fa fa-list"></i> Danh sách lỗi</button>
+            <button class="btn btn-success" *ngIf=" typeAction == 'show'" (click)="exportExcelDetail()" type="submit">
+              <i class="fa fa-download"></i> Xuất excel
+            </button>
           </div>
-
-          <nz-table #basicTable nzBordered [nzPageSize]="100" [nzData]="lstAuditCriteriaNvl">
-            <thead>
-              <tr>
-                <!-- <th colspan="3">Chỉ tiêu kiểm tra</th> -->
-                <th rowspan="2">Tiêu chí kiểm tra</th>
-                <th rowspan="2">Bậc rút nghiệm</th>
-                <th rowspan="2">Mức chấp nhận</th>
-                <th colspan="3">Yêu cầu kiểm tra</th>
-                <th rowspan="2" style="line-height: 65px">Yêu cầu chi tiết, lưu ý</th>
-                <th rowspan="2" style="line-height: 65px">Số lượng kiểm tra</th>
-                <th rowspan="2" style="line-height: 65px">Số lỗi thực tế</th>
-                <th colspan="2">Kết quả kiểm tra</th>
-                <th rowspan="2" style="line-height: 65px">Đánh giá</th>
-                <th rowspan="2" style="line-height: 65px">Ghi chú</th>
-                <th rowspan="2" style="line-height: 65px">Tùy chọn</th>
-              </tr>
-              <tr>
-                <th>Min</th>
-                <th>Max</th>
-                <th>Đơn vị</th>
-                <th>Min</th>
-                <th>Max</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr *ngFor="let audit of lstAuditCriteriaNvl let i=index">
-                <td>
-                  {{ audit.criteriaName }}
-                  <input type="hidden" name="auditCriteriaId" [(ngModel)]="audit.auditCriteriaId" />
-                </td>
-                <td>{{ audit.regulationLevel }}</td>
-                <td>{{ audit.acceptanceLevel }}</td>
-                <td>{{ audit.minAudit | number }}</td>
-                <td>{{ audit.maxAudit | number }}</td>
-                <td>{{ audit.unitAudit }}</td>
-                <td>{{ audit.noteAudit }}</td>
-                <td>
-                  <input type="text" placeholder="Số lượng" class="form-control" name="{{ 'quantity['+i+']' }}"
-                    [(ngModel)]="audit.quantity" />
-                </td>
-                <td>
-                  <input type="text" placeholder="Số lỗi thực tế" class="form-control"
-                    name="{{ 'ortherRequerement['+i+']' }}" [(ngModel)]="audit.ortherRequerement" />
-                </td>
-                <td>
-                  <input type="text" placeholder="min" class="form-control" name="{{ 'min['+i+']' }}"
-                    [(ngModel)]="audit.min" />
-                </td>
-                <td>
-                  <input type="text" placeholder="max" class="form-control" name="{{ 'max['+i+']' }}"
-                    [(ngModel)]="audit.max" />
-                </td>
-                <td>
-                  <select class="form-control" name="{{ 'checkResult['+i+']' }}" [(ngModel)]="audit.checkResult"
-                    #type="ngModel">
-                    <option value="Đạt">Đạt</option>
-                    <option value="Không đạt">Không đạt</option>
-                    <option value="Nhân nhượng">Nhân nhượng</option>
-                  </select>
-                </td>
-                <td>
-                  <input type="text" placeholder="Ghi chú" class="form-control" name="{{ 'note['+i+']' }}"
-                    [(ngModel)]="audit.note" />
-                </td>
-                <td>
-                  <button *ngIf=" typeAction == 'edit'||  typeAction == 'add'" class="btn btn-danger"
-                    (click)="deleteAuditRow(audit.ids, audit.id)">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </nz-table>
         </div>
+
+        <nz-table #basicTable nzBordered [nzPageSize]="100" [nzData]="lstAuditCriteriaNvl" [nzScroll]="{ x: '3700px' }"
+          [nzFrontPagination]="false">
+          <thead>
+            <!-- <tr>
+              <th rowspan="2" style="width: 2%;" nzLeft>STT</th>
+              <th rowspan="2" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+              <th rowspan="2" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+              <th rowspan="2" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+              <th colspan="3" style="width: 9%;">Yêu cầu kiểm tra</th>
+              <th rowspan="2" style="line-height: 65px">Yêu cầu chi tiết, lưu ý</th>
+              <th rowspan="2" style="line-height: 65px;width: 5%;">Số lượng kiểm tra</th>
+              <th rowspan="2" style="line-height: 65px;width: 4%;">Số lỗi thực tế</th>
+              <th colspan="2" style="width: 8%;">Kết quả kiểm tra</th>
+              <th rowspan="2" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
+              <th rowspan="2" style="line-height: 65px">Ghi chú</th>
+              <th rowspan="2" style="line-height: 65px;width: 3.5%;" nzRight>Tùy chọn</th>
+            </tr>
+            <tr>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Đơn vị</th>
+              <th>Min</th>
+              <th>Max</th>
+            </tr> -->
+            <tr>
+              <th [colspan]="1" class="set-color-background" style="width: 2%;" nzLeft>STT</th>
+              <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+              <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+              <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+              <th [colspan]="3" class="set-color-background" style="width: 9%;" nzLeft>Yêu cầu kiểm tra</th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px">Yêu cầu chi tiết, lưu ý
+              </th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5%;">Số lượng kiểm
+                tra</th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 4%;">Số lỗi thực tế
+              </th>
+              <th colspan="2" class="set-color-background" style="width: 8%;">Kết quả kiểm tra</th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px">Ghi chú</th>
+              <th rowspan="2" class="set-color-background" style="line-height: 65px; width: 3.5%;" nzRight>Tùy chọn
+              </th>
+            </tr>
+            <tr>
+              <th class="set-color-background" nzLeft></th>
+              <th class="set-color-background" nzLeft></th>
+              <th class="set-color-background" nzLeft></th>
+              <th class="set-color-background" nzLeft></th>
+              <th class="set-color-background" nzLeft>Min</th>
+              <th class="set-color-background" nzLeft>Max</th>
+              <th class="set-color-background" nzLeft>Đơn vị</th>
+              <th class="set-color-background">Min</th>
+              <th class="set-color-background">Max</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let audit of lstAuditCriteriaNvl let i=index">
+              <td nzLeft>{{audit.positionNumber}}</td>
+              <td nzLeft>
+                {{ audit.criteriaName }}
+                <input type="hidden" name="auditCriteriaId" [(ngModel)]="audit.auditCriteriaId" />
+              </td>
+              <td nzLeft>{{ audit.regulationLevel }}</td>
+              <td nzLeft>{{ audit.acceptanceLevel }}</td>
+              <td nzLeft>{{ audit.minAudit | number }}</td>
+              <td nzLeft>{{ audit.maxAudit | number }}</td>
+              <td nzLeft>{{ audit.unitAudit }}</td>
+              <td>{{ audit.noteAudit }}</td>
+              <td>
+                <input type="text" placeholder="Số lượng" class="form-control" name="{{ 'quantity['+i+']' }}"
+                  [(ngModel)]="audit.quantity" />
+              </td>
+              <td>
+                <input type="text" placeholder="Số lỗi thực tế" class="form-control"
+                  name="{{ 'ortherRequerement['+i+']' }}" [(ngModel)]="audit.ortherRequerement" />
+              </td>
+              <td>
+                <input type="text" placeholder="min" class="form-control" name="{{ 'min['+i+']' }}"
+                  [(ngModel)]="audit.min" />
+              </td>
+              <td>
+                <input type="text" placeholder="max" class="form-control" name="{{ 'max['+i+']' }}"
+                  [(ngModel)]="audit.max" />
+              </td>
+              <td>
+                <select class="form-control" name="{{ 'checkResult['+i+']' }}" [(ngModel)]="audit.checkResult"
+                  #type="ngModel">
+                  <option value="Đạt">Đạt</option>
+                  <option value="Không đạt">Không đạt</option>
+                  <option value="Nhân nhượng">Nhân nhượng</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" placeholder="Ghi chú" class="form-control" name="{{ 'note['+i+']' }}"
+                  [(ngModel)]="audit.note" />
+              </td>
+              <td nzRight>
+                <button class="btn btn-info" *ngIf=" typeAction == 'edit'||  typeAction == 'add'" title="Chỉnh sửa"
+                  (click)="open(mymodal,'edit',i)"><i class="fa fa-edit"></i></button>
+                <button *ngIf=" typeAction == 'edit'||  typeAction == 'add'" class="btn btn-danger"
+                  (click)="deleteAuditRow(audit.ids, audit.id)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
 
         <div class="form-group" style="margin-top: 20px">
 
@@ -509,7 +583,7 @@
             (click)="onSubmit('save')">
             <i class="fa fa-save"></i>
             <span *ngIf="typeAction =='add'"> Thêm mới biên bản</span>
-            <span *ngIf="typeAction =='edit'"> Cập nhật thông tin</span>
+            <span *ngIf="typeAction =='edit' "> Cập nhật thông tin</span>
           </button>
 
           <button *ngIf="typeAction =='add' || typeAction =='edit'" class="btn btn-info" type="submit"
@@ -652,12 +726,22 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <form name="form" (ngSubmit)="f.form.valid && onAddCheck()" #f="ngForm" novalidate>
+    <form name="form" (ngSubmit)="f.form.valid " #f="ngForm" novalidate>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Số thứ tự</label>
+            <input type="text" class="form-control {{ !positionNumber.valid ? 'is-invalid' :''}}"
+              [(ngModel)]="formAddCheck.positionNumber" #positionNumber="ngModel" required
+              [ngModelOptions]="{ standalone: true }" placeholder="Số thứ tự" (change)="checkDuplicateNumber()" />
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
             <label>Nhóm tiêu chí</label>
-            <input type="text" class="form-control" [(ngModel)]="testingCriticalGroup"
+            <input type="text" class="form-control " [(ngModel)]="testingCriticalGroup"
               [ngModelOptions]="{ standalone: true }" #criteriaName="ngModel" placeholder="Tiêu chí"
               list="testingCriticalGroup" (change)="findByCritiCalGroup()" />
             <datalist id="testingCriticalGroup">
@@ -672,9 +756,9 @@
         <div class="col-md-12">
           <div class="form-group">
             <label>Tiêu chí kiểm tra</label>
-            <input type="text" class="form-control" [(ngModel)]="formAddCheck.criteriaName"
-              [ngModelOptions]="{ standalone: true }" #criteriaName="ngModel" placeholder="Tiêu chí"
-              list="criteriaName1" />
+            <input type="text" class="form-control {{ !criteriaName1.valid ? 'is-invalid' :''}}"
+              [(ngModel)]="formAddCheck.criteriaName" [ngModelOptions]="{ standalone: true }" #criteriaName1="ngModel"
+              required name="criteriaName" placeholder="Tiêu chí" list="criteriaName1" />
             <datalist id="criteriaName1">
               <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
                 <span>{{ item.testingName }}</span>
@@ -687,8 +771,9 @@
         <div class="col-md-12">
           <div class="form-group">
             <label>Bậc rút nghiệm</label>
-            <input type="text" class="form-control" name="regulationLevel" [(ngModel)]="formAddCheck.regulationLevel"
-              #level="ngModel" placeholder="Mức quy định" />
+            <input type="text" class="form-control  {{ !regulationLevel.valid ? 'is-invalid' :''}}"
+              name="regulationLevel" [(ngModel)]="formAddCheck.regulationLevel" #regulationLevel="ngModel" required
+              placeholder="Mức quy định" />
           </div>
         </div>
       </div>
@@ -789,7 +874,14 @@
 
 
       <div class="form-group">
-        <button class="btn btn-success" type="submit" style="margin-top: 10px;">
+        <button id="btn-update" class="btn btn-success" type="submit" style="margin-top: 10px;"
+          [disabled]="!(f.form.valid)" (click)="onAddCheck('')">
+          <i class="fa fa-edit"></i> Cập nhật
+        </button>
+      </div>
+      <div class="form-group">
+        <button id="btn-insert" class="btn btn-success" type="submit" style="margin-top: 10px;"
+          [disabled]="!(f.form.valid) " (click)="onAddCheck(null)">
           <i class="fa fa-plus"></i> Thêm mới
         </button>
       </div>
@@ -804,7 +896,7 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+        <div class="column-table-check-nvl">Mã hàng hóa <br> <input type="text" class="input-errors"
             [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
             list="lstItemCode">
           <datalist id="lstItemCode">
@@ -845,7 +937,7 @@
           <thead>
             <tr>
               <th style="width: 5%;">STT</th>
-              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Mã hàng hóa </th>
               <th style="width: 9%;">Nhóm lỗi </th>
               <th style="width: 9%;">Mã lỗi </th>
               <th style="width: 21%;">Tên lỗi </th>
@@ -912,7 +1004,7 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div hidden>Mã sản phẩm <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
+        <div hidden>Mã hàng hóa <br> <input type="text" class="input-errors" [(ngModel)]="itemCode"
             [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()" list="lstItemCode">
           <datalist id="lstItemCode">
             <option *ngFor="let item of lstItemCode" value="{{item.itemCode}}"></option>
@@ -948,11 +1040,12 @@
           <thead>
             <tr>
               <th style="width: 5%;">STT</th>
-              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Mã hàng hóa </th>
               <th style="width: 9%;">Nhóm lỗi </th>
               <th style="width: 9%;">Mã lỗi </th>
               <th style="width: 21%;">Tên lỗi </th>
               <th style="width: 9%;">Số lượng</th>
+              <th style="width: 9%;">Ghi chú</th>
             </tr>
           </thead>
         </table>
@@ -967,6 +1060,7 @@
               <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
               <td style="text-align: left;width: 21%;"><span>{{item.errName}}</span></td>
               <td style="width: 9%;"><span>{{item.quantity}}</span></td>
+              <td style="width: 9%;"><span>{{item.note}}</span></td>
             </tr>
           </tbody>
         </table>

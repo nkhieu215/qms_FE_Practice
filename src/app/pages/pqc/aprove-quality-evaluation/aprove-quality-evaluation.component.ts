@@ -13,6 +13,7 @@ import { error } from 'console';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import { CommonService } from 'src/app/share/_services/common.service';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-aprove-quality-evaluation',
@@ -31,7 +32,8 @@ export class AproveQualityEvaluationComponent implements OnInit {
     private modalService: NgbModal,
     private tokenStorage: KeycloakService,
     private _formBuilder: FormBuilder,
-    private router: Router
+    private router: Router,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -52,6 +54,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
 
   idWorkOrder = '';
   ngOnInit(): void {
+    this.autoLogout.autoLogout(0, 'approve qms');
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
     this.getInfo()
@@ -73,13 +76,14 @@ export class AproveQualityEvaluationComponent implements OnInit {
       this.commonService.statusStep(id).toPromise().then(
         data => {
 
-          this.lstCheck = data.lstStep;
-
-
-          this.lstCheck.forEach(element => {
-            this.lstCheckStep?.push(element.step);
-            element.checked = element.checked;
-          });
+          this.lstCheck = data.lstStep.filter((x: any) => x.step != "PRINT_SERIAL");
+          // console.log("check list step", data.lstStep)
+          setTimeout(() => {
+            this.lstCheck.forEach(element => {
+              this.lstCheckStep?.push(element.step);
+              element.checked = element.checked;
+            });
+          }, 1000);
         },
         error => { }
       )
@@ -105,8 +109,8 @@ export class AproveQualityEvaluationComponent implements OnInit {
   }
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode } = this.formSearch;
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode).subscribe(
+    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode, version } = this.formSearch;
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode, version).subscribe(
       data => {
         var productionLst = new PQCPEndingOrderResponse();
         productionLst = data;
@@ -142,7 +146,8 @@ export class AproveQualityEvaluationComponent implements OnInit {
           note: this.note,
           conclude: action,
           type: action,
-          lstStep: this.lstCheck
+          lstStep: this.lstCheck,
+          updatedAt: new Date()
         };
         this.pqcService.approve(data).subscribe(
           (data) => {
@@ -172,7 +177,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
 
     this.commonService.statusStep(id).toPromise().then(
       data => {
-        this.lstCheck = data.lstStep;
+        this.lstCheck = data.lstStep.filter((x: any) => x.nameStep != 'Print Serial');
         this.lstCheck.forEach(element => {
           element.status = Utils.getStatusName(element.status);
         })
@@ -226,4 +231,6 @@ export interface StepCheck {
   step: string
   userId: string
   checked: boolean
+  updatedAt: any
+  createdAt: any
 }

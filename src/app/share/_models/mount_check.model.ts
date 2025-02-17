@@ -6,15 +6,17 @@ export class MountCompCheck {
   public machineName = null;
   public checkPerson = null;
   public checkTime = null;
+  public createdAt = null;
+  public updatedAt?: Date;
 
-  public quatity?:number;
+  public quatity?: number;
   public errTotal = null;
   public conclude = null;
   public note = null;
 
-  public errorLists:Array<ErrorElectronicComponent> =  [];
-  public ids ?:string;
-  public dttdMountCompId?:string;
-  public workOrderId?:string;
-  public operators?:string;
+  public errorLists: Array<ErrorElectronicComponent> = [];
+  public ids?: string;
+  public dttdMountCompId?: string;
+  public workOrderId?: string;
+  public operators?: string;
 }

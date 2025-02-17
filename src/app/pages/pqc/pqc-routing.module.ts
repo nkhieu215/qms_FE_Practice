@@ -47,7 +47,8 @@ const routes: Routes = [
     component: MakeProductOrderComponent,
     canActivate: [AuthGuard],
     data: {
-      allowedRoles: ['qms_admin', 'qms_pqc_pending_order_production']
+      // allowedRoles: ['qms_admin', 'qms_pqc_pending_order_production']
+      allowedRoles: []
     },
   },
 
@@ -56,7 +57,8 @@ const routes: Routes = [
     component: MakeOrderProductCRUDComponent,
     canActivate: [AuthGuard],
     data: {
-      allowedRoles: ['qms_admin', 'qms_pqc_pending_order_production']
+      // allowedRoles: ['qms_admin', 'qms_pqc_pending_order_production']
+      allowedRoles: []
     },
   },
 

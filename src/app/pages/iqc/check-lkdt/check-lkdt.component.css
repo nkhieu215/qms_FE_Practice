@@ -218,3 +218,8 @@
 .hidden-xs-up {
   display: none !important;
 }
+
+.set-color-background {
+  background-color: #dddddd;
+  border: #dddddd solid 1px;
+}

@@ -1,6 +1,7 @@
 
 import { AnimationPlayer } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { ExaminationService } from 'src/app/share/_services/examination.service';
 import { Examination } from 'src/app/share/response/examination/Examination';
 import { ExaminationResponse } from 'src/app/share/response/examination/ExaminationResponse';
@@ -27,23 +28,24 @@ export class ExaminationBrowsComponent implements OnInit {
   collectionSize = 0;
 
   auditCriteria: Examination[] = [];
-  examiantionRes?: ExaminationResponse ;
+  examiantionRes?: ExaminationResponse;
 
   formSearch: any = {
     name: null,
     type: 1
   };
 
-  constructor(private examinationService: ExaminationService) {
+  constructor(private examinationService: ExaminationService,
+    protected autoLogout: AuthService) {
     this.refreshExamination();
   }
 
   refreshExamination() {
     const { name, type, code } = this.formSearch;
-    this.examinationService.getAll(this.page, this.pageSize, name, type,code).subscribe(
+    this.examinationService.getAll(this.page, this.pageSize, name, type, code).subscribe(
       data => {
-        this.examiantionRes  = data;
-        this.auditCriteria =  data.lstExamination;
+        this.examiantionRes = data;
+        this.auditCriteria = data.lstExamination;
         this.collectionSize = Number(this.examiantionRes?.total) * this.pageSize;
       },
       err => {
@@ -55,7 +57,9 @@ export class ExaminationBrowsComponent implements OnInit {
   //   .map((country, i) => ({id: i + 1, ...country}))
   //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // this.autoLogout.autoLogout(0); 
+  }
 
   delete(id?: any) {
     Swal.fire({
@@ -68,17 +72,17 @@ export class ExaminationBrowsComponent implements OnInit {
     }).then((result) => {
       if (result.value) {
 
-            this.examinationService.delete(id).subscribe(
-              data => {
-                Swal.fire(
-                  'Thông báo',
-                  'Bạn đã thực hiện xóa thành công.',
-                  'success'
-                )
-                this.refreshExamination();
-              },
-              error => { }
+        this.examinationService.delete(id).subscribe(
+          data => {
+            Swal.fire(
+              'Thông báo',
+              'Bạn đã thực hiện xóa thành công.',
+              'success'
             )
+            this.refreshExamination();
+          },
+          error => { }
+        )
 
       } else if (result.dismiss === Swal.DismissReason.cancel) {
 
@@ -86,7 +90,7 @@ export class ExaminationBrowsComponent implements OnInit {
     })
   }
 
-  copy(id?:any){
+  copy(id?: any) {
     this.examinationService.copy(id).subscribe(
       data => {
         Swal.fire(

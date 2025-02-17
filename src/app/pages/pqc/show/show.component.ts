@@ -12,6 +12,7 @@ import { saveAs } from 'file-saver';
 import { formatDate } from '@angular/common';
 import { KeycloakService } from 'keycloak-angular';
 import { ExportExcelService } from 'src/app/share/_services/export-excel.service';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'pqc-show-work-order',
   templateUrl: './show.component.html',
@@ -35,10 +36,12 @@ export class ShowComponent implements OnInit {
     private data: PqcDataService,
     private tokenStorage: KeycloakService,
     private exportExelService: ExportExcelService,
+    protected autoLogout: AuthService
   ) { }
 
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.checkPrint = this.actRoute.snapshot.params['print'];
     this.checkType = this.actRoute.snapshot.params['type'];
     this.getInforWorkOrder();
@@ -73,8 +76,8 @@ export class ShowComponent implements OnInit {
           // }
 
 
+          console.log('check show', data.lstOrder, this.item_id, this.item_type);
           var statusStep = data.lstOrder[0].status
-          console.log(statusStep);
           if (statusStep == 'SUCCESS') {
             Swal.fire({
               title: 'Lỗi',

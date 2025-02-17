@@ -22,6 +22,7 @@ import { SolderCompCheck } from 'src/app/share/_models/solder_check.model';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-solder-check',
   templateUrl: './solder-check.component.html',
@@ -44,6 +45,7 @@ export class SolderCheckComponent implements OnInit {
     private errorService: ErrorListService,
     private scadaService: ScadaRequestService,
     private solderService: PQCSolderCheckService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -74,6 +76,7 @@ export class SolderCheckComponent implements OnInit {
   lstErrorGr?: ErrorList[];
   lstErrorRes?: ErrorListResponse;
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.checkTime = formatDate(new Date(), 'yyMMdd_HHmm', 'en_US');
     this.getInfo();
 
@@ -140,7 +143,7 @@ export class SolderCheckComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if (type =="add") {
+    if (type == "add") {
       // this.scadaService.getMachineName().toPromise().then(dataMachine=>{
       //   this.lstMachine2 = dataMachine.lstMachine2
       //   this.lstMachine2?.forEach(({ name, code }) => {
@@ -187,6 +190,8 @@ export class SolderCheckComponent implements OnInit {
         check.line = element.line;
         check.checkPerson = element.checkPerson;
         check.checkTime = element.checkTime;
+        check.createdAt = element.createdAt;
+        check.updatedAt = element.updatedAt;
         check.machineName = element.machineName;
         check.quatity = element.quatity;
         check.errTotal = element.errTotal;
@@ -197,6 +202,9 @@ export class SolderCheckComponent implements OnInit {
         check.dttdSolderCheckId = element.dttdSolderCheckId;
         this.lstSolderCompCheck?.push(check);
       });
+      setTimeout(() => {
+        this.lstSolderCompCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
+      }, 300);
     });
   }
 
@@ -226,14 +234,16 @@ export class SolderCheckComponent implements OnInit {
   }
 
   onAddUpdateCheck() {
-    const { batchId, line, checkPerson, checkTime, machineName, quatity, errTotal, conclude, note, dttdSolderCheckId, operators } = this.formEx;
+    const { batchId, line, checkPerson, checkTime, machineName, quatity, errTotal, conclude, note, dttdSolderCheckId, operators, createdAt } = this.formEx;
     var check = new SolderCompCheck();
     check.batchId = batchId;
     check.line = line,
-    check.checkPerson = checkPerson,
-    check.checkTime = checkTime,
-    check.machineName = machineName,
-    check.quatity = quatity;
+      check.checkPerson = checkPerson,
+      check.checkTime = checkTime,
+      check.createdAt = createdAt,
+      check.updatedAt = new Date(),
+      check.machineName = machineName,
+      check.quatity = quatity;
     check.errTotal = errTotal;
     check.conclude = conclude;
     check.note = note;
@@ -312,16 +322,16 @@ export class SolderCheckComponent implements OnInit {
   }
 
   arrErrChild: Array<ErrorElectronicComponent> = [];
-  dttdCheckId : any;
+  dttdCheckId: any;
   onAddErrorChild() {
 
     const { errGroup, errName, quantity } = this.formErrorChild;
     var ratio = ((quantity / (this.totalCheckElement == 0 ? 1 : this.totalCheckElement)) * 100).toFixed(2) + '%';
     const errorChild = new ErrorElectronicComponent(errName, errGroup, quantity, ratio, Utils.randomString(5));
-    errorChild.dttdCheckId =  this.dttdCheckId;
+    errorChild.dttdCheckId = this.dttdCheckId;
 
     this.solderService.addError(errorChild).toPromise().then(
-      data=>{
+      data => {
         Swal.fire(
           'Thông báo',
           'Bạn đã thực hiện thêm mới thông tin thành công.',
@@ -329,7 +339,7 @@ export class SolderCheckComponent implements OnInit {
         )
 
       },
-      error=>{}
+      error => { }
     )
 
     this.arrErrChild.push(errorChild);
@@ -348,7 +358,7 @@ export class SolderCheckComponent implements OnInit {
     this.arrErrChild.forEach((element, index) => {
       if (element.ids == ids) {
         this.solderService.deleteError(element.id).toPromise().then(
-          data=>{
+          data => {
             this.arrErrChild.splice(index, 1);
             Swal.fire(
               'Thông báo',
@@ -369,7 +379,7 @@ export class SolderCheckComponent implements OnInit {
     this.formEx = {};
     this.idsError = idError;
     this.formEx.checkPerson = this.tokenStorage.getUsername();
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.formErrorChild = [];
 
 
@@ -388,7 +398,7 @@ export class SolderCheckComponent implements OnInit {
               .subscribe(
                 (data) => {
                   this.arrErrChild = data.detail.lstError;
-                  this.arrErrChild.forEach(element=>{
+                  this.arrErrChild.forEach(element => {
                     element.ids = Utils.randomString(5);
                   })
                 },

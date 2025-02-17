@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -20,9 +21,9 @@ import Swal from 'sweetalert2';
 })
 export class TestingCriticalGroupComponent {
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCriticalGroup: any;
   listOfCriticalGroupOrigin: any;
@@ -96,6 +97,7 @@ export class TestingCriticalGroupComponent {
   constructor(
     protected http: HttpClient,
     private modalService: NgbModal,
+    protected autoLogout: AuthService
   ) { }
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -179,6 +181,7 @@ export class TestingCriticalGroupComponent {
     })
   }
   ngOnInit() {
+    this.autoLogout.autoLogout(0, 'testing group');
     this.getTestingCriticalGroupList();
     this.getTotalData();
     this.http.get<any>(`${this.address}/${this.path}/group/get-all`).subscribe(res => {

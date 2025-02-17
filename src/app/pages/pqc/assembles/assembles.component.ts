@@ -23,6 +23,7 @@ import { CommonService } from 'src/app/share/_services/common.service';
 import { AssemblesCheck } from 'src/app/share/_models/assembles_check.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-assembles',
@@ -48,7 +49,8 @@ export class AssemblesComponent implements OnInit {
     private errorService: ErrorListService,
     private scadaService: ScadaRequestService,
     private assemblesCheckService: PQCAssemblesCheckService,
-    private commonService: CommonService
+    private commonService: CommonService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -72,6 +74,7 @@ export class AssemblesComponent implements OnInit {
   lstErrorGr?: ErrorList[];
   lstErrorRes?: ErrorListResponse;
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.checkPerson = this.tokenStorage.getUsername();
     this.getInfo();
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -157,12 +160,17 @@ export class AssemblesComponent implements OnInit {
           check.ratio = element.ratio;
           check.conclude = element.conclude;
           check.checkTime = element.checkTime;
+          check.createdAt = element.createdAt;
+          check.updatedAt = element.updatedAt;
           check.note = element.note;
           check.operators = element.operators;
           check.ids = Utils.randomString(5);
           check.id = element.id;
           this.lstAssemblesCompCheck?.push(check);
         });
+        setTimeout(() => {
+          this.lstAssemblesCompCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
+        }, 300);
       });
     }
   }
@@ -194,7 +202,7 @@ export class AssemblesComponent implements OnInit {
   }
 
   onAddError() {
-    const { operators, lotNumber, line, checkPerson, processName, quatityPass, quatity, quatityFail, conclude, note, checkTime, ratio,
+    const { operators, lotNumber, line, checkPerson, processName, quatityPass, quatity, quatityFail, conclude, note, checkTime, ratio, createdAt
     } = this.formEx;
 
     var check = new AssemblesCheck();
@@ -209,6 +217,8 @@ export class AssemblesComponent implements OnInit {
     check.ratio = ratio
     check.conclude = conclude
     check.checkTime = checkTime
+    check.createdAt = createdAt
+    check.updatedAt = new Date()
     check.note = note;
     check.ids = Utils.randomString(5);
     check.workOrderId = this.actRoute.snapshot.params['id'];
@@ -328,7 +338,7 @@ export class AssemblesComponent implements OnInit {
   dttdCheckId?: any
   open(content: any, idError: any) {
     this.formEx = {};
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.formEx.checkPerson = this.tokenStorage.getUsername();
     // console.log(this.formEx.checkTime);
 

@@ -21,6 +21,7 @@ import { MountCompCheck } from 'src/app/share/_models/mount_check.model';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-mount-comp-check',
   templateUrl: './mount-comp-check.component.html',
@@ -39,7 +40,8 @@ export class MountCompCheckComponent implements OnInit {
     private tokenStorage: KeycloakService,
     private errorService: ErrorListService,
     private scadaService: ScadaRequestService,
-    private mountService: PQCMountCheckService
+    private mountService: PQCMountCheckService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -70,6 +72,7 @@ export class MountCompCheckComponent implements OnInit {
   idWorkOrder?: string;
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.checkTime = formatDate(new Date(), 'yyMMdd_HHmm', 'en_US');
     this.getInfo();
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -111,7 +114,7 @@ export class MountCompCheckComponent implements OnInit {
       this.errorService.getAllCategories().subscribe(
         (data) => {
           this.lstErrorRes = data;
-          this.lstErrorGr =data.lstError;
+          this.lstErrorGr = data.lstError;
           console.log(this.lstErrorRes);
         },
         (err) => { }
@@ -143,6 +146,9 @@ export class MountCompCheckComponent implements OnInit {
 
           element.ids = Utils.randomString(5);
         });
+        setTimeout(() => {
+          this.lstmountCompCheck.sort((a: any, b: any) => b.createdAt - a.createdAt);
+        }, 300);
       });
 
       // load machine
@@ -202,7 +208,8 @@ export class MountCompCheckComponent implements OnInit {
       conclude,
       note,
       dttdMountCompId,
-      operators
+      operators,
+      createdAt
     } = this.formEx;
 
     var check = new MountCompCheck();
@@ -210,6 +217,8 @@ export class MountCompCheckComponent implements OnInit {
     check.line = line;
     check.checkPerson = checkPerson;
     check.checkTime = checkTime;
+    check.createdAt = createdAt;
+    check.updatedAt = new Date();
     check.machineName = machineName;
     check.quatity = quatity;
     check.errTotal = errTotal;
@@ -333,7 +342,7 @@ export class MountCompCheckComponent implements OnInit {
   open(content: any, idError: any) {
     this.formEx = {};
     console.log(idError, this.lstmountCompCheck);
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.formEx.checkPerson = this.tokenStorage.getUsername();
     this.formErrorChild = [];
     if (idError != null) {

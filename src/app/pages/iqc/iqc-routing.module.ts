@@ -33,26 +33,55 @@ const routes: Routes = [
   {
     path: 'check-approve',
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     data: {
       breadcrumb: 'Danh sách phê duyệt',
-      allowedRoles: ['qms_admin', 'qms_approve_iqc']
     },
     children: [
       {
         path: '',
         component: ApproveRequestComponent,
+        data: {
+          breadcrumb: 'Phê duyệt',
+          allowedRoles: []
+        }
       },
       {
         path: ':id/:type',
         component: ApproveRequestComponent,
         data: {
           breadcrumb: 'Phê duyệt',
-          allowedRoles: ['qms_admin', 'qms_approve_iqc']
+          allowedRoles: ['qms_approve_iqc']
         }
       },
     ]
   },
-
+  {
+    path: 'iqc-list/:list',
+    canActivate: [AuthGuard],
+    data: {
+      breadcrumb: 'Danh sách biên bản IQC',
+      allowedRoles: []
+    },
+    children: [
+      {
+        path: '',
+        component: ApproveRequestComponent,
+        data: {
+          breadcrumb: 'Phê duyệt',
+          allowedRoles: []
+        }
+      },
+      {
+        path: ':id/:type',
+        component: ApproveRequestComponent,
+        data: {
+          breadcrumb: 'Phê duyệt',
+          allowedRoles: []
+        }
+      },
+    ]
+  },
   {
     path: 'iqc-lkdt-check',
     data: {

@@ -33,13 +33,15 @@
                       <th>Công đoạn sản xuất</th>
                       <th>Người kiểm tra</th>
                       <th>Người vận hành</th>
-                      <th>Thời gian</th>
+                      <th>Thời gian kiểm tra</th>
                       <th>Số lượng ktra</th>
                       <th>Số lượng đạt</th>
                       <th>SL hỏng</th>
                       <th>Tỷ lệ lỗi</th>
                       <th>Kết luận</th>
                       <th>Ghi chú</th>
+                      <th>Thời gian tạo</th>
+                      <th>Thời gian cập nhật</th>
                       <th>Tùy chọn</th>
                     </tr>
                   </thead>
@@ -56,6 +58,8 @@
                       <td>{{check.ratio}}</td>
                       <td>{{check.conclude}}</td>
                       <td>{{check.note}}</td>
+                      <td>{{check.createdAt|date:'dd/MM/yyyy HH:mm'}}</td>
+                      <td>{{check.updatedAt|date:'dd/MM/yyyy HH:mm'}}</td>
                       <td>
                         <div class="btn-group">
                           <button (click)="open(myModalError,check.ids)" class="btn btn-primary btn-sm"
@@ -111,7 +115,8 @@
               <div class="form-group">
                 <label>Công đoạn sx</label>
 
-                <select [(ngModel)]="formEx.processName"  class="form-control {{ !processName.valid ? 'is-invalid' :''}}" required #processName="ngModel" name="processName">
+                <select [(ngModel)]="formEx.processName" class="form-control {{ !processName.valid ? 'is-invalid' :''}}"
+                  required #processName="ngModel" name="processName">
                   <option *ngFor="let process of lstProcess " value="{{process.name}}">{{process.name}}</option>
 
                 </select>
@@ -123,7 +128,7 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group">
-                <label>Thời gian</label>
+                <label>Thời gian kiểm tra</label>
                 <input [(ngModel)]="formEx.checkTime" class="form-control" name="checkTime" required
                   placeholder="dd/mm/yyyy" />
               </div>

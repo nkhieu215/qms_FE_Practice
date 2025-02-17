@@ -166,7 +166,7 @@ export class PQCService {
     }, httpOptions);
   }
 
-  getListByStep(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate: string, sapcode: string, woCode: string, status: string, branchName: string, groupName: string, workOrderCode: string): Observable<any> {
+  getListByStep(page: number, size: number, name: string, code: string, lot: string, step: string, startDate: string, endDate: string, sapcode: string, woCode: string, status: string, branchName: string, groupName: string, workOrderCode: string, version: string): Observable<any> {
     console.log("check api: ", this.path + "/check-step");
     return this.http.post(this.path + "/check-step", {
       typeRequest: "ACTION_BROWS_STEP",
@@ -183,7 +183,8 @@ export class PQCService {
       status: status,
       groupName: groupName,
       branchName: branchName,
-      workOrderCode: workOrderCode
+      workOrderCode: workOrderCode,
+      version: version,
     }, httpOptions);
   }
 

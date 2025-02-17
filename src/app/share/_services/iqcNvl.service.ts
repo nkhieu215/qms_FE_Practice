@@ -24,6 +24,7 @@ const URL_CHECK_NVL_CREATE_PARAM = "electronic-components/create-param"
 const URL_COPY_IQC = "electronic-components/copy/"
 const URL_REPORT_NVL = "report/iqc-report-nvl/"
 const URL_REPORT_BTP = "report/iqc-report-btp/"
+const URL_REPORT_ALL = "report/iqc-report-all/"
 
 
 @Injectable({
@@ -34,7 +35,7 @@ export class IqcCheckService {
   constructor(private baseService: BaseService) {
   }
 
-  async getAll(page: number, size: number, param: any, type: string, typeRequest:string) {
+  async getAll(page: number, size: number, param: any, type: string, typeRequest: string) {
     let data = {
       typeRequest: typeRequest,
       page: page,
@@ -76,7 +77,7 @@ export class IqcCheckService {
   }
 
   report(id: any) {
-    return this.baseService.reportPostFile(`${URL_IQC_REPORT}/${id}`,{}, '');
+    return this.baseService.reportPostFile(`${URL_IQC_REPORT}/${id}`, {}, '');
   }
 
   // downloadfile(id: any): Observable<Blob>  {
@@ -90,17 +91,25 @@ export class IqcCheckService {
   //   return data ;
   // }
 
-  downloadfileNVL(id: any, fileName: any,listError:any) {
-    let data = this.baseService.reportPostFile(`${URL_REPORT_NVL} ${id}`,listError, '').subscribe(
+  downloadfileNVL(id: any, fileName: any, listError: any) {
+    let data = this.baseService.reportPostFile(`${URL_REPORT_NVL} ${id}`, listError, '').subscribe(
       blob => {
         saveAs(blob, fileName)
       }
     );
     return data;
   }
-
-  downloadfileBtp(id: any, fileName: any,listError:any) {
-    let data = this.baseService.reportPostFile(`${URL_REPORT_BTP} ${id}`,listError, '').subscribe(
+  downloadfile(id: any, fileName: any, searchBody: any) {
+    let data = this.baseService.reportPostFile(`${URL_REPORT_ALL} ${id}`, searchBody, '').subscribe(
+      blob => {
+        saveAs(blob, fileName)
+        console.log("check download:", blob)
+      }
+    );
+    return data;
+  }
+  downloadfileBtp(id: any, fileName: any, listError: any) {
+    let data = this.baseService.reportPostFile(`${URL_REPORT_BTP} ${id}`, listError, '').subscribe(
       blob => {
         saveAs(blob, fileName)
       }
@@ -110,7 +119,7 @@ export class IqcCheckService {
 
 
   // async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, lstError: any, type: any) {
-    async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, type: any) {
+  async create(component: any, lstIqcNvl: any, lstIqcParam: any, lstIqcLkdt: any, type: any) {
     let data = {
       typeRequest: type,
       component: component,
@@ -125,8 +134,8 @@ export class IqcCheckService {
 
 
   async copy(id: any) {
-   let data={}
-    let dataRes = await this.baseService.postService(data, URL_COPY_IQC+id, '');
+    let data = {}
+    let dataRes = await this.baseService.postService(data, URL_COPY_IQC + id, '');
     return dataRes;
   }
 

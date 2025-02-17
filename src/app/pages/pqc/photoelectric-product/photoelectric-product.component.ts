@@ -16,6 +16,7 @@ import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import { ExportExcelService } from 'src/app/share/_services/export-excel.service';
 import { PQCPhotoelectricService } from 'src/app/share/_services/pqcPhotoelectric.service';
 import { PqcPhotoelectricProduct } from 'src/app/share/_models/pqc_photoelectric_product.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-photoelectric-product',
   templateUrl: './photoelectric-product.component.html',
@@ -38,6 +39,7 @@ export class PhotoelectricProductComponent implements OnInit {
     private errorService: ErrorListService,
     private exportExelService: ExportExcelService,
     private photoelectricService: PQCPhotoelectricService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -92,6 +94,7 @@ export class PhotoelectricProductComponent implements OnInit {
   isLoading = false;
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.form.checkPerson = this.tokenStorage.getUsername();
     this.getInfo();
   }
@@ -241,13 +244,13 @@ export class PhotoelectricProductComponent implements OnInit {
           result = filteredData.reduce(function (a: any[], b: any[]) {
             var x = isNaN(parseFloat(a[col])) ? 0 : parseFloat(a[col]);
             var y = isNaN(parseFloat(b[col])) ? 0 : parseFloat(b[col]);
-            length ++;
-            tmp[col] =(x + y);
+            length++;
+            tmp[col] = (x + y);
 
             return tmp;
           }, tmp)[col];
 
-          result = (result/length).toFixed(2);
+          result = (result / length).toFixed(2);
         }
 
 
@@ -298,7 +301,7 @@ export class PhotoelectricProductComponent implements OnInit {
         }
       })
     } else {
-      this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+      this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
       this.formEx.checkPerson = this.tokenStorage.getUsername();
       this.formEx.lotNumber = this.form.lotNumber;
     }
@@ -386,13 +389,13 @@ export class PhotoelectricProductComponent implements OnInit {
 
       this.photoelectricService.createUpdateProd(check).subscribe(
         data => {
-          if(check.id){
+          if (check.id) {
             Swal.fire(
               'Cập nhật thông tin',
               'Bạn đã thực hiện cập nhật thông tin kiểm tra thành công.',
               'success'
             )
-          }else{
+          } else {
             Swal.fire(
               'Thêm mới thông tin',
               'Bạn đã thực hiện thêm mới thông tin kiểm tra thành công.',
@@ -449,7 +452,7 @@ export class PhotoelectricProductComponent implements OnInit {
 
   delete(id: any) {
     this.photoelectricService.deleteProd(id).subscribe(
-      data=>{
+      data => {
         Swal.fire(
           'Xóa',
           'Bạn đã thực hiện xóa thông tin kiểm tra thành công.',

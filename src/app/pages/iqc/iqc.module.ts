@@ -29,7 +29,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { TestingCriticalGroupComponent } from './testing-critical-group/testing-critical-group.component';
 import { TestingCriticalComponent } from './testing-critical/testing-critical.component';
-import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
+import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator';
 
 @NgModule({
   declarations: [

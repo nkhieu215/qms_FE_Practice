@@ -1,5 +1,6 @@
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import Utils from 'src/app/share/_utils/utils';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
@@ -13,12 +14,14 @@ import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
 export class PqcShowListComponent implements OnInit {
   @Input() item_type = '';
 
-  constructor(private pqcService: PQCService) { }
+  constructor(private pqcService: PQCService,
+    protected autoLogout: AuthService) { }
 
   strNameTitle?: string;
   strUrl?: string;
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     console.log(this.item_type);
     console.log(this.strUrl);
     switch (this.item_type) {
@@ -54,11 +57,11 @@ export class PqcShowListComponent implements OnInit {
         this.strUrl = 'pqc/pqc-assembles-check';
         break;
       case 'PHOTOELECTRIC':
-        this.strNameTitle = 'Kiểm tra thông số quang điện cho SP';
+        this.strNameTitle = 'Kiểm tra thông số quang điện cho BTP';
         this.strUrl = 'pqc/photoelectric';
         break;
       case 'PHOTOELECTRIC_PRODUCT':
-        this.strNameTitle = 'Kiểm tra thông số quang điện cho BTP';
+        this.strNameTitle = 'Kiểm tra thông số quang điện cho SP';
         this.strUrl = 'pqc/photoelectric-product';
         break;
       case 'FIX_ERR':
@@ -107,7 +110,7 @@ export class PqcShowListComponent implements OnInit {
   };
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode } = this.formSearch;
+    const { name, code, lot, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode, version } = this.formSearch;
     if (this.item_type == 'CHECK_NVL') {
       let strStatus = '';
       if (status == 'WAIT') {
@@ -121,7 +124,7 @@ export class PqcShowListComponent implements OnInit {
 
       this.show_check = true;
       this.pqcService
-        .getListByStep(this.page, this.pageSize, name, code, lot, "CHECK_NVL", startDate, endDate, sap, woCode, strStatus, branchName, groupName, workOrderCode)
+        .getListByStep(this.page, this.pageSize, name, code, lot, "CHECK_NVL", startDate, endDate, sap, woCode, strStatus, branchName, groupName, workOrderCode, version)
         .subscribe(
           (data) => {
             var productionLst = new PQCPEndingOrderResponse();
@@ -136,7 +139,7 @@ export class PqcShowListComponent implements OnInit {
         );
     } else {
       this.pqcService
-        .getListByStep(this.page, this.pageSize, name, code, lot, this.item_type, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode)
+        .getListByStep(this.page, this.pageSize, name, code, lot, this.item_type, startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode, version)
         .subscribe(
           (data) => {
             var productionLst = new PQCPEndingOrderResponse();

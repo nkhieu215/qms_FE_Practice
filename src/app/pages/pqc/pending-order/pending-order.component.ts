@@ -1,5 +1,6 @@
 
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import { PQCPendingOrder } from 'src/app/share/response/pqcResponse/pqcPendingOrder';
 
@@ -10,9 +11,11 @@ import { PQCPendingOrder } from 'src/app/share/response/pqcResponse/pqcPendingOr
 })
 export class PendingProductOrderComponent implements OnInit {
 
-  constructor(private pqcService: PQCService) { }
+  constructor(private pqcService: PQCService,
+    protected autoLogout: AuthService) { }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.refreshPage();
   }
 
@@ -20,7 +23,7 @@ export class PendingProductOrderComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
 
-  lstOrderPending : PQCPendingOrder[] = [];
+  lstOrderPending: PQCPendingOrder[] = [];
 
   formSearch: any = {
     name: null,
@@ -29,8 +32,8 @@ export class PendingProductOrderComponent implements OnInit {
     status: null,
   };
 
-  refreshPage(){
-    const { name, productCode,lot,woCode } = this.formSearch;
+  refreshPage() {
+    const { name, productCode, lot, woCode } = this.formSearch;
     let dataSearch = {
       typeRequest: "BROWS",
       page: this.page,
@@ -41,7 +44,7 @@ export class PendingProductOrderComponent implements OnInit {
       woCode: woCode
     }
 
-    this.pqcService.getOrderList(this.page, this.pageSize, name, productCode,  lot, woCode).subscribe(
+    this.pqcService.getOrderList(this.page, this.pageSize, name, productCode, lot, woCode).subscribe(
       data => {
         console.log(data);
         this.lstOrderPending = data.lstProduct;

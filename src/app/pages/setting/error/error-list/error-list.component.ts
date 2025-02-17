@@ -1,6 +1,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 @Component({
@@ -10,7 +11,9 @@ import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationR
 })
 export class ErrorListComponent implements OnInit {
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // this.autoLogout.autoLogout(0); 
+  }
 
   page = 1;
   pageSize = 10;
@@ -24,7 +27,8 @@ export class ErrorListComponent implements OnInit {
     code: null
   };
 
-  constructor(private errorService: ErrorListService) {
+  constructor(private errorService: ErrorListService,
+    protected autoLogout: AuthService) {
     this.refreshExamination();
   }
 

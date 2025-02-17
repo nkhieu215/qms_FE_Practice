@@ -14,20 +14,20 @@ export class PqcDrawNvlTest {
   public uotherNam?: string;
   public ulocation?: string;
 
-  public po?:string;
-  public date?:string;
-  public reelID?:string;
+  public po?: string;
+  public date?: string;
+  public reelID?: string;
 
-  public color?:string;
-  public feeder?:string;
-  public statusScanFeeder:boolean = false;
+  public color?: string;
+  public feeder?: string;
+  public statusScanFeeder: boolean = false;
   public stautsScanPart: boolean = false;
-  public err?:string;
+  public err?: string;
 
 
   public drawTestNvlId = null;
-  public allowResult?:string;
-  public checkDate?:string;
+  public allowResult?: string;
+  public checkDate?: string;
   public externalInspection = null;
   public itemCode = null;
 
@@ -46,18 +46,18 @@ export class PqcDrawNvlTest {
   public rankAp = null;
   public rankMau = null;
   public rankQuang = null;
-  public realResult?:string;
-  public regulationCheck = null;
-  public sampleQuantity = null;
+  public realResult?: string;
+  public regulationCheck = 5;
+  public sampleQuantity = 5;
   public technicalPara = null;
   public vendor = null;
   public workOrderId = null;
   public pqcDrawNvlId = null;
-  public ids ?:string;
+  public ids?: string;
   public ex_sampleQuantity = null
   public note = null
   public paramMin = null;
-  public paramMax= null;
-  public unit=null;
-  public returnDay ?:string;
+  public paramMax = null;
+  public unit = null;
+  public returnDay?: string;
 }

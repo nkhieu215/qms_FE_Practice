@@ -18,7 +18,7 @@ import { AuditCriteria } from 'src/app/share/_models/auditCriteria.model';
 import Utils from 'src/app/share/_utils/utils';
 import { HttpClient } from '@angular/common/http';
 import { OitmService } from 'src/app/share/_services/oitmservice';
-
+import { AuthService } from 'src/app/share/_services/auth.service';
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
@@ -26,9 +26,9 @@ import { OitmService } from 'src/app/share/_services/oitmservice';
 })
 export class ExaminationEditComponent implements OnInit {
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list tieu chi
   listOfCriticalName: any;
@@ -66,12 +66,15 @@ export class ExaminationEditComponent implements OnInit {
 
   formAudit: any = {
   };
+  arrayAuditCheckDup: Array<AuditCriteriaNvl> = []
+  arrayAuditLKDT2CheckDup: Array<AuditCriteriaLKDT2> = [];
 
   arrayAuditLKDT2: Array<AuditCriteriaLKDT2> = [];
   formAuditLKDT2: any = {
   };
 
   arrayAuditParam: Array<AuditCriteriaParam> = [];
+  arrayAuditParamCheckDup: Array<AuditCriteriaParam> = [];
   formAuditParam: any = {
   };
 
@@ -83,8 +86,87 @@ export class ExaminationEditComponent implements OnInit {
     private modalService: NgbModal,
     private tokenStorage: KeycloakService,
     private oitmService: OitmService,
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected autoLogout: AuthService
   ) {
+  }
+  sortList(type: any) {
+    if (type == 'NVL') {
+      this.arrayAudit = this.arrayAudit.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    } else if (type == 'LKDT1') {
+      this.arrayAuditLKDT2 = this.arrayAuditLKDT2.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    } else if (type == 'LKDT2') {
+      this.arrayAuditParam = this.arrayAuditParam.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    }
+  }
+  checkDuplicateNumber(type: any) {
+    if (type == 'NVL') {
+      var result = this.arrayAuditCheckDup.find(x => x.positionNumber == this.formAudit.positionNumber);
+      if (result) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAudit.length == 0) {
+          this.formAudit.positionNumber = 1;
+        } else {
+          this.formAudit.positionNumber = 0;
+          this.arrayAudit.forEach(x => {
+            if (x.positionNumber! >= this.formAudit.positionNumber) {
+              const i = x.positionNumber!
+              this.formAudit.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT1') {
+      var result1 = this.arrayAuditLKDT2CheckDup.find(x => x.positionNumber == this.formAuditLKDT2.positionNumber);
+      if (result1) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAuditLKDT2.length == 0) {
+          this.formAuditLKDT2.positionNumber = 1;
+        } else {
+          this.formAuditLKDT2.positionNumber = 0;
+          this.arrayAuditLKDT2.forEach(x => {
+            if (x.positionNumber! >= this.formAuditLKDT2.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditLKDT2.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT2') {
+      var result2 = this.arrayAuditParamCheckDup.find(x => x.positionNumber == this.formAuditParam.positionNumber);
+      if (result2) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.arrayAuditParam.length == 0) {
+          this.formAuditParam.positionNumber = 1;
+        } else {
+          this.formAuditParam.positionNumber = 0;
+          this.arrayAuditParam.forEach(x => {
+            if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditParam.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
   }
   // ----------------------------------------------------------- Danh sách sản phẩm áp dụng mẫu biên bản --------------------------------------------
   getListOfItems(value: any) {
@@ -223,6 +305,7 @@ export class ExaminationEditComponent implements OnInit {
   // ----------------------------------------------------------- --------------------------------------------------------------------------------------------
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.getinfor();
     console.log("checsk type:", this.examinationType, this.form.type)
     this.getListTestingGroupByType();
@@ -307,7 +390,7 @@ export class ExaminationEditComponent implements OnInit {
   onAddAudit(type: any, even: any) {
     console.log(type);
     if (type == 'LKDT1') {
-      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel, min, max, unit } =
+      const { auditContent, regulationLevel, technicalRequirement, id, acceptanceLevel, min, max, unit, positionNumber } =
         this.formAuditLKDT2;
       var lkdt = new AuditCriteriaLKDT2();
       lkdt.auditContent = auditContent;
@@ -317,6 +400,7 @@ export class ExaminationEditComponent implements OnInit {
       lkdt.min = min;
       lkdt.max = max;
       lkdt.unit = unit;
+      lkdt.positionNumber = positionNumber;
       lkdt.ids = Utils.randomString(5);
       lkdt.templateId = this.id;
       if (even == 'EDIT') {
@@ -350,9 +434,10 @@ export class ExaminationEditComponent implements OnInit {
         (err) => { }
       );
     } else if (type == 'LKDT2') {
-      const { parameterName, conditions, min, max, unit, id } =
+      const { parameterName, conditions, min, max, unit, id, positionNumber } =
         this.formAuditParam;
       var lkdt2 = new AuditCriteriaParam();
+      lkdt2.positionNumber = positionNumber;
       lkdt2.parameterName = parameterName;
       lkdt2.conditions = conditions;
       lkdt2.min = min;
@@ -378,7 +463,7 @@ export class ExaminationEditComponent implements OnInit {
         (data) => {
           Swal.fire({
             title: 'Cập nhật',
-            text: 'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
+            text: 'Bạn đã thực hiện thêm mới / cập nhật thông số kiểm tra thành công.',
             icon: 'success',
             showCancelButton: false,
             showConfirmButton: false,
@@ -390,20 +475,20 @@ export class ExaminationEditComponent implements OnInit {
         (err) => { }
       );
     } else if (type == 'NVL') {
-      const { criteriaName, regulationLevel, min, max, unit, note, id, acceptanceLevel } =
+      const { criteriaName, regulationLevel, min, max, unit, note, id, acceptanceLevel, positionNumber, testingName } =
         this.formAudit;
       const audit: AuditCriteriaNvl = new AuditCriteriaNvl();
-      audit.criteriaName = this.testingName;
+      audit.criteriaName = testingName;
       audit.regulationLevel = regulationLevel;
       audit.min = min;
       audit.max = max;
       audit.unit = unit;
       audit.note = note;
       audit.acceptanceLevel = acceptanceLevel;
+      audit.positionNumber = positionNumber;
       audit.ids = Utils.randomString(5);
       audit.templateId = this.actRoute.snapshot.params['id'];
       audit.id = id;
-
       if (even == 'EDIT') {
         (type = 'EDIT'),
           this.arrayAudit.forEach((element, index) => {
@@ -461,108 +546,254 @@ export class ExaminationEditComponent implements OnInit {
   }
 
   deleteAuditRow(ids: any, type: any) {
-    if (type == 'LKDT2') {
-      this.arrayAuditParam.forEach((element, index) => {
-        if (element.id == ids) {
-          this.arrayAuditParam.splice(index, 1);
-          var lkdt2 = new AuditCriteriaParam();
-          lkdt2.parameterName = element.parameterName;
-          lkdt2.conditions = element.conditions;
-          lkdt2.min = element.min;
-          lkdt2.max = element.max;
-          lkdt2.unit = element.unit;
-          lkdt2.id = element.id;
-          this.examinationService
-            .updateParam(null, null, lkdt2, 'DELETE', null)
-            .subscribe(
-              (data) => { },
-              (err) => { }
-            );
-        }
-      });
-    } else if (type == 'LKDT1') {
-      this.arrayAuditLKDT2.forEach((element, index) => {
-        if (element.ids == ids) {
-          this.arrayAuditLKDT2.splice(index, 1);
+    Swal.fire({
+      title: 'Cảnh báo',
+      text: 'Bạn có muốn tiếp tục thực hiện xóa tiêu chí này không?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý',
+      cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+      if (result.value) {
+        if (type == 'LKDT2') {
+          this.arrayAuditParam.forEach((element, index) => {
+            if (element.id == ids) {
+              this.arrayAuditParam.splice(index, 1);
+              var lkdt2 = new AuditCriteriaParam();
+              lkdt2.parameterName = element.parameterName;
+              lkdt2.conditions = element.conditions;
+              lkdt2.min = element.min;
+              lkdt2.max = element.max;
+              lkdt2.unit = element.unit;
+              lkdt2.id = element.id;
+              this.examinationService
+                .updateParam(null, null, lkdt2, 'DELETE', null)
+                .subscribe(
+                  (data) => {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: "top-end",
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                      }
+                    });
+                    Toast.fire({
+                      icon: "success",
+                      title: "Đã xoá thông tin thành công"
+                    });
+                  },
+                  (err) => { }
+                );
+            }
+          });
+        } else if (type == 'LKDT1') {
+          this.arrayAuditLKDT2.forEach((element, index) => {
+            if (element.ids == ids) {
+              this.arrayAuditLKDT2.splice(index, 1);
 
-          var lkdt = new AuditCriteriaLKDT2();
-          lkdt.auditContent = element.auditContent;
-          lkdt.regulationLevel = element.regulationLevel;
-          lkdt.technicalRequirement = element.technicalRequirement;
-          lkdt.id = element.id;
-          this.examinationService
-            .updateParam(null, lkdt, null, 'DELETE', null)
-            .subscribe(
-              (data) => { },
-              (err) => { }
-            );
+              var lkdt = new AuditCriteriaLKDT2();
+              lkdt.auditContent = element.auditContent;
+              lkdt.regulationLevel = element.regulationLevel;
+              lkdt.technicalRequirement = element.technicalRequirement;
+              lkdt.id = element.id;
+              this.examinationService
+                .updateParam(null, lkdt, null, 'DELETE', null)
+                .subscribe(
+                  (data) => {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: "top-end",
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                      }
+                    });
+                    Toast.fire({
+                      icon: "success",
+                      title: "Đã xoá thông tin thành công"
+                    });
+                  },
+                  (err) => { }
+                );
+            }
+          });
+        }
+        else if (type == 'CLSP') {
+          this.arrayAuditCLSP.forEach((element, index) => {
+            if (element.id == ids) {
+              this.arrayAuditCLSP.splice(index, 1);
+
+              var lkdt = new AuditCriteriaLKDT2();
+              lkdt.auditContent = element.auditContent;
+              lkdt.regulationLevel = element.regulationLevel;
+              lkdt.technicalRequirement = element.technicalRequirement;
+              lkdt.id = element.id;
+              this.examinationService
+                .updateParam(null, null, null, 'DELETE', lkdt)
+                .subscribe(
+                  (data) => {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: "top-end",
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                      }
+                    });
+                    Toast.fire({
+                      icon: "success",
+                      title: "Đã xoá thông tin thành công"
+                    });
+                  },
+                  (err) => { }
+                );
+            }
+          });
+        }
+        else {
+          this.arrayAudit.forEach((element, index) => {
+            if (element.id == ids) {
+              this.arrayAudit.splice(index, 1);
+              //delete sẻver
+              this.examinationService
+                .updateParam(element, null, null, 'DELETE', null)
+                .subscribe(
+                  (data) => {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: "top-end",
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                      }
+                    });
+                    Toast.fire({
+                      icon: "success",
+                      title: "Đã xoá thông tin thành công"
+                    });
+                  },
+                  (err) => { }
+                );
+            }
+          });
+        }
+      }
+    })
+  }
+
+  open(content: any, id: any, type: any, testingName: any, index: any) {
+    // console.log('group:::::::::', this.listOfCriticalGroup)
+    this.testingCriticalGroup = '';
+    this.testingName = '';
+
+    if (type == 'NVL') {
+      this.formAudit = {};
+      console.log("update-NVL");
+      this.arrayAudit.forEach((element, index) => {
+        if (element.id == id) {
+          this.formAudit = element;
         }
       });
+      if (this.arrayAudit.length == 0) {
+        this.formAudit.positionNumber = 1;
+      } else {
+        console.log("update-check");
+        this.arrayAuditCheckDup = [];
+        if (index != null) {
+          const list = this.arrayAudit;
+          console.log("update", this.arrayAuditCheckDup);
+          this.arrayAuditCheckDup = list.filter(x => x.positionNumber != list[index].positionNumber);
+        } else {
+          console.log("insert", this.arrayAuditCheckDup);
+          const list1 = this.arrayAudit;
+          this.arrayAuditCheckDup = list1;
+          this.formAudit.positionNumber = 0;
+          this.arrayAudit.forEach(x => {
+            if (x.positionNumber! >= this.formAudit.positionNumber) {
+              const i = x.positionNumber!
+              this.formAudit.positionNumber = Number(i) + 1;
+
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT2') {
+
+      this.arrayAuditParam.forEach((element, index) => {
+        if (element.id == id) {
+          this.formAuditParam = element;
+        }
+      });
+      if (this.arrayAuditParam.length == 0) {
+        this.formAuditParam.positionNumber = 1;
+      } else {
+        if (index != null) {
+          const list5 = this.arrayAuditParam;
+          this.arrayAuditParamCheckDup = list5.filter(x => x.positionNumber != list5[index].positionNumber);
+        } else {
+          const list6 = this.arrayAuditParam
+          this.arrayAuditParamCheckDup = list6;
+          this.formAuditParam.positionNumber = 0;
+          this.arrayAuditParam.forEach(x => {
+            if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditParam.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'LKDT1') {
+      this.formAuditLKDT2 = {};
+      this.arrayAuditLKDT2.forEach((element, index) => {
+        if (element.id == id) {
+          this.formAuditLKDT2 = element;
+        }
+      });
+      if (this.arrayAuditLKDT2.length == 0) {
+        this.formAuditLKDT2.positionNumber = 1;
+      } else {
+        if (index != null) {
+          const list2 = this.arrayAuditLKDT2;
+          this.arrayAuditLKDT2CheckDup = list2.filter(x => x.positionNumber != list2[index].positionNumber);
+        } else {
+          const list3 = this.arrayAuditLKDT2
+          this.arrayAuditLKDT2CheckDup = list3;
+          this.formAuditLKDT2.positionNumber = 0;
+          this.arrayAuditLKDT2.forEach(x => {
+            if (x.positionNumber! >= this.formAuditLKDT2.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditLKDT2.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
     }
     else if (type == 'CLSP') {
       this.arrayAuditCLSP.forEach((element, index) => {
-        if (element.id == ids) {
-          this.arrayAuditCLSP.splice(index, 1);
-
-          var lkdt = new AuditCriteriaLKDT2();
-          lkdt.auditContent = element.auditContent;
-          lkdt.regulationLevel = element.regulationLevel;
-          lkdt.technicalRequirement = element.technicalRequirement;
-          lkdt.id = element.id;
-          this.examinationService
-            .updateParam(null, null, null, 'DELETE', lkdt)
-            .subscribe(
-              (data) => {
-                Swal.fire({
-                  title: 'Xóa',
-                  text: 'Bạn đã thực hiện xóa thông tin kiểm tra thành công.',
-                  icon: 'success',
-                  showCancelButton: false,
-                  showConfirmButton: false,
-                  timer: 5000
-                })
-              },
-              (err) => { }
-            );
+        if (element.id == id) {
+          this.formAuditLKDT2 = element;
         }
       });
     }
     else {
-      this.arrayAudit.forEach((element, index) => {
-        if (element.id == ids) {
-          this.arrayAudit.splice(index, 1);
-          //delete sẻver
-          this.examinationService
-            .updateParam(element, null, null, 'DELETE', null)
-            .subscribe(
-              (data) => { },
-              (err) => { }
-            );
-        }
-      });
+      this.formAudit = {};
+      this.formAuditLKDT2 = {};
+      this.formAuditParam = {};
+      // console.log(this.formAudit);
     }
-  }
-
-  open(content: any, id: any, type: any, testingName: any) {
-    console.log('group:::::::::', this.listOfCriticalGroup)
-    this.testingCriticalGroup = '';
-    this.testingName = '';
-    if (testingName !== null) {
-      this.testingName = testingName;
-      var data = { testingName: testingName }
-      this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
-        this.testingCriticalGroup = res.testingCriticalGroup;
-        console.log("group name: ", res)
-      })
-    }
-    if (!this.listOfParameters) {
-      var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
-      this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
-        this.listOfParameters = res;
-        console.log(this.listOfParameters)
-      })
-    }
-    console.log(id);
     this.modalService.open(content, this.modalOptions).result.then(
       (result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -571,42 +802,21 @@ export class ExaminationEditComponent implements OnInit {
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       }
     );
-
-    if (type == 'NVL') {
-      this.arrayAudit.forEach((element, index) => {
-        if (element.id == id) {
-          this.formAudit = element;
-        }
-      });
-    } else if (type == 'LKDT2') {
-
-      this.arrayAuditParam.forEach((element, index) => {
-        if (element.id == id) {
-          this.formAuditParam = element;
-        }
-      });
-
-    } else if (type == 'LKDT1') {
-      this.arrayAuditLKDT2.forEach((element, index) => {
-        if (element.id == id) {
-          this.formAuditLKDT2 = element;
-        }
-      });
+    if (testingName !== null) {
+      this.formAuditLKDT2.testingName = testingName;
+      this.formAudit.testingName = testingName;
+      var data = { testingName: testingName }
+      // this.http.post<any>(`${this.address}/${this.path}/get-group-name`, data).subscribe(res => {
+      //   this.testingCriticalGroup = res.testingCriticalGroup;
+      //   console.log("group name: ", res)
+      // })
     }
-    else if (type == 'CLSP') {
-      this.arrayAuditCLSP.forEach((element, index) => {
-        if (element.id == id) {
-          this.formAuditLKDT2 = element;
-        }
-      });
-    }
-
-    else {
-      this.formAudit = {};
-      this.formAuditLKDT2 = {};
-      this.formAuditParam = {};
-      this.formAuditLKDT2 = {};
-      console.log(this.formAudit);
+    if (!this.listOfParameters) {
+      var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
+      this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data1).subscribe(res => {
+        this.listOfParameters = res;
+        console.log(this.listOfParameters)
+      })
     }
   }
 
@@ -648,17 +858,19 @@ export class ExaminationEditComponent implements OnInit {
         this.arrayAudit.forEach(element => {
           element.ids = Utils.randomString(5);
         })
+        this.sortList('NVL');
         this.arrayAuditParam =
           data.examinationType.iqcAuditCriteriaParameters || [];
         this.arrayAuditParam.forEach(element => {
           element.ids = Utils.randomString(5);
         })
+        this.sortList('LKDT2');
 
         this.arrayAuditLKDT2 = data.examinationType.lstAuditCriteriaLkdt;
         this.arrayAuditLKDT2.forEach(element => {
           element.ids = Utils.randomString(5);
         })
-
+        this.sortList('LKDT1');
         this.arrayAuditCLSP = data.examinationType.lstPqcCriteriaQualities;
         this.arrayAuditCLSP.forEach(element => {
           element.ids = Utils.randomString(5);

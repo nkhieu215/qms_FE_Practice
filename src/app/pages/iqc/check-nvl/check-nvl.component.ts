@@ -25,6 +25,7 @@ import { Constant } from 'src/app/share/_services/constant';
 import * as moment from 'moment';
 import { HttpClient } from '@angular/common/http';
 import { StoreCheckService } from 'src/app/share/_services/store_check.service';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-check-nvl',
@@ -34,9 +35,9 @@ import { StoreCheckService } from 'src/app/share/_services/store_check.service';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
@@ -99,6 +100,7 @@ export class CheckNvlComponent implements OnInit {
   strSelect: any = '';
   strSelectElec: any = '';
   lstAuditCriteriaNvl: AuditCriteriaNvl[] = [];
+  lstAuditCriteriaNvlCheckDup: AuditCriteriaNvl[] = [];
   lstElectronic?: Array<OitmObjResponse> = [];
   error?: string;
   classError?: string;
@@ -126,18 +128,49 @@ export class CheckNvlComponent implements OnInit {
     private tokenStorage: KeycloakService,
     private iqcCheckService: IqcCheckService,
     protected http: HttpClient,
-    protected storeCheckService: StoreCheckService
+    protected storeCheckService: StoreCheckService,
+    protected autoLogout: AuthService
 
   ) {
   }
-
+  sortList() {
+    this.lstAuditCriteriaNvl = this.lstAuditCriteriaNvl.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+  }
+  checkDuplicateNumber() {
+    var result1 = this.lstAuditCriteriaNvlCheckDup.find(x => x.positionNumber == this.formAddCheck.positionNumber);
+    if (result1) {
+      Swal.fire({
+        title: 'Lỗi',
+        text: 'Lặp số thứ tự',
+        icon: 'warning',
+        showCancelButton: false,
+        showConfirmButton: true,
+      })
+      if (this.lstAuditCriteriaNvl.length == 0) {
+        this.formAddCheck.positionNumber = 1;
+      } else {
+        this.formAddCheck.positionNumber = 0;
+        this.lstAuditCriteriaNvl.forEach(x => {
+          if (x.positionNumber! >= this.formAddCheck.positionNumber) {
+            const i = x.positionNumber!
+            this.formAddCheck.positionNumber = Number(i) + 1;
+          }
+        })
+      }
+    }
+  }
   onSelected() {
     // console.log('select', this.selectedEx);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectedEx.id}`).subscribe(res => {
       this.listOfItem = res;
+      this.listOfItem.forEach(x => {
+        x.iqcElecCompId = this.id;
+      })
     })
     this.strSelect = this.selectedEx.name + '(' + this.selectedEx.code + ')';
     this.iqcElecCompCode = this.selectedEx.code;
+    this.form.elecCompCode = this.form.templateCode = this.selectedEx.code;
+    this.form.electCompName = this.selectedEx.name;
     this.iqcElecCompname = this.selectedEx.name;
     this.lstAuditCriteriaNvl = this.selectedEx.lstAuditCriteriaNvl;
     this.lstAuditCriteriaNvl.forEach((element) => {
@@ -151,8 +184,11 @@ export class CheckNvlComponent implements OnInit {
       element.note = '';
       element.checkResult = 'Đạt'
       element.regulationLevel = element.regulationLevel;
+      element.quantity = '';
+      element.ortherRequerement = '0';
       element.ids = Utils.randomString(5);
     })
+    this.sortList()
   }
 
   onSelectedElectronic(index: any, itemCode: any) {
@@ -178,10 +214,10 @@ export class CheckNvlComponent implements OnInit {
         this.listOfItems = [];
       }
     }, 50);
-    // console.log("check lk", this.selectedElectronic);
+    console.log("check lk", this.listOfItem);
     this.strSelectElec = this.selectedElectronic.itemCode;
     this.lstElectronic = this.selectedElectronic.lstAuditCriteriaNvl;
-    this.form.electCompName = this.selectedElectronic.itemName;
+    // this.form.electCompName = this.selectedElectronic.itemName;
   }
 
   displayWith(value: any) {
@@ -194,25 +230,31 @@ export class CheckNvlComponent implements OnInit {
   }
 
   async refreshExamination() {
-    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType } = this.formSearch;
+    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType, origin } = this.formSearch;
     const dataSearch = {
       name: name,
       code: code,
       iqcCode: iqcCode,
       reportCode: reportCode,
-      startDate: startDate ? startDate + " 00:00:00" : null,
-      endDate: endDate ? endDate + " 23:59:59" : null,
+      // startDate: startDate ? startDate + " 00:00:00" : null,
+      // endDate: endDate ? endDate + " 23:59:59" : null,
+      startDate: startDate ? startDate : null,
+      endDate: endDate ? endDate : null,
       status: status,
       itemType: itemType,
-      invoiceNumber: invoiceNumber
+      invoiceNumber: invoiceNumber,
+      origin: origin,
+      grpoNumber: null,
+      createBy: null,
     }
+    console.log(this.formSearch);
     let data = await this.iqcCheckService.getAll(this.page, this.pageSize, dataSearch, Constant.TYPE_ELECTRIC_COMPONENT_NVL, Constant.IQC_TYPE_CREATE)
-    // console.log(data);
     this.auditnvl = data.lst;
     this.collectionSize = Number(data.total) * this.pageSize;
   }
 
   ngOnInit(): void {
+    this.autoLogout.autoLogout(0, 'check nvl');
     this.searchOriginCtrl.valueChanges
       .pipe(
         filter((res) => {
@@ -244,6 +286,11 @@ export class CheckNvlComponent implements OnInit {
     if (this.typeAction) {
       this.iqcElecCompId = this.id;
       this.lstview = false;
+      this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
+        this.listOfErrorWait = res;
+        // console.log('list errors:1 ', res, this.id);
+
+      })
       this.initCreate();
     } else {
       this.lstview = true;
@@ -253,6 +300,7 @@ export class CheckNvlComponent implements OnInit {
 
   async delete(id?: any) {
     let data = await this.iqcCheckService.delete(id);
+    console.log(data)
     if (data.result.responseCode == '00') {
       this.refreshExamination();
       Swal.fire("Thành công", "Bạn đã xóa thông tin kiểm tra thành công", "warning")
@@ -266,6 +314,7 @@ export class CheckNvlComponent implements OnInit {
       setTimeout(() => {
         let fileName = this.tokenStorage.getUsername() + "_" + code + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx"
         this.iqcCheckService.downloadfileNVL(id, fileName, this.listOfError);
+        console.log(this.listOfError)
       }, 100)
     })
   }
@@ -292,35 +341,41 @@ export class CheckNvlComponent implements OnInit {
     }
   }
 
-  async onAddCheck() {
-    const { criteriaName, regulationLevel, minAudit, maxAudit, unitAudit, noteAudit, ortherRequerement, quantityAudit, min, max, checkResult, note, acceptanceLevel } = this.formAddCheck;
-    this.formAddCheck.ids = Utils.randomString(5);
-    let audit = new AuditCriteriaNvl();
-    audit.criteriaName = criteriaName;
-    audit.regulationLevel = regulationLevel;
-    audit.minAudit = minAudit;
-    audit.maxAudit = maxAudit;
-    audit.unitAudit = unitAudit;
-    audit.noteAudit = noteAudit;
-    audit.ortherRequerement = ortherRequerement;
-    audit.min = min;
-    audit.quantityAudit = quantityAudit;
-    audit.max = max;
-    audit.note = note;
-    audit.checkResult = checkResult;
-    audit.acceptanceLevel = acceptanceLevel;
-
-
-    if (this.typeAction == 'edit') {
-      audit.electCompId = this.id;
-      let data = await this.iqcCheckService.addCheckParam({ nvlParam: audit, type: 'NVL' });
-      if (data.result.responseCode == '00') {
-        audit.id = data.id;
-        this.lstAuditCriteriaNvl.push(audit);
-        Swal.fire("Thành công", "Bạn đã thêm thông tin kiểm tra thành công", "success")
-      }
+  async onAddCheck(index: any) {
+    if (index != null) {
+      let data = await this.iqcCheckService.addCheckParam({ nvlParam: this.formAddCheck, type: 'NVL' });
+      Swal.fire("Thành công", "Bạn đã cập nhật thông tin kiểm tra thành công", "success");
+      this.sortList();
+      console.log(data);
     } else {
-      this.lstAuditCriteriaNvl.push(audit);
+      const { criteriaName, regulationLevel, minAudit, maxAudit, unitAudit, noteAudit, ortherRequerement, quantityAudit, min, max, checkResult, note, acceptanceLevel, positionNumber } = this.formAddCheck;
+      this.formAddCheck.ids = Utils.randomString(5);
+      let audit = new AuditCriteriaNvl();
+      audit.criteriaName = criteriaName;
+      audit.regulationLevel = regulationLevel;
+      audit.minAudit = minAudit;
+      audit.maxAudit = maxAudit;
+      audit.unitAudit = unitAudit;
+      audit.noteAudit = noteAudit;
+      audit.ortherRequerement = ortherRequerement;
+      audit.min = min;
+      audit.quantityAudit = quantityAudit;
+      audit.max = max;
+      audit.note = note;
+      audit.checkResult = checkResult;
+      audit.acceptanceLevel = acceptanceLevel;
+      audit.positionNumber = positionNumber;
+      if (this.typeAction == 'edit') {
+        audit.electCompId = this.id;
+        let data = await this.iqcCheckService.addCheckParam({ nvlParam: audit, type: 'NVL' });
+        if (data.result.responseCode == '00') {
+          audit.id = data.id;
+          this.lstAuditCriteriaNvl.push(audit);
+          Swal.fire("Thành công", "Bạn đã thêm thông tin kiểm tra thành công", "success")
+        }
+      } else {
+        this.lstAuditCriteriaNvl.push(audit);
+      }
     }
     this.modalService.dismissAll();
 
@@ -360,7 +415,7 @@ export class CheckNvlComponent implements OnInit {
     });
   }
 
-  open(content: any) {
+  open(content: any, type: any, index: any) {
     var data = { type: 'NVL' }
     this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
       // console.log("check list: ", res)
@@ -374,6 +429,29 @@ export class CheckNvlComponent implements OnInit {
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       }
     );
+
+
+
+    if (type == 'edit') {
+      this.formAddCheck = this.lstAuditCriteriaNvl[index];
+      this.lstAuditCriteriaNvlCheckDup = this.lstAuditCriteriaNvl.filter(x => x.positionNumber != this.lstAuditCriteriaNvl[index].positionNumber);
+      console.log("check update: ", this.lstAuditCriteriaNvlCheckDup)
+      document.getElementById('btn-update')!.hidden = false;
+      document.getElementById('btn-insert')!.hidden = true;
+    } else {
+      document.getElementById('btn-update')!.hidden = true;
+      document.getElementById('btn-insert')!.hidden = false;
+      this.formAddCheck = {};
+      var list3 = this.lstAuditCriteriaNvl
+      this.lstAuditCriteriaNvlCheckDup = list3;
+      this.formAddCheck.positionNumber = 0;
+      this.lstAuditCriteriaNvl.forEach(x => {
+        if (x.positionNumber! >= this.formAddCheck.positionNumber) {
+          const i = x.positionNumber!
+          this.formAddCheck.positionNumber = Number(i) + 1;
+        }
+      })
+    }
   }
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -430,6 +508,8 @@ export class CheckNvlComponent implements OnInit {
       this.form.checkDate = new Date();
       this.form.importDate = new Date();
       this.form.iqcElectType = false;
+      this.form.itemType = 'Hàng nhập';
+      this.form.suggestion = 'Nhập kho bình thường';
     } else if (this.typeAction == 'edit' || this.typeAction == 'show') {
       this.http.get<any>(`${this.address}/${this.path}/iqc/get-all/${this.id}`).subscribe(res => {
         this.listOfItem = res;
@@ -442,11 +522,13 @@ export class CheckNvlComponent implements OnInit {
       var id = this.id;
       let data = await this.iqcCheckService.detail(id);
       this.form = data.component;
-      if (this.form.iqcElectType == 'false') {
-        this.form.iqcElectType = false;
-      } else {
-        this.form.iqcElectType = true;
-      }
+      setTimeout(() => {
+        if (this.form.iqcElectType == 'false') {
+          this.form.iqcElectType = false;
+        } else {
+          this.form.iqcElectType = true;
+        }
+      }, 300);
       // console.log("check data :", data)
       this.selectedEx = this.form.templateCode = data.component.templateCode;
       this.form.checkDate = new Date(this.form.checkDate);
@@ -521,8 +603,34 @@ export class CheckNvlComponent implements OnInit {
         this.filteredOitm = data;
         // console.log('hello', this.filteredOitm);
       });
+    this.sortList();
+    console.log('check list err :', this.arrErrChild)
   }
-
+  createReport() {
+    this.form.elecCompCode = '';
+    this.form.electCompName = '';
+    this.form.checkDate = new Date();
+    this.form.importDate = new Date();
+    this.form.reportCode = formatDate(new Date(), 'yyyyMMddhhmmss', 'en_US') + '-RANGDONG-QC';
+    this.form.iqcElectType = false;
+    this.form.itemType = 'Hàng nhập';
+    this.form.suggestion = 'Nhập kho bình thường';
+    this.form.conclusion = 'Đạt nhập kho';
+    this.form.status = 'DRAFF';
+    this.form.type = Constant.TYPE_ELECTRIC_COMPONENT_NVL;
+    setTimeout(async () => {
+      let data = await this.iqcCheckService.create(this.form, null, null, null, 'ADD');
+      // setTimeout(() => {
+      console.log('check data :: ', data)
+      this.router.navigate([
+        `/iqc/iqc-nvl-check/${data.id}/edit`,
+        {},
+      ]).then(() => {
+        window.location.reload();
+      });
+      // }, 200);
+    }, 200);
+  }
   /**
    * thêm mới thông tin audit
    */
@@ -546,15 +654,17 @@ export class CheckNvlComponent implements OnInit {
         this.form.importDateStr =
           this.form.importDate != null ? moment(this.form.importDate).format('DD-MM-YYYY') : '';
         this.form.checkDateStr = this.form.checkDate != null ? moment(this.form.checkDate).format('DD-MM-YYYY') : '';
-        this.form.elecCompCode = this.strSelectElec;
+        // this.form.elecCompCode = this.strSelectElec;
         this.form.type = Constant.TYPE_ELECTRIC_COMPONENT_NVL;
+        // this.form.templateCode = this.iqcElecCompCode;
+        // this.form.elecCompCode = this.iqcElecCompCode;
 
-        if (this.typeAction == 'add') {
-          this.form.templateCode = this.iqcElecCompCode;
-          this.form.elecCompCode = this.iqcElecCompCode;
-          this.form.electCompName = this.iqcElecCompname;
-          // console.log('add nvl: ', this.form)
-        }
+        console.log('add nvl: ', this.form)
+        // if (this.typeAction == 'edit') {
+        //   this.form.templateCode = this.iqcElecCompCode;
+        //   this.form.elecCompCode = this.iqcElecCompCode;
+        //   // this.form.electCompName = this.iqcElecCompname;
+        // }
 
         let message = "Thêm mới biên bản thành công.";
         let showPage = false;
@@ -567,8 +677,8 @@ export class CheckNvlComponent implements OnInit {
         }
 
         // let data = await this.iqcCheckService.create(this.form, this.lstAuditCriteriaNvl, null, null, this.arrErrChild, 'ADD');
-        let data = await this.iqcCheckService.create(this.form, this.lstAuditCriteriaNvl, null, null, 'ADD');
-        // console.log(data)
+        let data = await this.iqcCheckService.create(this.form, this.lstAuditCriteriaNvl, null, null, 'EDIT');
+        console.log('check code', this.iqcElecCompCode, data);
         if (data && data.result.responseCode == '00') {
           Swal.fire('Thành công', message, 'success')
           Swal.fire({
@@ -579,19 +689,23 @@ export class CheckNvlComponent implements OnInit {
             confirmButtonText: 'Đồng ý',
           }).then(async (result) => {
             this.listOfErrorWait.forEach(x => {
-              x.electCompId = data.id;
+              if (this.actRoute.snapshot.params['type'] == 'edit') {
+                x.electCompId = this.actRoute.snapshot.params['id'];
+              } else {
+                x.electCompId = data.id;
+              }
             })
 
             setTimeout(() => {
               if (buttonType == 'send_approve') {
                 this.iqcElecCompId = data.id;
-                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = this.id);
                 setTimeout(() => {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
                   const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
                   // console.log(body)
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                    // console.log('1', res)
+                    console.log('send approve')
                     this.listOfErrorWait.forEach(x => {
                       var result2 = res.find((y: any) => y.itemCode == x.itemCode);
                       if (result2) {
@@ -610,25 +724,39 @@ export class CheckNvlComponent implements OnInit {
                   })
                 }, 1500);
               } else {
-                this.iqcElecCompId = data.id;
-                this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
+                // this.iqcElecCompId = data.id;
+                this.listOfItem.forEach((item: any) => item.iqcElecCompId = this.id);
                 setTimeout(() => {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
-                  const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
-                  this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                    console.log('1', res)
+                  if (this.actRoute.snapshot.params['type'] == 'edit') {
                     this.listOfErrorWait.forEach(x => {
-                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                      var result2 = this.listOfItem.find((y: any) => y.itemCode == x.itemCode);
                       if (result2) {
                         x.auditResultItemId = result2.id;
                       }
                     })
                     setTimeout(() => {
+                      // console.log('update: ', this.listOfErrorWait)
                       this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
                       });
                     }, 300);
+                  } else {
+                    const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                    this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                      console.log('1', res)
+                      this.listOfErrorWait.forEach(x => {
+                        var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                        if (result2) {
+                          x.auditResultItemId = result2.id;
+                        }
+                      })
+                      setTimeout(() => {
+                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                          console.log('insert')
+                        });
+                      }, 300);
+                    });
                   }
-                  );
                 }, 300);
                 setTimeout(() => {
                   this.router.navigate([
@@ -657,7 +785,9 @@ export class CheckNvlComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then(async (result) => {
       const data = await this.iqcCheckService.copy(id);
-      this.router.navigate([`/iqc/iqc-nvl-check/${data.id}/edit`, {},]);
+      // this.router.navigate([`/iqc/iqc-nvl-check/${data.id}/edit`, {},]);
+      window.open(`/iqc/iqc-nvl-check/${data.id}/edit`, '_blank')
+      window.location.reload();
     })
   }
 
@@ -874,6 +1004,14 @@ export class CheckNvlComponent implements OnInit {
     }
   }
   submitError(index: any) {
+    if (this.listOfError[index].quantity == 0) {
+      Swal.fire(
+        'Lỗi',
+        'Số lượng lỗi cần lớn hơn 0 !',
+        'warning'
+      )
+      return;
+    }
     if (this.listOfError[index].errorCode === '') {
       Swal.fire(
         'Lỗi',
@@ -1113,6 +1251,12 @@ export class CheckNvlComponent implements OnInit {
     this.strSelectOrigin = this.selectedOrigin.name;
     this.form.origin = this.selectedOrigin.name;
     // console.log(this.form.origin);
+
+  }
+  onSelectedOriginS() {
+    this.strSelectOrigin = this.selectedOrigin.name;
+    this.formSearch.origin = this.selectedOrigin.name;
+    console.log(this.formSearch.origin);
 
   }
 }

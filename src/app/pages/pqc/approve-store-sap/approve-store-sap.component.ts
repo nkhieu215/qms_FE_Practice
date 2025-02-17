@@ -14,6 +14,8 @@ import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
 import { StepCheck } from '../aprove-quality-evaluation/aprove-quality-evaluation.component';
 import { StoreCheck } from 'src/app/share/_models/storeCheck.model';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
+import { AppComponent } from 'src/app/app.component';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-approve-store-sap',
@@ -32,7 +34,8 @@ export class ApproveStoreSapComponent implements OnInit {
     private commonService: CommonService,
     private modalService: NgbModal,
     private router: Router,
-    private storeCheckService: StoreCheckService
+    private storeCheckService: StoreCheckService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -70,6 +73,7 @@ export class ApproveStoreSapComponent implements OnInit {
   optionsDoituong: string[] = [];
 
   ngOnInit(): void {
+    this.autoLogout.autoLogout(0, 'approve store');
     this.approveId = this.actRoute.snapshot.params['approveId'];
     this.getInfo();
 

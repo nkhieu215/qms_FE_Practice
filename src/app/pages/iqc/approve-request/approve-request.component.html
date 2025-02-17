@@ -6,28 +6,50 @@
     <div class="row">
       <div class="col-md-3">
         <div class="form-group">
-          <label>Tên nguyên vật liệu</label>
-          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
-            placeholder="Tên nguyên vật liệu" />
+          <label>Từ ngày</label>
+          <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
+            placeholder="Từ ngày" />
         </div>
       </div>
-
       <div class="col-md-3">
         <div class="form-group">
-          <label>Mã NVL</label>
-          <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
-            placeholder="Mã nguyên vật liệu" />
+          <label>Tới ngày</label>
+          <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
+            placeholder="Tới ngày" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Tên biên bản</label>
+          <input type="text" class="form-control" name="name" [(ngModel)]="formSearch.name" #name="ngModel"
+            placeholder="Tên biên bản" />
         </div>
       </div>
 
       <div class="col-md-3">
         <div class="form-group">
           <label>Mã biên bản</label>
-          <input type="text" class="form-control" name="reportCode" [(ngModel)]="formSearch.reportCode" #name="ngModel"
+          <input type="text" class="form-control" name="code" [(ngModel)]="formSearch.code" #name="ngModel"
             placeholder="Mã biên bản" />
         </div>
       </div>
 
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Số biên bản</label>
+          <input type="text" class="form-control" name="reportCode" [(ngModel)]="formSearch.reportCode" #name="ngModel"
+            placeholder="Số biên bản" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Số PO</label>
+          <input type="text" class="form-control" name="grpoNumber" [(ngModel)]="formSearch.grpoNumber" #name="ngModel"
+            placeholder="Số PO" />
+        </div>
+      </div>
       <div class="col-md-3">
         <div class="form-group">
           <label>Số hóa đơn</label>
@@ -35,38 +57,7 @@
             #name="ngModel" placeholder="Số hóa đơn" />
         </div>
       </div>
-    </div>
-
-    <div class="row">
-
-      <div class="col-md-2">
-        <div class="form-group">
-          <label>Từ ngày</label>
-          <input type="date" class="form-control" name="startDate" [(ngModel)]="formSearch.startDate" #name="ngModel"
-            placeholder="Từ ngày" />
-        </div>
-      </div>
-      <div class="col-md-2">
-        <div class="form-group">
-          <label>Tới ngày</label>
-          <input type="date" class="form-control" name="endDate" [(ngModel)]="formSearch.endDate" #name="ngModel"
-            placeholder="Tới ngày" />
-        </div>
-      </div>
-
-      <div class="col-md-2">
-        <div class="form-group">
-          <label>Trạng thái</label>
-          <select class="form-control" name="type" [(ngModel)]="formSearch.status" #type="ngModel">
-            <option value="WAIT_APPROVE">Chờ duyệt</option>
-            <option value="APPROVE">Đã duyệt</option>
-            <option value="CONCESSIONS">Nhân nhượng</option>
-            <option value="REJECT">Từ chối</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="col-md-2">
+      <div class="col-md-3">
         <div class="form-group">
           <label>Loại hàng</label>
           <select class="form-control" name="itemType" [(ngModel)]="formSearch.itemType" #type="ngModel">
@@ -76,7 +67,23 @@
           </select>
         </div>
       </div>
-      <div class="col-md-2">
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select class="form-control" name="type" [(ngModel)]="formSearch.status" #type="ngModel">
+            <option selected value="">Tất cả</option>
+            <option selected value="DRAFF" *ngIf="openList == 'show'">Nháp</option>
+            <option value="WAIT_APPROVE">Chờ duyệt</option>
+            <option value="APPROVE">Đã duyệt</option>
+            <option value="CONCESSIONS">Nhân nhượng</option>
+            <option value="REJECT">Từ chối</option>
+            <option value="CANCEL">Hủy</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
         <div class="form-group">
           <label>Loại biên bản</label>
           <select class="form-control" name="type" [(ngModel)]="formSearch.type" #type="ngModel">
@@ -87,13 +94,44 @@
         </div>
       </div>
 
-
-      <div class="col-md-2">
-        <div class="form-group" style="line-height: 70px;">
-          <button class="btn btn-primary " type="submit">
-            <i class="fa fa-search"></i> Tìm kiếm
-          </button>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Nhà cung cấp</label>
+          <input type="text" class="form-control" [(ngModel)]="selectedOrigin" value={{formSearch.origin}} name="origin"
+            [matAutocomplete]="originS" [formControl]="searchOriginCtrl" placeholder="Nhà cung cấp"
+            style="height: 40px;">
+          <mat-autocomplete #originS="matAutocomplete" (optionSelected)="onSelectedOriginS()"
+            [displayWith]="displayWith">
+            <mat-option *ngIf="isLoadingOrigin" class="is-loading">Loading...</mat-option>
+            <ng-container *ngIf="!isLoadingOrigin">
+              <mat-option value="">
+                <span>Tất cả</span>
+              </mat-option>
+              <mat-option *ngFor="let oitm of filteredOrigin.lstOcrd" [value]="oitm">
+                <span><b>{{oitm.name}}</b> ({{oitm.code}})</span>
+              </mat-option>
+            </ng-container>
+          </mat-autocomplete>
         </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label>Người tạo</label>
+          <input type="text" class="form-control" name="createBy" [(ngModel)]="formSearch.createBy" #name="ngModel"
+            placeholder="Người tạo" />
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group" style="line-height: 70px;">
+        <button class="btn btn-primary " type="submit">
+          <i class="fa fa-search"></i> Tìm kiếm
+        </button>
+        <button class="btn btn-primary "
+          style="margin-left: 20px;background-color: rgb(30, 130, 43);border: rgb(30, 130, 43) solid 1px ;"
+          (click)="exportFile()">
+          <i class="fa fa-download"></i> Xuất Excel
+        </button>
       </div>
     </div>
   </form>
@@ -106,17 +144,20 @@
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">Số biên bản</th>
-            <th scope="col">Mã biên bản</th>
-            <th scope="col">Tên biên bản </th>
+            <th scope="col" style="width: 10.2%;">Số biên bản</th>
+            <th scope="col" style="width: 11%;">Mã biên bản</th>
+            <th scope="col" style="width: 11%;">Tên biên bản </th>
+            <th scope="col" style="width: 11%;">Nhà cung cấp</th>
             <th scope="col">Loại</th>
             <th>Loại biên bản</th>
             <th>Loại hàng</th>
+            <th>Ngày nhận hàng</th>
             <th scope="col">Người tạo</th>
             <th scope="col">Ngày thực hiện</th>
             <th scope="col">Ngày cập nhật</th>
+            <th scope="col" style="width: 8%;">Đề nghị</th>
             <th scope="col">Trạng thái</th>
-            <th>Nhận xét</th>
+            <th style="width: 13%;">Nhận xét</th>
             <th scope="col">Tùy chọn</th>
           </tr>
         </thead>
@@ -126,36 +167,43 @@
             <td>{{ audit.reportCode}}</td>
             <td>{{ audit.elecCompCode}}</td>
             <td>{{ audit.electCompName }}</td>
+            <td>{{ audit.origin }}</td>
             <td> <span *ngIf="audit.iqcElectType == 'false'">IQC</span><span
                 *ngIf="audit.iqcElectType == 'true'">PhiếuSPKPH</span> </td>
             <td>{{audit.type ==1 ? 'NVL/BTP/TP': 'LKDT/BTP'}}</td>
             <td>{{audit.itemType}}</td>
+            <td>{{audit.importDate| date:'dd/MM/yyyy'}}</td>
             <td>{{ audit.createBy}}</td>
-            <td>{{ audit.createdAt | date:'dd/MM/YYYY HH:mm'}}</td>
-            <td>{{ audit.updatedAt | date:'dd/MM/YYYY HH:mm'}}</td>
+            <td>{{ audit.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{ audit.updatedAt | date:'dd/MM/yyyy HH:mm'}}</td>
+            <td>{{ audit.suggestion}}</td>
+
             <td>
+              <p *ngIf="audit.status =='DRAFF' && openList == 'show'"> Nháp</p>
               <p *ngIf="audit.status =='REJECT'"> Từ chối</p>
               <p *ngIf="audit.status =='WAIT_APPROVE'"> Chờ duyệt </p>
               <p *ngIf="audit.status =='APPROVE'"> Đã duyệt </p>
               <p *ngIf="audit.status =='CONCESSIONS'"> Nhân nhượng </p>
+              <p *ngIf="audit.status =='CANCEL'"> Hủy</p>
             </td>
             <td>{{ audit.approveNote}}</td>
 
             <td class="text-center">
 
-              <button *ngIf="audit.status == 'WAIT_APPROVE'" style="margin-right: 5px;" class="btn btn-sm btn-primary"
-                routerLink="/iqc/check-approve/{{audit.id}}/approve">
+              <a *ngIf="audit.status == 'WAIT_APPROVE' && openList != 'show'" style="margin-right: 5px;"
+                class="btn btn-sm btn-primary" routerLink="/iqc/check-approve/{{audit.id}}/approve" target="_blank">
                 <i class="fa fa-check"></i> Phê duyệt
-              </button>
-              <button style="margin-right: 10px;" class="btn btn-sm btn-info"
-                routerLink="/iqc/check-approve/{{audit.id}}/show">
+              </a>
+              <a *ngIf="openList == ''" style="margin-right: 10px;" title="view approve" class="btn btn-sm btn-info"
+                routerLink="/iqc/check-approve/{{audit.id}}/show" target="_blank">
                 <i class="fa fa-eye"></i>
-              </button>
-
+              </a>
+              <a *ngIf="openList == 'show'" style="margin-right: 10px;" title="view detail" class="btn btn-sm btn-info"
+                routerLink="/iqc/iqc-list/view/{{audit.id}}/show" target="_blank">
+                <i class="fa fa-eye"></i>
+              </a>
               <button class="btn btn-sm btn-success" (click)="report(audit.id,audit.type,audit.reportCode)"
                 title="File biên bản"><i class="fa fa-download"></i></button>
-
-
           </tr>
         </tbody>
       </nz-table>
@@ -184,7 +232,7 @@
             <div class="col-sm-4">
               <label>Mẫu biên bản</label>
               <input type="text" readonly class="form-control" placeholder="Tên linh kiện"
-                [(ngModel)]="form.templateCode" [ngModelOptions]="{ standalone: true }" />
+                [(ngModel)]="form.elecCompCode" [ngModelOptions]="{ standalone: true }" />
             </div>
             <div class="col-sm-4">
               <label>Số biên bản</label>
@@ -193,10 +241,12 @@
             </div>
             <div class="col-sm-4">
               <label>Loại hàng</label>
-              <select class="form-control" name="itemType" [(ngModel)]="form.itemType" #type="ngModel" readonly>
+              <!-- <select class="form-control" name="itemType" [(ngModel)]="form.itemType" #type="ngModel" readonly>
                 <option value="Hàng nhập">Hàng nhập</option>
                 <option value="Hàng mẫu">Hàng mẫu</option>
-              </select>
+              </select> -->
+              <input type="text" class="form-control" name="itemType" [(ngModel)]="form.itemType" #name="ngModel"
+                readonly />
             </div>
           </div>
 
@@ -225,8 +275,8 @@
               </mat-form-field>
             </div>
             <div class="col-sm-4">
-              <label>Xuất xứ</label>
-              <input type="text" readonly class="form-control" placeholder="Xuất xứ" name="origin"
+              <label>Nhà cung cấp</label>
+              <input type="text" readonly class="form-control" placeholder="Nhà cung cấp" name="origin"
                 [(ngModel)]="form.origin" />
             </div>
           </div>
@@ -265,36 +315,76 @@
               <input type="text" readonly class="form-control" placeholder="SPKPH" name="spkphNumber"
                 [(ngModel)]="form.spkphNumber" />
             </div>
+            <div class="col-sm-4" style="display: flex;flex-direction: column;">
+              <label>Phiếu SPKPH</label>
+              <input id="cbx" class="hidden-xs-up" checked="" type="checkbox" name="iqcElectType"
+                [(ngModel)]="form.iqcElectType" style="width: 30px;height: 28px;">
+              <label for="cbx" class="cbx"></label>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-sm-4">
-              <label>Kết luận</label>
-
-              <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel" readonly>
+              <label>Đề nghị của bộ phận kiểm tra</label>
+              <input type="text" readonly class="form-control" placeholder="Mã PO" name="suggestion"
+                [(ngModel)]="form.suggestion" />
+            </div>
+            <div class="col-sm-4">
+              <label>Kết luận của bộ phận kiểm tra</label>
+              <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel"
+                *ngIf="actRoute.snapshot.params['type'] == 'approve'">
                 <option value="Đạt nhập kho">Đạt nhập kho</option>
                 <option value="Không đạt trả về">Không đạt trả về</option>
                 <option value="Nhập kho nhân nhượng">Nhập kho nhân nhượng</option>
               </select>
+              <input type="text" class="form-control" name="itemType" [(ngModel)]="form.conclusion" #name="ngModel"
+                *ngIf="actRoute.snapshot.params['type'] == 'show'" readonly />
+            </div>
+          </div>
+          <div class="row">
+            <div class="row pb-3">
+              <div class="col-sm-12">
+                <label>Ghi chú</label>
+                <input type="text" class="form-control" placeholder="Ghi chú" name="note" [(ngModel)]="form.note">
+              </div>
+
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 pt-3 pb-3"
+            *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS' || form.status =='WAIT_APPROVE')">
+            <div class="row">
+              <h2>Thông tin phê duyệt</h2>
+              <div class="col-xs-6 col-sm-6">
+                <label>Nhận xét</label>
+                <input type="text" readonly="true" class="form-control" placeholder="Nhận xét" name="templateCode"
+                  [(ngModel)]="form.approveNote" />
+              </div>
+              <div class="col-xs-6 col-sm-6">
+                <label>Trạng thái biên bản</label>
+                <input type="text" readonly="true" class="form-control" placeholder="Kết luận" name="statusStr"
+                  value="{{statusStr}}" [(ngModel)]="statusStr" />
+              </div>
             </div>
           </div>
           <!-- Danh sách item được áp dụng -->
           <div class="table-responsive">
             <div style="display: flex;flex-direction: column;">
-              <!-- Danh sách mã sản phẩm -->
+              <!-- Danh sách mã hàng hóa -->
               <div style="margin-left: 7px;">
                 <div style="margin: 25px 0px 0px 0px;;width: 99%;">
                   <div class="float-right"
                     style="border:#dee2e6 solid 1px; margin-bottom: -22px;padding: 1%;font-size: 19px;">
-                    Danh sách sản phẩm áp dụng
+                    Danh sách hàng hóa áp dụng
                   </div>
                   <table class="tables" style="margin-bottom: 0px;">
                     <thead>
                       <tr>
                         <th style="width: 4%;">STT</th>
-                        <th style="width: 7%;">Mã sản phẩm</th>
-                        <th style="width: 29%;">Tên sản phẩm</th>
+                        <th style="width: 7%;">Mã hàng hóa</th>
+                        <th style="width: 29%;">Tên hàng hóa</th>
                         <th style="width: 7%;">Số lượng lô hàng</th>
                         <th style="width: 7%;">Số lô</th>
                         <th style="width: 7%;">Số hóa đơn</th>
-                        <th style="width: 7%;">Số lượng kiểm tra</th>
+                        <th style="width: 7%;">Số lượng kiểm tra ngoại quan</th>
                         <th style="width: 6%;">Thông tin lỗi</th>
                         <th style="width: 20%;">Ghi chú</th>
                       </tr>
@@ -323,22 +413,6 @@
               </div>
             </div>
           </div>
-          <div class="col-xs-12 col-sm-12 pt-3 pb-3"
-            *ngIf="typeAction == 'show' && (form.status =='APPROVE' || form.status =='REJECT'||form.status =='CONCESSIONS' || form.status =='WAIT_APPROVE')">
-            <div class="row">
-              <h2>Thông tin phê duyệt</h2>
-              <div class="col-xs-6 col-sm-6">
-                <label>Nhận xét</label>
-                <input type="text" readonly="true" class="form-control" placeholder="Nhận xét" name="templateCode"
-                  [(ngModel)]="form.approveNote" />
-              </div>
-              <div class="col-xs-6 col-sm-6">
-                <label>Kết luận</label>
-                <input type="text" readonly="true" class="form-control" placeholder="Kết luận" name="statusStr"
-                  value="{{statusStr}}" [(ngModel)]="statusStr" />
-              </div>
-            </div>
-          </div>
           <!-- thong tin kiem tra nvl -->
           <div *ngIf="form.type == 1 ; else blockptp">
             <div class="table-responsive">
@@ -350,18 +424,19 @@
                   (click)="openPopupError(listErrorView,null)"><i class="fa fa-list"></i> Danh sách lỗi</button>
               </div>
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="lstAuditCriteriaNvl"
-                [nzFrontPagination]="false">
+                [nzScroll]="{ x: '3700px' }" [nzFrontPagination]="false">
                 <thead>
-                  <tr>
-                    <th rowspan="2">Tiêu chí kiểm tra</th>
-                    <th rowspan="2">Bậc rút nghiệm</th>
-                    <th rowspan="2">Mức chấp nhận</th>
-                    <th colspan="3">Yêu cầu kiểm tra</th>
+                  <!-- <tr>
+                    <th rowspan="2" style="width: 2%;" nzLeft>STT</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+                    <th colspan="3" style="width: 9%;">Yêu cầu kiểm tra</th>
                     <th rowspan="2" style="line-height: 65px">Yêu cầu chi tiết, lưu ý</th>
-                    <th rowspan="2" style="line-height: 65px">Số lượng kiểm tra</th>
-                    <th rowspan="2" style="line-height: 65px">Số lỗi thực tế</th>
-                    <th colspan="2">Kết quả kiểm tra</th>
-                    <th rowspan="2" style="line-height: 65px">Đánh giá</th>
+                    <th rowspan="2" style="line-height: 65px;width: 5%;">Số lượng kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px;width: 4%;">Số lỗi thực tế</th>
+                    <th colspan="2" style="width: 8%;">Kết quả kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
                     <th rowspan="2" style="line-height: 65px">Ghi chú</th>
                   </tr>
                   <tr>
@@ -370,19 +445,47 @@
                     <th>Đơn vị</th>
                     <th>Min</th>
                     <th>Max</th>
+                  </tr> -->
+                  <tr>
+                    <th [colspan]="1" class="set-color-background" style="width: 2%;" nzLeft>STT</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+                    <th [colspan]="3" class="set-color-background" style="width: 9%;" nzLeft>Yêu cầu kiểm tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px">Yêu cầu chi tiết, lưu ý
+                    </th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5%;">Số lượng kiểm
+                      tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 4%;">Số lỗi thực tế
+                    </th>
+                    <th colspan="2" class="set-color-background" style="width: 8%;">Kết quả kiểm tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px">Ghi chú</th>
+                  </tr>
+                  <tr>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft>Min</th>
+                    <th class="set-color-background" nzLeft>Max</th>
+                    <th class="set-color-background" nzLeft>Đơn vị</th>
+                    <th class="set-color-background">Min</th>
+                    <th class="set-color-background">Max</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let audit of lstAuditCriteriaNvl let i=index">
-                    <td>
+                    <td nzLeft>{{ audit.positionNumber }}</td>
+                    <td nzLeft>
                       {{ audit.criteriaName }}
                       <input type="hidden" name="auditCriteriaId" [(ngModel)]="audit.auditCriteriaId" />
                     </td>
-                    <td>{{ audit.regulationLevel }}</td>
-                    <td>{{ audit.acceptanceLevel }}</td>
-                    <td>{{ audit.minAudit | number }}</td>
-                    <td>{{ audit.maxAudit | number }}</td>
-                    <td>{{ audit.unitAudit }}</td>
+                    <td nzLeft>{{ audit.regulationLevel }}</td>
+                    <td nzLeft>{{ audit.acceptanceLevel }}</td>
+                    <td nzLeft>{{ audit.minAudit | number }}</td>
+                    <td nzLeft>{{ audit.maxAudit | number }}</td>
+                    <td nzLeft>{{ audit.unitAudit }}</td>
                     <td>{{ audit.noteAudit }}</td>
                     <td>
                       <input type="text" readonly placeholder="Số lượng" class="form-control"
@@ -431,20 +534,20 @@
               </div>
 
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
-                [nzFrontPagination]="false">
+                [nzScroll]="{ x: '3700px' }" [nzFrontPagination]="false">
                 <thead>
-                  <tr>
-                    <th rowspan="2">#</th>
-                    <th rowspan="2">Chỉ tiêu kiểm tra</th>
-                    <th rowspan="2">Bậc rút nghiệm</th>
-                    <th rowspan="2">Mức chấp nhận</th>
-                    <th colspan="3">Yêu cầu kiểm tra</th>
-                    <th rowspan="2" style="width: 20%">Yêu cầu chi tiết/Lưu ý</th>
-                    <th rowspan="2" style="width: 4%">Số lượng kiểm tra</th>
-                    <th rowspan="2" style="width: 4%">Sai lỗi thực tế</th>
-                    <th colspan="2" style="width: 9%">Kết quả kiểm tra</th>
-                    <th rowspan="2" style="width: 135px;text-align: center;">Đánh giá</th>
-                    <th rowspan="2" style="width: 20%">Ghi chú</th>
+                  <!-- <tr>
+                    <th rowspan="2" style="width: 2%;" nzLeft>STT</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+                    <th rowspan="2" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+                    <th colspan="3" style="width: 9%;">Yêu cầu kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px">Yêu cầu chi tiết, lưu ý</th>
+                    <th rowspan="2" style="line-height: 65px;width: 5%;">Số lượng kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px;width: 4%;">Số lỗi thực tế</th>
+                    <th colspan="2" style="width: 8%;">Kết quả kiểm tra</th>
+                    <th rowspan="2" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
+                    <th rowspan="2" style="line-height: 65px">Ghi chú</th>
                   </tr>
                   <tr>
                     <th>Min</th>
@@ -452,17 +555,44 @@
                     <th>Đơn vị</th>
                     <th style="text-align: center;">Min</th>
                     <th style="text-align: center;">Max</th>
+                  </tr> -->
+                  <tr>
+                    <th [colspan]="1" class="set-color-background" style="width: 2%;" nzLeft>STT</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Tiêu chí kiểm tra</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Bậc rút nghiệm</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 4%;" nzLeft>Mức chấp nhận</th>
+                    <th [colspan]="3" class="set-color-background" style="width: 9%;" nzLeft>Yêu cầu kiểm tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px">Yêu cầu chi tiết, lưu ý
+                    </th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5%;">Số lượng kiểm
+                      tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 4%;">Số lỗi thực tế
+                    </th>
+                    <th colspan="2" class="set-color-background" style="width: 8%;">Kết quả kiểm tra</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px;width: 5.5%;">Đánh giá</th>
+                    <th rowspan="2" class="set-color-background" style="line-height: 65px">Ghi chú</th>
+                  </tr>
+                  <tr>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft>Min</th>
+                    <th class="set-color-background" nzLeft>Max</th>
+                    <th class="set-color-background" nzLeft>Đơn vị</th>
+                    <th class="set-color-background">Min</th>
+                    <th class="set-color-background">Max</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let auditLKDT of lstAuditCriteriaLKDT;let i = index;">
-                    <td>{{ i +1 }}</td>
-                    <td>{{ auditLKDT.auditContent }}</td>
-                    <td>{{ auditLKDT.regulationLevel }}</td>
-                    <td>{{ auditLKDT.acceptanceLevel }}</td>
-                    <td>{{ auditLKDT.min }}</td>
-                    <td>{{ auditLKDT.max }}</td>
-                    <td>{{ auditLKDT.unit }}</td>
+                    <td nzLeft>{{auditLKDT.positionNumber }}</td>
+                    <td nzLeft>{{ auditLKDT.auditContent }}</td>
+                    <td nzLeft>{{ auditLKDT.regulationLevel }}</td>
+                    <td nzLeft>{{ auditLKDT.acceptanceLevel }}</td>
+                    <td nzLeft>{{ auditLKDT.min }}</td>
+                    <td nzLeft>{{ auditLKDT.max }}</td>
+                    <td nzLeft>{{ auditLKDT.unit }}</td>
                     <td>{{ auditLKDT.technicalRequirement}}</td>
                     <td>
                       <input type="text" placeholder="Số lượng" class="form-control" name="auditQuantity[{{i}}]"
@@ -494,43 +624,45 @@
               </nz-table>
 
               <nz-table #borderedTable nzBordered nzTitle="Thông tin tiêu chí" [nzData]="['']"
-                [nzFrontPagination]="false">
+                [nzScroll]="{ x: '3200px' }" [nzFrontPagination]="false">
                 <thead>
                   <tr>
-                    <th rowspan="2">#</th>
-                    <th rowspan="2">Thông số</th>
-                    <th rowspan="2">Điều kiện</th>
-                    <th colspan="3">Tiêu chuẩn</th>
-                    <th rowspan="2">Q Trung bình</th>
-                    <th rowspan="2">Số lượng</th>
-                    <th rowspan="2">Min</th>
-                    <th rowspan="2">Max</th>
-                    <th rowspan="2">Trung bình</th>
-                    <th rowspan="2">S</th>
-                    <th rowspan="2">KU</th>
-                    <th rowspan="2">KL</th>
-                    <th rowspan="2">KMin</th>
-                    <th rowspan="2">CPK up</th>
-                    <th rowspan="2">CPK Low</th>
-                    <th rowspan="2">CPK</th>
-                    <th rowspan="2">Đánh giá</th>
-                    <th rowspan="2">Nội dung</th>
-                    <th rowspan="2">Tùy chọn</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 2%;" nzLeft>STT</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 6%;" nzLeft>Thông số kiểm tra</th>
+                    <th [colspan]="1" class="set-color-background" style="width: 5%;" nzLeft>Điều kiện kiểm tra</th>
+                    <th [colspan]="3" class="set-color-background" style="width: 9%;" nzLeft>Tiêu chuẩn kiểm tra</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4.2%;">Q Trung bình</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">Số lượng</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">Min</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">Max</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">Trung bình</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">S</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">KU</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">KL</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">KMin</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">CPK up</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">CPK Low</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">CPK</th>
+                    <th rowspan="2" class="set-color-background" style="width: 4%;">Đánh giá</th>
+                    <th rowspan="2" class="set-color-background">Nội dung</th>
                   </tr>
                   <tr>
-                    <th>Min</th>
-                    <th>Max</th>
-                    <th>Đơn vị</th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft></th>
+                    <th class="set-color-background" nzLeft>Min</th>
+                    <th class="set-color-background" nzLeft>Max</th>
+                    <th class="set-color-background" nzLeft>Đơn vị</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let auditLKDT of lstAuditCriteriaParam;let i = index;">
-                    <td>{{ i +1}}</td>
-                    <td>{{ auditLKDT.parameterName }}</td>
-                    <td>{{ auditLKDT.conditions }}</td>
-                    <td>{{ auditLKDT.min | number }}</td>
-                    <td>{{ auditLKDT.max | number }}</td>
-                    <td>{{ auditLKDT.unit }}</td>
+                    <td nzLeft>{{ i +1}}</td>
+                    <td nzLeft>{{ auditLKDT.parameterName }}</td>
+                    <td nzLeft>{{ auditLKDT.conditions }}</td>
+                    <td nzLeft>{{ auditLKDT.min | number }}</td>
+                    <td nzLeft>{{ auditLKDT.max | number }}</td>
+                    <td nzLeft>{{ auditLKDT.unit }}</td>
                     <td>
                       <input type="text" placeholder="Q trung bình" class="form-control" name="auditQAvg[{{i}}]"
                         [(ngModel)]="auditLKDT.auditQAvg" readonly>
@@ -596,9 +728,6 @@
                     <td>
                       <input type="text" placeholder="Ghi chú" class="form-control" name="content[{{i}}]"
                         [(ngModel)]="auditLKDT.content" readonly>
-                    </td>
-
-                    <td>
                     </td>
                   </tr>
                 </tbody>
@@ -680,6 +809,10 @@
         <i class="fa fa-check"></i>
         Từ chối
       </button>
+      <button class="btn btn-danger" type="submit" style="margin-left: 30px;" (click)="onSubmitApprove('CANCEL')">
+        <i class="fa fa-check"></i>
+        Hủy
+      </button>
     </div>
 
   </div>
@@ -692,7 +825,7 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+        <div class="column-table-check-nvl">Mã hàng hóa <br> <input type="text" class="input-errors"
             [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
             list="lstItemCode">
           <datalist id="lstItemCode">
@@ -727,7 +860,7 @@
           <thead>
             <tr>
               <th style="width: 5%;">STT</th>
-              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Mã hàng hóa </th>
               <th style="width: 9%;">Nhóm lỗi </th>
               <th style="width: 9%;">Mã lỗi </th>
               <th style="width: 21%;">Tên lỗi </th>
@@ -766,7 +899,7 @@
     <div style="margin-left: 10px; font-size: 19px;margin-bottom: 10px;"><b>Danh sách lỗi</b></div>
     <div style="display: flex;justify-content: space-between;width: 98%;margin: auto;">
       <div style="display: flex;">
-        <div class="column-table-check-nvl">Mã sản phẩm <br> <input type="text" class="input-errors"
+        <div class="column-table-check-nvl">Mã hàng hóa <br> <input type="text" class="input-errors"
             [(ngModel)]="itemCode" [ngModelOptions]="{ standalone: true }" (ngModelChange)="getLstItemCode()"
             list="lstItemCode">
           <datalist id="lstItemCode">
@@ -803,11 +936,12 @@
           <thead>
             <tr>
               <th style="width: 5%;">STT</th>
-              <th style="width: 9%;">Mã sản phẩm </th>
+              <th style="width: 9%;">Mã hàng hóa </th>
               <th style="width: 9%;">Nhóm lỗi </th>
               <th style="width: 9%;">Mã lỗi </th>
               <th style="width: 21%;">Tên lỗi </th>
               <th style="width: 9%;">Số lượng</th>
+              <th style="width: 9%;">Ghi chú</th>
             </tr>
           </thead>
         </table>
@@ -822,6 +956,7 @@
               <td style="text-align: left;width: 9%;">{{item.errCode}}</td>
               <td style="text-align: left;width: 21%;"><span>{{item.errName}}</span></td>
               <td style="width: 9%;"><span>{{item.quantity}}</span></td>
+              <td style="width: 9%;"><span>{{item.note}}</span></td>
             </tr>
           </tbody>
         </table>

@@ -11,19 +11,19 @@ export class ButtonSuccessComponent implements OnInit {
 
   constructor(
     private actRoute: ActivatedRoute,
-    private commonService :CommonService,
+    private commonService: CommonService,
     private router: Router
-    ) { }
+  ) { }
 
   @Input() item_type = '';
-  @Input()  show_work_order = '';
+  @Input() show_work_order = '';
   strNameTitle?: string;
   strUrl?: string;
-  showButtonSuccess?: boolean= false;
+  showButtonSuccess?: boolean = false;
 
   ngOnInit(): void {
     var type = this.actRoute.snapshot.params['type'];
-    if(type =='add'){
+    if (type == 'add') {
       this.showButtonSuccess = true
     }
     console.log(type)
@@ -84,14 +84,14 @@ export class ButtonSuccessComponent implements OnInit {
         this.strNameTitle = 'Duyệt nhập kho';
         this.strUrl = '/pqc/pqc-tin-check';
         break;
-        case 'MAKE_ORDER':
-          this.strNameTitle = 'Danh sách lệnh sản xuất';
-          this.strUrl = '/pqc/make-order-production';
-          break;
+      case 'MAKE_ORDER':
+        this.strNameTitle = 'Danh sách lệnh sản xuất';
+        this.strUrl = '/pqc/make-order-production';
+        break;
     }
   }
 
-  onSubmit(type:any){
+  onSubmit(type: any) {
     Swal.fire({
       title: 'Xác nhận',
       text: 'Bạn có muốn tiếp tục thực hiện hoàn thành quá trình kiểm tra ? ',
@@ -101,16 +101,27 @@ export class ButtonSuccessComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then((result) => {
       if (result.value) {
-        this.commonService.successStep( this.actRoute.snapshot.params['id'],this.item_type,type).toPromise().then(
-          data=>{
-            Swal.fire(
-              'Thành công',
-              'Bạn đã thực hiện thành công.',
-              'success'
-            )
+        this.commonService.successStep(this.actRoute.snapshot.params['id'], this.item_type, type).toPromise().then(
+          data => {
+            console.log("check data", data);
+            if (data.result.message == 'NULL') {
+              Swal.fire(
+                'Thất bại',
+                'Công đoạn check NVL chưa hoàn thành',
+                'warning'
+              )
+            } else {
+              // console.log('check data: ', data);
+              Swal.fire(
+                'Thành công',
+                'Bạn đã thực hiện thành công.',
+                'success'
+              )
+            }
             this.router.navigate([this.strUrl])
           },
-          error=>{}
+          error => {
+          }
         )
       } else if (result.dismiss === Swal.DismissReason.cancel) {
 

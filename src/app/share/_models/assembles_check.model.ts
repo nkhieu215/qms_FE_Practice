@@ -8,15 +8,17 @@ export class AssemblesCheck {
   public checkPerson = null;
   public quatity = null;
   public checkTime = null;
-  public quatityPass?:number;
+  public createdAt = null;
+  public updatedAt?: Date;
+  public quatityPass?: number;
   public quatityFail = null;
   public ratio = null;
   public conclude = null;
   public note = null;
-  public workOrderId= null;
-  public operators?:string;
+  public workOrderId = null;
+  public operators?: string;
 
-  public errorLists:Array<ErrorElectronicComponent> =  [];
-  public ids ?:string;
-  public dttdMountCompId?:string;
+  public errorLists: Array<ErrorElectronicComponent> = [];
+  public ids?: string;
+  public dttdMountCompId?: string;
 }

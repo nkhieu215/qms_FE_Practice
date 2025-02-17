@@ -28,7 +28,9 @@
                       <th>Người thực hiện</th>
                       <th>Số lượng</th>
                       <th>Ngày thực hiện</th>
+                      <th>Ngày cập nhật</th>
                       <th>Kết quả kiểm tra</th>
+                      <th>Phúc tra</th>
                       <th>Ghi chú</th>
                       <th>Tùy chọn</th>
                     </tr>
@@ -37,7 +39,8 @@
                     <tr *ngFor="let check of lstCheck; let i = index">
                       <td>{{ check.checkPersion }}</td>
                       <td>{{ check.quantity }}</td>
-                      <td>{{ check.createdAtClient |date:'dd/MM/YYYY HH:mm' }}</td>
+                      <td>{{ check.createdAtClient |date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>{{ check.updatedAt |date:'dd/MM/yyyy HH:mm' }}</td>
                       <td [ngSwitch]="check.conclude">
                         <ng-container *ngSwitchCase="1"> Đạt </ng-container>
                         <ng-container *ngSwitchCase="2"> Không đạt </ng-container>
@@ -51,6 +54,18 @@
                         <ng-container *ngSwitchCase="'Nhân nhượng'">
                           Nhân nhượng
                         </ng-container>
+                      </td>
+                      <td>
+                        <div class="checkbox-container" *ngIf="check.checked == true">
+                          <input type="checkbox" checked="checked" disabled="disabled" />
+                        </div>
+                        <div *ngIf="check.checked == false">
+                          <input type="checkbox" style="width: 26px;height: 26px;" />
+                        </div>
+                        <!-- <input type="checkbox" [(ngModel)]="check.checked" [ngModelOptions]="{ standalone: true }"
+                          style="width: 24px;
+                          height: 24px;
+                          accent-color: #0d6efd;" disabled /> -->
                       </td>
                       <td>{{ check.note }}</td>
                       <td>
@@ -145,12 +160,12 @@
                 ">
                 <td>
                   <input type="text" (change)="totalQuantity()" placeholder="Chỉ tiêu kiểm tra" class="form-control"
-                    name="auditContent[{{ i }}]" [(ngModel)]="check.auditContent" list="testingCriticalGroup"/>
-                    <datalist  id="testingCriticalGroup">
-                      <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
-                        <span>{{ item.testingCriticalGroup }}</span>
-                      </option>
-                    </datalist>
+                    name="auditContent[{{ i }}]" [(ngModel)]="check.auditContent" list="testingCriticalGroup" />
+                  <datalist id="testingCriticalGroup">
+                    <option *ngFor="let item of listOfCriticalName" [value]="item.testingName">
+                      <span>{{ item.testingCriticalGroup }}</span>
+                    </option>
+                  </datalist>
                 </td>
                 <td>
                   <input type="text" (change)="totalQuantity()" placeholder="Bậc rút nghiệm" class="form-control"

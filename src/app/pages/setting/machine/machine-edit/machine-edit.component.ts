@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { MachineService } from 'src/app/share/_services/machine.service';
 
 @Component({
@@ -15,10 +16,11 @@ export class MachineEditComponent implements OnInit {
     idScada: '',
     source: '',
   };
-  id :number;
+  id: number;
   constructor(
-    private machineService : MachineService,
-    private route: ActivatedRoute
+    private machineService: MachineService,
+    private route: ActivatedRoute,
+    protected autoLogout: AuthService
   ) {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (this.machineService.webData != undefined) {
@@ -34,20 +36,22 @@ export class MachineEditComponent implements OnInit {
   }
   onSubmit() {
     this.machineService
-    .update(
-      this.id,
-      this.form.idScada,
-      this.form.machineName,
-      this.form.description,
-      this.form.machineCode,
-      'WEB'
-    )
-    .subscribe(
-      (data) => {
-        console.log(data);
-        alert('Cập nhật thành công!');
-      }
-    )
+      .update(
+        this.id,
+        this.form.idScada,
+        this.form.machineName,
+        this.form.description,
+        this.form.machineCode,
+        'WEB'
+      )
+      .subscribe(
+        (data) => {
+          console.log(data);
+          alert('Cập nhật thành công!');
+        }
+      )
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
+  }
 }

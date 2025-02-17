@@ -11,21 +11,21 @@ import { KeycloakService } from 'keycloak-angular';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private authService: AuthService , private userService: UserService,private tokenStorage:KeycloakService) {
+  constructor(private authService: AuthService, private userService: UserService, private tokenStorage: KeycloakService) {
   }
 
   isCollapsed = true;
   content?: string;
-  menuResponse?: MenuResponse ;
+  menuResponse?: MenuResponse;
   lstMenuRes?: Menu[];
-  strName?:string;
+  strName?: string;
 
   ngOnInit(): void {
 
-    if(this.authService.isLoggedIn){
+    if (this.authService.isLoggedIn) {
       this.userService.getMenu().toPromise().then(
         data => {
-          this.menuResponse =  JSON.parse(data);
+          this.menuResponse = JSON.parse(data);
           this.lstMenuRes = this.menuResponse?.lstmenu;
           console.log('list menu: ', this.lstMenuRes)
         },
@@ -34,12 +34,12 @@ export class AppComponent {
         }
       );
 
-      this.strName  = this.tokenStorage.getUsername();
+      this.strName = this.tokenStorage.getUsername();
     }
 
   }
 
-  signOut(){
+  signOut() {
     this.tokenStorage.logout();
   }
 

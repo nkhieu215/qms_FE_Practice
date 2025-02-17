@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { LineService } from 'src/app/share/_services/line.service';
 
 @Component({
@@ -16,7 +17,8 @@ export class ProductionLineEditComponent implements OnInit {
     source: '',
   };
   id: number;
-  constructor(private lineService: LineService, private route: ActivatedRoute) {
+  constructor(private lineService: LineService, private route: ActivatedRoute,
+    protected autoLogout: AuthService) {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (this.lineService.webData != undefined) {
       this.lineService.webData.forEach((element) => {
@@ -44,5 +46,7 @@ export class ProductionLineEditComponent implements OnInit {
         // console.log(data);
       });
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //  this.autoLogout.autoLogout(0); 
+  }
 }

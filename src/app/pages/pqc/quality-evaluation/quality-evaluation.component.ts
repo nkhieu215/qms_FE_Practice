@@ -18,6 +18,7 @@ import { AuditCriteriaQuality } from 'src/app/share/_models/auditCriteriaQuality
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { PqcQuality } from 'src/app/share/_models/pqc_quality.model';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-quality-evaluation',
@@ -26,9 +27,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class QualityEvaluationComponent implements OnInit {
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCriticalName: any;
   @Input() show_check = '';
@@ -48,7 +49,8 @@ export class QualityEvaluationComponent implements OnInit {
     private errorService: ErrorListService,
     private exampleService: ExaminationService,
     private qcCheckService: PQCQcCheckService,
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -88,6 +90,7 @@ export class QualityEvaluationComponent implements OnInit {
     return value?.Title;
   }
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     var data = { testingCriticalGroup: '', type: 'Đánh giá CL SP' }
     this.http.post<any>(`${this.address}/${this.path}/get-list-guide`, data).subscribe(res => {
       this.listOfCriticalName = res;
@@ -162,6 +165,11 @@ export class QualityEvaluationComponent implements OnInit {
         this.lstCheck.forEach(element => {
           element.ids = Utils.randomString(5);
           element.createdAtClient = element.createdAt;
+          if (element.checked == 'false') {
+            element.checked = false;
+          } else {
+            element.checked = true;
+          }
         })
       });
     }
@@ -215,7 +223,7 @@ export class QualityEvaluationComponent implements OnInit {
     var pqc = new PqcQuality();
     pqc.checkPersion = this.tokenStorage.getUsername();
     pqc.conclude = this.formEx.conclude;
-    pqc.createdAtClient = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US')
+    pqc.createdAtClient = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US')
     pqc.note = this.formEx.note;
     pqc.quantity = this.formEx.quantity;
     pqc.workOrderId = this.id;

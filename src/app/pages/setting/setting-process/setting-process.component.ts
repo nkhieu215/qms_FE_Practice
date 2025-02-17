@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/share/_services/auth.service';
 import { ProcessSettingsService } from 'src/app/share/_services/prcessSetting.service';
 
 import Swal from 'sweetalert2';
@@ -12,17 +13,19 @@ export class SettingProcessComponent implements OnInit {
 
 
   constructor(private processService: ProcessSettingsService,
-    private modalService: NgbModal,) {
+    private modalService: NgbModal,
+    protected autoLogout: AuthService) {
     this.refreshExamination();
   }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
   }
 
   formSearch: any = {
   };
 
-  formEx:any ={
+  formEx: any = {
 
   }
   closeResult: string = '';
@@ -32,13 +35,13 @@ export class SettingProcessComponent implements OnInit {
   page = 1;
   pageSize = 10;
   collectionSize = 0;
-  lstRest?:any
+  lstRest?: any
 
   refreshExamination() {
     const { name, code } = this.formSearch;
-    this.processService.getList(this.formSearch.name,this.formSearch.code,this.page, this.pageSize).subscribe(
+    this.processService.getList(this.formSearch.name, this.formSearch.code, this.page, this.pageSize).subscribe(
       data => {
-        this.lstRest  = data.lstSettingProcess;
+        this.lstRest = data.lstSettingProcess;
         this.collectionSize = Number(data.total) * this.pageSize;
         console.log(this.collectionSize);
       },
@@ -48,16 +51,16 @@ export class SettingProcessComponent implements OnInit {
     );
   }
 
-  onCreate(){
-    this.processService.createUpdate(this.formEx.id,this.formEx.name,this.formEx.code).subscribe(
+  onCreate() {
+    this.processService.createUpdate(this.formEx.id, this.formEx.name, this.formEx.code).subscribe(
       data => {
-       this.refreshExamination()
-       Swal.fire(
-        'Thành công',
-        'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
-        'success'
-      )
-      this.modalService.dismissAll();
+        this.refreshExamination()
+        Swal.fire(
+          'Thành công',
+          'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
+          'success'
+        )
+        this.modalService.dismissAll();
       },
       err => {
 
@@ -65,8 +68,8 @@ export class SettingProcessComponent implements OnInit {
     );
   }
 
-  open(content: any,data:any) {
-    if(data != null){
+  open(content: any, data: any) {
+    if (data != null) {
       this.formEx = data;
     }
     this.modalService.open(content, this.modalOptions).result.then(
@@ -79,13 +82,13 @@ export class SettingProcessComponent implements OnInit {
     );
   }
 
-  delete(data:any){
-    this.processService.remove(data.id).subscribe( data => {
+  delete(data: any) {
+    this.processService.remove(data.id).subscribe(data => {
       this.refreshExamination()
-     },
-     err => {
+    },
+      err => {
 
-     })
+      })
   }
 
 

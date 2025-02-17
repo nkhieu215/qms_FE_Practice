@@ -20,6 +20,7 @@ import { PqcTin } from 'src/app/share/_models/pqc_tin_check.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { TinSerial } from 'src/app/share/_models/tin_serial.model';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-tin-check',
@@ -39,7 +40,8 @@ export class TinCheckComponent implements OnInit {
     private modalService: NgbModal,
     private errorService: ErrorListService,
     private tinCheckSerialService: TinCheckSerialService,
-    private tokenStorage: KeycloakService
+    private tokenStorage: KeycloakService,
+    protected autoLogout: AuthService
   ) { }
 
   page = 1;
@@ -73,6 +75,7 @@ export class TinCheckComponent implements OnInit {
   lstErrorGr?: ErrorList[];
   lstErrorRes?: ErrorListResponse;
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.getInfo();
   }
 
@@ -128,6 +131,7 @@ export class TinCheckComponent implements OnInit {
           check.line = element.line;
           check.checkPerson = element.checkPerson;
           check.checkTime = element.checkTime;
+          check.createdAt = element.createdAt;
           check.expiryDate = element.expiryDate;
           check.quatity = element.quatity;
           check.errTotal = element.errTotal;
@@ -143,6 +147,9 @@ export class TinCheckComponent implements OnInit {
           check.operators = element.operators;
           this.lstTinCheck.push(check);
         });
+        setTimeout(() => {
+          this.lstTinCheck.sort((a: any, b: any) => b.createdAt - a.createdAt);
+        }, 300);
       });
 
       this.tinCheckSerialService
@@ -168,7 +175,7 @@ export class TinCheckComponent implements OnInit {
         (data) => {
           this.edit = false;
           this.create = false;
-          Swal.fire('Thành công' ,'Thêm mới thông tin thành công', 'success');
+          Swal.fire('Thành công', 'Thêm mới thông tin thành công', 'success');
         },
         (err) => { }
       );
@@ -181,6 +188,8 @@ export class TinCheckComponent implements OnInit {
     check.line = this.formEx.line;
     check.checkPerson = this.formEx.checkPerson;
     check.checkTime = this.formEx.checkTime;
+    check.createdAt = this.formEx.createdAt;
+    check.updatedAt = new Date();
     check.expiryDate = this.formEx.expiryDate;
     check.quatity = this.formEx.quatity;
     check.errTotal = this.formEx.errTotal;
@@ -212,19 +221,22 @@ export class TinCheckComponent implements OnInit {
         check.knifeCode,
         check.gridCode,
         check.workOrderId,
-        check.operators
+        check.operators,
+        check.createdAt,
+        check.updatedAt
       )
       .toPromise()
       .then(
         (data) => {
           check.id = data.idCheck;
-          Swal.fire('Thành công' ,'Thêm mới thông tin thành công', 'success');
+          Swal.fire('Thành công', 'Thêm mới thông tin thành công', 'success');
 
-          if(this.formEx.id == null){
+          if (this.formEx.id == null) {
             this.lstTinCheck.push(check);
           }
 
           this.modalService.dismissAll;
+          window.location.reload();
         },
         (error) => { }
       );
@@ -244,13 +256,13 @@ export class TinCheckComponent implements OnInit {
             'success'
           )
 
-          if(type =='check'){
+          if (type == 'check') {
             this.lstTinCheck?.forEach((element, index) => {
               if (element.id == id) {
                 this.lstTinCheck?.splice(index, 1);
               }
             });
-          }else{
+          } else {
             this.lstTin?.forEach((element, index) => {
               if (element.id == id) {
                 this.lstTin?.splice(index, 1);
@@ -259,7 +271,7 @@ export class TinCheckComponent implements OnInit {
           }
         },
         (err) => {
-          Swal.fire('Lỗi' ,'Có lỗi trong quá trình thực hiện vui lòng thực hiện lại sau ít phút.', 'warning');
+          Swal.fire('Lỗi', 'Có lỗi trong quá trình thực hiện vui lòng thực hiện lại sau ít phút.', 'warning');
         }
       );
 
@@ -283,16 +295,16 @@ export class TinCheckComponent implements OnInit {
   }
 
   arrErrChild: Array<ErrorElectronicComponent> = [];
-  dttdCheckId : any;
+  dttdCheckId: any;
   onAddErrorChild() {
-    const { errGroup, errName, quantity,serial } = this.formErrorChild;
+    const { errGroup, errName, quantity, serial } = this.formErrorChild;
     var ratio = ((quantity / (this.totalCheckElement == 0 ? 1 : this.totalCheckElement)) * 100).toFixed(2) + '%';
     const errorChild = new ErrorElectronicComponent(errName, errGroup, quantity, ratio, Utils.randomString(5));
-    errorChild.dttdCheckId =  this.dttdCheckId;
-    errorChild.serial  = serial
+    errorChild.dttdCheckId = this.dttdCheckId;
+    errorChild.serial = serial
 
     this.tinCheckSerialService.addError(errorChild).toPromise().then(
-      data=>{
+      data => {
         Swal.fire(
           'Thông báo',
           'Bạn đã thực hiện thêm mới thông tin thành công.',
@@ -300,7 +312,7 @@ export class TinCheckComponent implements OnInit {
         )
 
       },
-      error=>{}
+      error => { }
     )
 
     this.arrErrChild.push(errorChild);
@@ -320,8 +332,8 @@ export class TinCheckComponent implements OnInit {
     this.arrErrChild.forEach((element, index) => {
       if (element.ids == ids) {
         this.tinCheckSerialService.deleteError(element.id).subscribe(
-          data=>{
-            Swal.fire("Thành công","Bạn đã thực hiện xóa thành công.","warning")
+          data => {
+            Swal.fire("Thành công", "Bạn đã thực hiện xóa thành công.", "warning")
           }
         )
         this.arrErrChild.splice(index, 1);
@@ -334,7 +346,7 @@ export class TinCheckComponent implements OnInit {
   open(content: any, idError: any) {
     this.formEx = {}
     this.ids = idError;
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     this.formEx.checkPerson = this.tokenStorage.getUsername();
     this.formErrorChild = [];
     this.start_gia = '';
@@ -379,8 +391,8 @@ export class TinCheckComponent implements OnInit {
   openEdit(content: any, id: any) {
 
     this.formEx = {};
-    this.lstTinCheck.forEach(element=>{
-      if(element.id == id){
+    this.lstTinCheck.forEach(element => {
+      if (element.id == id) {
         this.formEx = element;
       }
     })
@@ -415,16 +427,16 @@ export class TinCheckComponent implements OnInit {
       if (action == 'START') {
         this.start_khuay = this.formTincheck.startKhuay = formatDate(
           new Date(),
-          'dd/MM/YYYY HH:mm:ss',
+          'dd/MM/yyyy HH:mm:ss',
           'en_US'
         );
       } else {
         if (this.start_khuay == '') {
-          Swal.fire('Lỗi' ,'Bạn chưa bấm thời gian bắt đầu khuấy.', 'warning');
+          Swal.fire('Lỗi', 'Bạn chưa bấm thời gian bắt đầu khuấy.', 'warning');
         } else {
           this.end_khuay = this.formTincheck.endKhuay = formatDate(
             new Date(),
-            'dd/MM/YYYY HH:mm:ss',
+            'dd/MM/yyyy HH:mm:ss',
             'en_US'
           );
         }
@@ -435,16 +447,16 @@ export class TinCheckComponent implements OnInit {
       if (action == 'START') {
         this.start_gia = this.formTincheck.startGia = formatDate(
           new Date(),
-          'dd/MM/YYYY HH:mm:ss',
+          'dd/MM/yyyy HH:mm:ss',
           'en_US'
         );
       } else {
         if (this.start_gia == '') {
-          Swal.fire('Lỗi' ,'Bạn chưa bấm thời gian bắt đầu giã đông.', 'warning');
+          Swal.fire('Lỗi', 'Bạn chưa bấm thời gian bắt đầu giã đông.', 'warning');
         } else {
           this.end_gia = this.formTincheck.endGia = formatDate(
             new Date(),
-            'dd/MM/YYYY HH:mm:ss',
+            'dd/MM/yyyy HH:mm:ss',
             'en_US'
           );
         }
@@ -460,14 +472,14 @@ export class TinCheckComponent implements OnInit {
   addTinCheck() {
     this.formTincheck.checkTime = formatDate(
       new Date(),
-      'dd/MM/YYYY HH:mm',
+      'dd/MM/yyyy HH:mm',
       'en_US'
     );
     this.formTincheck.checkPerson = this.tokenStorage.getUsername();
 
     var tin = new PqcTin();
     tin.checkPerson = this.tokenStorage.getUsername();
-    tin.checkTime = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    tin.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
     tin.startGia = this.start_gia;
     tin.endGia = this.end_gia;
     tin.startKhuay = this.start_khuay;
@@ -503,7 +515,7 @@ export class TinCheckComponent implements OnInit {
           // close popup
           this.getDismissReason('reason');
           if (this.idCheck != null) {
-            Swal.fire('Thành công' ,'Cập nhật thông tin kiểm tra thành công', 'success');
+            Swal.fire('Thành công', 'Cập nhật thông tin kiểm tra thành công', 'success');
             this.lstTin.forEach((element, index) => {
               if (element.id == this.idCheck) {
                 console.log('update');
@@ -512,13 +524,13 @@ export class TinCheckComponent implements OnInit {
             });
           } else {
             this;
-            Swal.fire('Thành công' ,'Thêm mới thông tin kiểm tra thành công', 'success');
+            Swal.fire('Thành công', 'Thêm mới thông tin kiểm tra thành công', 'success');
           }
           tin.id = data.idCheck;
           this.lstTin?.push(tin);
         },
         (err) => {
-          Swal.fire('Lỗi' ,'Có lỗi trong quá trình thực hiện vui lòng thực hiện lại sau ít phút.', 'warning');
+          Swal.fire('Lỗi', 'Có lỗi trong quá trình thực hiện vui lòng thực hiện lại sau ít phút.', 'warning');
         }
       );
   }

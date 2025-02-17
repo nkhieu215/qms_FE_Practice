@@ -34,7 +34,7 @@
             <tbody>
               <tr *ngFor="let check of lstStoreCheck; let i = index">
                 <td>{{ check.lot }}</td>
-                <td>{{ check.createdAt|date:'dd/MM/YYYY HH:mm' }}</td>
+                <td>{{ check.createdAt|date:'dd/MM/yyyy HH:mm' }}</td>
                 <td>{{ check.colorName }}</td>
                 <td>{{ check.checkPerson }}</td>
                 <td>{{ check.totalErr }}</td>
@@ -49,8 +49,8 @@
                     (click)="openShowDetailStore(myModalView,check.id)" style="margin-right: 5px;">
                     <i class="fa fa-eye"></i>
                   </button>
-                  <button class="btn btn-warning btn-sm" title="Duyệt nhập kho sap" (click)="open(approve,id,check.id)" *ngIf="show_work_order"
-                    style="margin-right: 5px;">
+                  <button class="btn btn-warning btn-sm" title="Duyệt nhập kho sap" (click)="open(approve,id,check.id)"
+                    *ngIf="show_work_order" style="margin-right: 5px;">
                     <i class="fa fa-check"></i>
                   </button>
 
@@ -75,7 +75,7 @@
 <ng-template #approve let-modal>
   <div class="modal-header">
     <h2 class="modal-title" id="modal-basic-title">Phê duyệt yêu cầu</h2>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
 
@@ -188,7 +188,7 @@
 <ng-template #historySap let-modal>
   <div class="modal-header">
     <h2 class="modal-title" id="modal-basic-title">Lịch sử nhập kho</h2>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
@@ -205,7 +205,7 @@
       </thead>
       <tbody *ngIf="lstStoreHis">
         <tr *ngFor="let check of lstStoreHis; let i = index">
-          <td>{{ check.dateApproveSap | date:'dd/MM/YYYY'}}</td>
+          <td>{{ check.dateApproveSap | date:'dd/MM/yyyy'}}</td>
           <td>{{ check.quantityStoreSap }}</td>
           <td>{{ check.khonhap }}</td>
           <td>{{ check.khoBh }}</td>
@@ -221,7 +221,7 @@
 <ng-template #myModalView let-modal>
   <div class="modal-header">
     <h2 class="modal-title" id="modal-basic-title">Chi tiết thông tin kiểm tra</h2>
-<button type="button" class="btn-close" aria-label="Close"  (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
     <h3>Kiểm tra thông tin ngoại quan</h3>
@@ -333,47 +333,47 @@
           <td>{{ check.note }}</td>
         </tr>
       </tbody>
-      </nz-table>
+    </nz-table>
 
-      <h3>An toàn</h3>
-      <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
-        <thead>
-          <tr>
+    <h3>An toàn</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
           <th>Số lượng kiểm tra</th>
           <th>Tiêu chí an toàn</th>
           <th>Kết luận</th>
           <th>Ghi chú</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let check of storeCheck.lstSafe; let i = index">
-            <td>{{ check.quatity }}</td>
-            <td>{{ check.standard }}</td>
-            <td>{{ check.conclude }}</td>
-            <td>{{ check.note }}</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstSafe; let i = index">
+          <td>{{ check.quatity }}</td>
+          <td>{{ check.standard }}</td>
+          <td>{{ check.conclude }}</td>
+          <td>{{ check.note }}</td>
 
-          </tr>
-        </tbody>
-      </nz-table>
+        </tr>
+      </tbody>
+    </nz-table>
 
-      <h3>Lắp lẫn</h3>
-      <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
-        <thead>
-          <tr>
+    <h3>Lắp lẫn</h3>
+    <nz-table #borderedTable nzBordered nzTitle="Thông tin kiểm tra" [nzData]="['']" [nzFrontPagination]="false">
+      <thead>
+        <tr>
           <th>Số lượng kiểm tra</th>
           <th>Kết luận</th>
           <th>Ghi chú</th>
           <th>Tùy chọn</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let check of storeCheck.lstConfused; let i = index">
-            <td>{{ check.quatity }}</td>
-            <td>{{ check.conclude }}</td>
-            <td>{{ check.note }}</td>
-          </tr>
-        </tbody>
-      </nz-table>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let check of storeCheck.lstConfused; let i = index">
+          <td>{{ check.quatity }}</td>
+          <td>{{ check.conclude }}</td>
+          <td>{{ check.note }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
 
 
   </div>

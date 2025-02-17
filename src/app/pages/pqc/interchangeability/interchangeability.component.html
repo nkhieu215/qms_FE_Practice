@@ -31,7 +31,7 @@
                     <tr>
                       <th rowspan="2">Dây chuyền sx</th>
                       <th rowspan="2">Người kiểm tra</th>
-                      <th rowspan="2">Thời gian</th>
+                      <th rowspan="2">Thời gian kiểm tra</th>
                       <th rowspan="2">Số lượng ktra</th>
                       <th rowspan="2">Ngoại quan</th>
                       <th colspan="2">Công suất</th>
@@ -40,6 +40,8 @@
                       <th rowspan="2">Số sp lắp lẫn</th>
                       <th rowspan="2">Kết luận</th>
                       <th rowspan="2">Ghi chú</th>
+                      <th rowspan="2">Thời gian tạo</th>
+                      <th rowspan="2">Thời gian cập nhật</th>
                       <th rowspan="2">Vận hành</th>
                       <th rowspan="2">Tùy chọn</th>
                     </tr>
@@ -68,6 +70,8 @@
                       <td>{{check.total}}</td>
                       <td>{{check.conclude}}</td>
                       <td>{{check.note}}</td>
+                      <td>{{check.createdAt|date:'dd/MM/yyyy HH:mm'}}</td>
+                      <td>{{check.updatedAt|date:'dd/MM/yyyy HH:mm'}}</td>
                       <td>{{check.operators}}</td>
                       <td>
                         <div class="btn-group">
@@ -157,7 +161,7 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group">
-                <label>Thời gian</label>
+                <label>Thời gian kiểm tra</label>
                 <input type="text" class="form-control  {{ !checkTime.valid ? 'is-invalid' :''}}" #checkTime="ngModel"
                   required name="checkTime" [(ngModel)]="formEx.checkTime" placeholder="dd/mm/yyyy" />
 

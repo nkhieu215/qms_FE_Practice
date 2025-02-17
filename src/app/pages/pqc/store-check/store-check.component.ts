@@ -38,6 +38,7 @@ import { StoreCheckConfused } from 'src/app/share/_models/storeCheckConfused.mod
 import { StoreCheck } from 'src/app/share/_models/storeCheck.model';
 import { HttpClient } from '@angular/common/http';
 import { data } from 'jquery';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 
 
@@ -48,9 +49,9 @@ import { data } from 'jquery';
 })
 export class StoreCheckComponent implements OnInit {
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
 
   //Điều kiện triển khai hiện tại
   path = 'store-check';
@@ -105,7 +106,8 @@ export class StoreCheckComponent implements OnInit {
     private aqlService: AqlTemplateService,
     private exportExelService: ExportExcelService,
     private commonService: CommonService,
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected autoLogout: AuthService
   ) { }
   page = 1;
   pageSize = 10;
@@ -134,6 +136,7 @@ export class StoreCheckComponent implements OnInit {
 
   formErrorChild: any = {};
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0, 'store check');
     this.getInfo();
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -442,10 +445,11 @@ export class StoreCheckComponent implements OnInit {
     this.http.post<any>(`${this.address}/${this.path}/update`, check).subscribe();
   }
   onAddError(action: any, ids: any) {
-    // console.log("save store check : ", this.formEx, action)
     if (action == 'CHECK' || action == 'CHECK_EDIT') {
       var check = new StoreCheck();
       check.checkDate = this.formEx.checkDate;
+      check.createdAt = new Date();
+      check.updatedAt = new Date();
       check.quatityStore = this.formEx.quatityStore;
       check.lot = this.formEx.lot;
       check.quatity = 0;
@@ -459,6 +463,7 @@ export class StoreCheckComponent implements OnInit {
       check.colorCode = this.formEx.colorCode;
       check.colorName = this.formEx.colorName;
       // call api save
+      console.log("save store check : ", check)
       this.storeCheckService.createUpdateStoreCheck(check).subscribe(
         (data) => {
           if (action == 'CHECK_EDIT') {
@@ -499,13 +504,14 @@ export class StoreCheckComponent implements OnInit {
           this.modalService.dismissAll();
         },
         (error) => {
-          alert('Có lỗi xảy ra vui lòng thử lại sau ít phút.');
+          // alert('Có lỗi xảy ra vui lòng thử lại sau ít phút.');
+          window.location.reload();
         }
       );
 
       // this.formEx = null;
     } else {
-      this.lstStoreCheck.forEach((element) => {
+      this.lstStoreCheck.forEach(async (element) => {
         if (element.ids == ids) {
           var store_check_id = element.id;
           this.storeCheck = element;
@@ -520,7 +526,7 @@ export class StoreCheckComponent implements OnInit {
               checkelec.note = this.formEx.note;
               checkelec.quantityCheck = this.formEx.quantityCheck;
               checkelec.storeCheckId = store_check_id;
-              this.findMax(store_check_id, this.formEx.quantityCheck);
+              await this.findMax(store_check_id, this.formEx.quantityCheck);
               this.storeCheckService
                 .createCheck(checkelec, 'ELEC')
                 .toPromise()
@@ -765,7 +771,8 @@ export class StoreCheckComponent implements OnInit {
 
     this.titlemodal = title;
     this.action = action;
-    this.formEx.checkDate = formatDate(new Date(), 'dd/MM/YYYY HH:mm', 'en_US');
+    this.formEx.checkDate = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
+    // this.formEx.checkDate = new Date();
     this.formEx.checkPerson = this.tokenStorage.getUsername();
     this.formEx.lot = this.wo.lotNumber;
 

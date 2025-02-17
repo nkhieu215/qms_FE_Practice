@@ -2,6 +2,7 @@ import { NgbModal, NgbModalOptions, ModalDismissReasons } from '@ng-bootstrap/ng
 import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 import { AqlTemplateService } from 'src/app/share/_services/aqlTemplate.service';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-aql-template',
@@ -11,17 +12,19 @@ import { AqlTemplateService } from 'src/app/share/_services/aqlTemplate.service'
 export class AqlTemplateComponent implements OnInit {
 
   constructor(private errorService: AqlTemplateService,
-    private modalService: NgbModal,) {
+    private modalService: NgbModal,
+    protected autoLogout: AuthService) {
     this.refreshExamination();
   }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
   }
 
   formSearch: any = {
   };
 
-  formEx:any ={
+  formEx: any = {
 
   }
   closeResult: string = '';
@@ -31,13 +34,13 @@ export class AqlTemplateComponent implements OnInit {
   page = 1;
   pageSize = 10;
   collectionSize = 0;
-  lstRest?:any
+  lstRest?: any
 
   refreshExamination() {
     const { name, code } = this.formSearch;
-    this.errorService.getList(this.formSearch.testLevel,this.formSearch.acceptanceLevel,this.formSearch.allowedError,this.page, this.pageSize).subscribe(
+    this.errorService.getList(this.formSearch.testLevel, this.formSearch.acceptanceLevel, this.formSearch.allowedError, this.page, this.pageSize).subscribe(
       data => {
-        this.lstRest  = data.lstTemplate;
+        this.lstRest = data.lstTemplate;
         this.collectionSize = Number(data.total) * this.pageSize;
         console.log(this.collectionSize);
       },
@@ -47,15 +50,15 @@ export class AqlTemplateComponent implements OnInit {
     );
   }
 
-  onCreate(){
-    this.errorService.createUpdate(this.formEx.id,this.formEx.testLevel,this.formEx.acceptanceLevel,this.formEx.allowedError,this.formEx.note).subscribe(
+  onCreate() {
+    this.errorService.createUpdate(this.formEx.id, this.formEx.testLevel, this.formEx.acceptanceLevel, this.formEx.allowedError, this.formEx.note).subscribe(
       data => {
-       this.refreshExamination()
-       Swal.fire(
-        'Thành công',
-        'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
-        'success'
-      )
+        this.refreshExamination()
+        Swal.fire(
+          'Thành công',
+          'Bạn đã thực hiện thêm mới / cập nhật thông tin kiểm tra thành công.',
+          'success'
+        )
       },
       err => {
 
@@ -63,8 +66,8 @@ export class AqlTemplateComponent implements OnInit {
     );
   }
 
-  open(content: any,data:any) {
-    if(data != null){
+  open(content: any, data: any) {
+    if (data != null) {
       this.formEx = data;
     }
     this.modalService.open(content, this.modalOptions).result.then(
@@ -77,13 +80,13 @@ export class AqlTemplateComponent implements OnInit {
     );
   }
 
-  delete(data:any){
-    this.errorService.remove(data.id).subscribe( data => {
+  delete(data: any) {
+    this.errorService.remove(data.id).subscribe(data => {
       this.refreshExamination()
-     },
-     err => {
+    },
+      err => {
 
-     })
+      })
   }
 
 

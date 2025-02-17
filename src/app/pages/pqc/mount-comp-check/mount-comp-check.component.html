@@ -25,11 +25,13 @@
                   <th>Tên máy</th>
                   <th>Người kiểm tra</th>
                   <th>Người vận hành</th>
-                  <th>Thời gian</th>
+                  <th>Thời gian kiểm tra</th>
                   <th>Số lượng ktra</th>
                   <th>Tổng lỗi</th>
                   <th>Kết luận</th>
                   <th>Ghi chú</th>
+                  <th>Thời gian tạo</th>
+                  <th>Thời gian cập nhật</th>
                   <th>Tùy chọn</th>
                 </tr>
               </thead>
@@ -44,6 +46,8 @@
                   <td>{{ check.errTotal }}</td>
                   <td>{{ check.conclude }}</td>
                   <td>{{ check.note }}</td>
+                  <td>{{ check.createdAt |date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td>{{ check.updatedAt |date:'dd/MM/yyyy HH:mm' }}</td>
                   <td>
                     <div class="btn-group btn-group-toggle">
                       <button (click)="open(myModalError, check.ids)" class="btn btn-primary btn-sm"
@@ -119,11 +123,11 @@
 
           <div class="col-sm-6">
             <div class="form-group">
-              <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;" >
+              <mat-form-field class="example-full-width" appearance="fill" style="width:100%;line-height: 30px;">
                 <mat-label>Máy sản xuất</mat-label>
                 <input matInput [(ngModel)]="formEx.machineName" name="line" placeholder="Máy sản xuất" required
                   aria-label="Máy sản xuất" matInput [formControl]="maChineControl" [matAutocomplete]="autoMachine">
-                <mat-autocomplete #autoMachine="matAutocomplete" >
+                <mat-autocomplete #autoMachine="matAutocomplete">
                   <mat-option *ngFor="let option of filteredMachine | async" [value]="option">
                     {{option}}
                   </mat-option>
@@ -136,7 +140,7 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="form-group">
-              <label>Thời gian</label>
+              <label>Thời gian kiểm tra</label>
               <input [(ngModel)]="formEx.checkTime" type="text" class="form-control" name="checkTime" required="true"
                 placeholder="dd/mm/yyyy" />
             </div>
@@ -174,22 +178,23 @@
         <div class="row">
           <div class="form-group">
             <label>Người vận hành</label>
-            <input [(ngModel)]="formEx.operators" type="text" class="form-control {{ !operators.valid ? 'is-invalid' :''}}" name="operators" required
-            #operators="ngModel" placeholder="Người vận hành" />
+            <input [(ngModel)]="formEx.operators" type="text"
+              class="form-control {{ !operators.valid ? 'is-invalid' :''}}" name="operators" required
+              #operators="ngModel" placeholder="Người vận hành" />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group">
             <label>Ghi chú</label>
-            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
-              placeholder="Ghi chú" />
+            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group">
-            <button (click)="onAddError()" class="btn btn-success" type="submit" [disabled]="!(f.form.valid && maChineControl.valid) ">
+            <button (click)="onAddError()" class="btn btn-success" type="submit"
+              [disabled]="!(f.form.valid && maChineControl.valid) ">
               Thêm mới
             </button>
           </div>
@@ -279,7 +284,7 @@
             </div>
           </div>
           <div class="form-group">
-            <button class="btn btn-success" type="submit" >Thêm mới</button>
+            <button class="btn btn-success" type="submit">Thêm mới</button>
           </div>
         </div>
       </form>

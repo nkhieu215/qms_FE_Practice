@@ -8,6 +8,7 @@ import { CommonService } from 'src/app/share/_services/common.service';
 import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
 import { PQCPEndingOrderResponse } from 'src/app/share/response/pqcResponse/pqcPendingOrderResponse';
 import Utils from 'src/app/share/_utils/utils';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-make-order',
@@ -20,10 +21,12 @@ export class MakeProductOrderComponent implements OnInit {
     private pqcService: PQCService,
     private modalService: NgbModal,
     private actRoute: ActivatedRoute,
-    private commonService: CommonService
+    private commonService: CommonService,
+    protected autoLogout: AuthService
   ) { }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.refreshPage();
   }
   page = 1;
@@ -45,10 +48,10 @@ export class MakeProductOrderComponent implements OnInit {
   };
 
   refreshPage() {
-    const { name, code, lot, startDate, endDate, sap, woCode, status, groupName, branchName, workOrderCode } = this.formSearch;
+    const { name, code, lot, startDate, endDate, sap, woCode, status, groupName, branchName, workOrderCode, version } = this.formSearch;
     // thay đổi mới 15/7/2024: đảo ngược vị trí biến branchName và groupName
     console.log('search body', this.formSearch)
-    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode).subscribe(
+    this.pqcService.getListByStep(this.page, this.pageSize, name, code, lot, "", startDate, endDate, sap, woCode, status, branchName, groupName, workOrderCode, version).subscribe(
       data => {
         var productionLst = new PQCPEndingOrderResponse();
         productionLst = data;
@@ -71,7 +74,7 @@ export class MakeProductOrderComponent implements OnInit {
 
     this.commonService.statusStep(id).toPromise().then(
       data => {
-        this.lstCheck = data.lstStep;
+        this.lstCheck = data.lstStep.filter((x: any) => x.nameStep != 'Print Serial');
         this.lstCheck?.forEach(el => {
           el.status = Utils.getStatusName(el.status);
         })

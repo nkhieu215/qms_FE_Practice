@@ -64,6 +64,7 @@
                       <th>Trạng thái nhập kho SAP</th>
                       <th>Số lượng nhập SAP</th>
                       <th>Ngày nhập SAP</th>
+                      <th>Thời gian cập nhật</th>
                       <th>Ghi chú</th>
                       <th>Tùy chọn</th>
                     </tr>
@@ -71,7 +72,7 @@
                   <tbody>
                     <tr *ngFor="let check of lstStoreCheck; let i = index">
                       <td>{{ check.lot }}</td>
-                      <td>{{ check.createdAt | date:'dd/MM/YYYY HH:mm'}}</td>
+                      <td>{{ check.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
                       <td>{{ check.quatity }}</td>
                       <td>{{ check.checkDate }}</td>
                       <td>{{ check.quatityStore }}</td>
@@ -82,6 +83,7 @@
                       <td>{{ check.statusApproveSapStr }}</td>
                       <td>{{check.quantityStoreSap}}</td>
                       <td>{{check.dateApproveSap}}</td>
+                      <td>{{ check.updatedAt | date:'dd/MM/yyyy HH:mm'}}</td>
                       <td>{{ check.note }}</td>
                       <td>
                         <button class="btn btn-info btn-sm" title="Chi tiết kiểm tra"

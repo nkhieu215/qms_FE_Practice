@@ -25,6 +25,7 @@ import { PqcDrawNvlTest } from 'src/app/share/_models/pqc_draw_nvl_test.model';
 import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorListService } from 'src/app/share/_services/errorlist.service';
+import { AuthService } from 'src/app/share/_services/auth.service';
 type AOA = any[][];
 
 @Component({
@@ -37,9 +38,9 @@ type AOA = any[][];
 export class NvlProductionComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'check-nvl-new';
   @Input() show_check = '';
   @Input() woData: any = null;
@@ -82,11 +83,13 @@ export class NvlProductionComponent implements OnInit {
     private exportExelService: ExportExcelService,
     private datapqc: PqcDataService,
     protected http: HttpClient,
-    protected errorService: ErrorListService
+    protected errorService: ErrorListService,
+    protected autoLogout: AuthService
   ) {
   }
 
   ngOnInit(): void {
+    // this.autoLogout.autoLogout(0);
     this.getInfo();
   }
   selectedFiles?: FileList;
@@ -459,8 +462,8 @@ export class NvlProductionComponent implements OnInit {
 
     let dataHeader: string[] = [
       "Tên vật tư",
-      "Mã", "Partnumber", "Số mẫu thử", "Ngày ktra (DD/MM/YYYY)",
-      "Quy định KT", "Kết quả cho phép", "Thực tế", "Thông số min", "Thông số max", "Đơn vị", "Ngày về", "Ghi chú"
+      "Mã", "Partnumber", "Số mẫu kiểm tra", "Ngày ktra (DD/MM/YYYY)",
+      "Quy định KT", "Số lỗi cho phép", "Số lỗi thực tế", "Thông số min", "Thông số max", "Đơn vị", "Ngày về", "Ghi chú"
     ];
 
     var dataForExcel: any = [];
@@ -471,8 +474,11 @@ export class NvlProductionComponent implements OnInit {
         row.itemName,
         row.itemCode,
         row.partNumber,
-        "",
-        formatDate(new Date(), 'dd/MM/yyyy', 'en')
+        5,
+        formatDate(new Date(), 'dd/MM/yyyy', 'en'),
+        5,
+        0,
+        0
       ])
     })
 
@@ -519,7 +525,7 @@ export class NvlProductionComponent implements OnInit {
             bom.paramMax = element[9]
             bom.unit = element[10]
 
-            const [day, month, year] = element[11].split('/');
+            const [day, month, year] = element[11] == undefined ? '00/00/0000'.split('/') : element[11].split('/');
             console.log(element[11]);
             bom.returnDay = `${year}-${month}-${day}`;
             bom.note = element[12]
@@ -743,64 +749,82 @@ export class NvlProductionComponent implements OnInit {
     }
   }
   updateError(index: any) {
-    var result = this.lstQuantityByItem.find((x: any) => x.id == null)
-    console.log(result)
-    if (result) {
-      this.updateQuantity(result);
-      setTimeout(() => {
-        this.lstErrorByItem.forEach((x: any) => {
-          x.pqcBomQuantityId = this.quantityId;
-        })
-        this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
-          Swal.fire({
-            title: 'Thêm mới',
-            text: 'Thêm mới danh sách lỗi thành công! ',
-            icon: 'success',
-            showCancelButton: false,
-            showConfirmButton: false,
-            timer: 1000
-          })
-          this.confirmChange = true;
-          this.showBtn = false;
-        })
-      }, 100);
-    } else {
-      this.updateQuantity(this.lstQuantityByItem[Number(index)]);
-      if (index == null) {
-        this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
-          Swal.fire({
-            title: 'Cập nhật',
-            text: 'Cập nhật danh sách lỗi thành công! ',
-            icon: 'success',
-            showCancelButton: false,
-            showConfirmButton: false,
-            timer: 1000
-          })
-          this.http.get<any>(`${this.address}/${this.path}/get-lst-quantity/${this.itemId}`).subscribe(res => {
-            this.lstQuantityByItem = res;
-          })
-          this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${this.itemId}`).subscribe(res => {
-            this.lstErrorByItem = res;
-          })
-          this.confirmChange = true;
-          this.showBtn = false;
-        })
-      } else {
-        this.lstErrorByItem[Number(index)].updatedAt = new Date;
-        const data = [this.lstErrorByItem[Number(index)]];
-        this.http.post<any>(`${this.address}/${this.path}/update-errors`, data).subscribe(() => {
-          Swal.fire({
-            title: 'Cập nhật',
-            text: 'Cập nhật thông tin lỗi thành công! ',
-            icon: 'success',
-            showCancelButton: false,
-            showConfirmButton: false,
-            timer: 1000
-          })
-          this.confirmChange = true;
-        })
+    var check = false;
+    this.lstErrorByItem.forEach((x: any) => {
+      if (x.quantity == 0) {
+        check = true;
+        return;
       }
-    }
+    })
+    setTimeout(() => {
+      if (check == true) {
+        Swal.fire(
+          'Lỗi',
+          'Số lượng lỗi cần lớn hơn 0 !',
+          'warning'
+        )
+        return;
+      } else {
+        var result = this.lstQuantityByItem.find((x: any) => x.id == null)
+        console.log(result)
+        if (result) {
+          this.updateQuantity(result);
+          setTimeout(() => {
+            this.lstErrorByItem.forEach((x: any) => {
+              x.pqcBomQuantityId = this.quantityId;
+            })
+            this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
+              Swal.fire({
+                title: 'Thêm mới',
+                text: 'Thêm mới danh sách lỗi thành công! ',
+                icon: 'success',
+                showCancelButton: false,
+                showConfirmButton: false,
+                timer: 1000
+              })
+              this.confirmChange = true;
+              this.showBtn = false;
+            })
+          }, 100);
+        } else {
+          this.updateQuantity(this.lstQuantityByItem[Number(index)]);
+          if (index == null) {
+            this.http.post<any>(`${this.address}/${this.path}/update-errors`, this.lstErrorByItem).subscribe(() => {
+              Swal.fire({
+                title: 'Cập nhật',
+                text: 'Cập nhật danh sách lỗi thành công! ',
+                icon: 'success',
+                showCancelButton: false,
+                showConfirmButton: false,
+                timer: 1000
+              })
+              this.http.get<any>(`${this.address}/${this.path}/get-lst-quantity/${this.itemId}`).subscribe(res => {
+                this.lstQuantityByItem = res;
+              })
+              this.http.get<any>(`${this.address}/${this.path}/get-lst-two/${this.itemId}`).subscribe(res => {
+                this.lstErrorByItem = res;
+              })
+              this.confirmChange = true;
+              this.showBtn = false;
+            })
+          } else {
+            this.lstErrorByItem[Number(index)].updatedAt = new Date;
+            const data = [this.lstErrorByItem[Number(index)]];
+            this.http.post<any>(`${this.address}/${this.path}/update-errors`, data).subscribe(() => {
+              Swal.fire({
+                title: 'Cập nhật',
+                text: 'Cập nhật thông tin lỗi thành công! ',
+                icon: 'success',
+                showCancelButton: false,
+                showConfirmButton: false,
+                timer: 1000
+              })
+              this.confirmChange = true;
+            })
+          }
+        }
+      }
+    }, 1000);
   }
   deleteError(id: any, quantityId: any, quantity: any) {
     Swal.fire({

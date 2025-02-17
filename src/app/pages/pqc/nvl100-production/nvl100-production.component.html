@@ -11,7 +11,7 @@
             <label style="color: blue;" *ngIf="show_work_order"><strong>Thực hiện quét mã linh kiện đầu vào . .
                 .</strong></label>
             <div style="width: 34%;">
-              <button class="btn machine-info-btn btn-confirm" (click)="open(confirm,'')" *ngIf="condition == true">Xác
+              <button class="btn machine-info-btn btn-confirm" (click)="open(confirm,'')">Xác
                 nhận xử lý lỗi scan</button>
               <button class="btn machine-info-btn btn-manage" (click)="open(machine,'machine')"
                 *ngIf="show_work_order">Quản lý
@@ -428,7 +428,7 @@
               <th>STT</th>
               <th>Material <br> <input class="table-input" type="text" [(ngModel)]="materialSearchKey"
                   [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
-              <th>Part number <br> <input class="table-input" type="text" [(ngModel)]="partNumberSearchKey"
+              <th>Part number <br> <input class="table-input" type="text" [(ngModel)]="materialSearchKey"
                   [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()"></th>
               <th>Trạng thái <br> <select class="table-input" [(ngModel)]="statusSearchKey"
                   [ngModelOptions]="{ standalone: true }" (change)="searchByMaterial()">

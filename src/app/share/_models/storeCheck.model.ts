@@ -18,14 +18,15 @@ export class StoreCheck {
   status: any;
   id: any;
   ids: any;
-  statusApproveSap?:string;
-  statusApproveSapStr?:string;
-  quantityStoreSap?:string;
-  dateApproveSap?:string;
-  colorName?:string;
-  colorCode?:string;
-  createdAt?:Date;
-  hisString?:any;
+  statusApproveSap?: string;
+  statusApproveSapStr?: string;
+  quantityStoreSap?: string;
+  dateApproveSap?: string;
+  colorName?: string;
+  colorCode?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  hisString?: any;
 
   lstElectronic: StoreElectronic[] = [];
   lstExternal: StoreExternalInspection[] = [];

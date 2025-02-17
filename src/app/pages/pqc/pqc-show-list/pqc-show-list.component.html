@@ -89,6 +89,15 @@
         </div>
       </div>
       <div class="col-md-3">
+        <div class="form-group">
+          <label>Bom version</label>
+          <input type="text" class="form-control" name="workOrderCode" [(ngModel)]="formSearch.version" #name="ngModel"
+            placeholder="Bom version" />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
         <div class="form-group" style="line-height: 70px;margin-bottom: 0px;">
           <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
             <i class="fa fa-search"></i> Tìm kiếm
@@ -113,6 +122,7 @@
             <th scope="col">Tên sản phẩm</th>
             <th scope="col">Mã sản phẩm</th>
             <th scope="col">Số lô</th>
+            <th scope="col">Bom version</th>
             <th>Số lượng</th>
             <th>Mã Wo</th>
             <th>Mã lệnh SAP</th>
@@ -132,6 +142,7 @@
             <td>{{work.productionName}}</td>
             <td>{{work.productionCode}}</td>
             <td>{{work.lotNumber}}</td>
+            <td>{{work.bomVersion}}</td>
             <td>{{work.quantityPlan}}</td>
             <td>{{work.workOrderId}}</td>
             <td>{{work.sapWo}}</td>
@@ -141,7 +152,7 @@
             <td>{{work.totalSap | number}}</td>
 
             <td>{{work.strStatus}}</td>
-            <td>{{work.createdAt| date:'dd/MM/YYYY'}}</td>
+            <td>{{work.createdAt| date:'dd/MM/yyyy'}}</td>
 
             <td nzRight>
               <div class="btn-group">

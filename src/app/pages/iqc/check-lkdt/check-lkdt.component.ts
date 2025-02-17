@@ -28,6 +28,7 @@ import { IqcCheckService } from 'src/app/share/_services/iqcNvl.service';
 import { Constant } from 'src/app/share/_services/constant';
 import Utils from 'src/app/share/_utils/utils';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/share/_services/auth.service';
 
 @Component({
   selector: 'app-check-lkdt',
@@ -37,9 +38,9 @@ import { HttpClient } from '@angular/common/http';
 export class CheckLkdtComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   rawData: any;
@@ -97,9 +98,11 @@ export class CheckLkdtComponent implements OnInit {
   lstview = true;
   lstAuditCriteriaParamResponse: Array<AuditCriteriaParam> = [];
   lstAuditCriteriaParam: Array<AuditCriteriaParam> = [];
+  lstAuditCriteriaParamCheckDup: Array<AuditCriteriaParam> = [];
   listOfParameters: any;
   lstAuditCriteriaLKDTResponse: Array<AuditCriteriaLKDT2> = [];
   lstAuditCriteriaLKDT: Array<AuditCriteriaLKDT2> = [];
+  lstAuditCriteriaLKDTCheckDup: Array<AuditCriteriaLKDT2> = [];
 
   lstElectronic?: Array<OitmObjResponse> = [];
   lstErrorRes?: ErrorListResponse;
@@ -141,11 +144,63 @@ export class CheckLkdtComponent implements OnInit {
     private iqcCheckService: IqcCheckService,
     private storeCheckService: StoreCheckService,
     private datePipe: DatePipe,
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected autoLogout: AuthService
   ) { }
+  sortList() {
+    this.lstAuditCriteriaLKDT = this.lstAuditCriteriaLKDT.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+    this.lstAuditCriteriaParam = this.lstAuditCriteriaParam.sort((a: any, b: any) => a.positionNumber - b.positionNumber);
+  }
+  checkDuplicateNumber(type: any) {
+    if (type == 'LKDT') {
 
+      var result1 = this.lstAuditCriteriaLKDTCheckDup.find(x => x.positionNumber == this.formAuditCriteriaLKDT.positionNumber);
+      if (result1) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.lstAuditCriteriaLKDT.length == 0) {
+          this.formAuditCriteriaLKDT.positionNumber = 1;
+        } else {
+          this.formAuditCriteriaLKDT.positionNumber = 0;
+          this.lstAuditCriteriaLKDT.forEach(x => {
+            if (x.positionNumber! >= this.formAuditCriteriaLKDT.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditCriteriaLKDT.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    } else if (type == 'TS') {
+      var result2 = this.lstAuditCriteriaParamCheckDup.find(x => x.positionNumber == this.formAuditCriteriaLKDT.positionNumber);
+      if (result2) {
+        Swal.fire({
+          title: 'Lỗi',
+          text: 'Lặp số thứ tự',
+          icon: 'warning',
+          showCancelButton: false,
+          showConfirmButton: true,
+        })
+        if (this.lstAuditCriteriaParam.length == 0) {
+          this.formAuditParam.positionNumber = 1;
+        } else {
+          this.formAuditParam.positionNumber = 0;
+          this.lstAuditCriteriaParam.forEach(x => {
+            if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+              const i = x.positionNumber!
+              this.formAuditParam.positionNumber = Number(i) + 1;
+            }
+          })
+        }
+      }
+    }
+  }
   ngOnInit(): void {
-
+    this.autoLogout.autoLogout(0, 'check lkdt');
     this.typeAction = this.actRoute.snapshot.params['type'];
     this.id = this.actRoute.snapshot.params['id'];
     var data1 = { testingCriticalGroup: 'Thông số điện', type: 'LKDT' }
@@ -155,10 +210,13 @@ export class CheckLkdtComponent implements OnInit {
     })
     this.getListError();
     this.getListErrorGroup();
+    this.initCreate();
+    this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
+      this.listOfErrorWait = res;
+    })
     if (this.typeAction) {
       this.iqcElecCompId = this.id;
       this.lstview = false;
-      this.initCreate();
     } else {
       this.refreshExamination();
     }
@@ -248,6 +306,7 @@ export class CheckLkdtComponent implements OnInit {
       )
       .subscribe((data: any) => {
         this.filteredOrigin = data;
+        console.log(this.filteredOrigin)
       });
 
 
@@ -256,17 +315,22 @@ export class CheckLkdtComponent implements OnInit {
       this.form.importDate = new Date();
       this.form.reportCode = formatDate(new Date(), 'yyyyMMddhhmmss', 'en_US') + '-RANGDONG-QC';
       this.form.iqcElectType = false;
+      this.form.itemType = 'Hàng nhập';
+      this.form.suggestion = 'Nhập kho bình thường';
+      this.form.conclusion = 'Đạt nhập kho';
     } else if (this.typeAction == 'edit' || this.typeAction == 'show') {
       this.http.get<any>(`${this.address}/${this.path}/iqc/get-all/${this.id}`).subscribe(res => {
         this.listOfItem = res;
       })
       let data = await this.iqcCheckService.detail(this.id);
       this.form = data.component;
-      if (this.form.iqcElectType == 'false') {
-        this.form.iqcElectType = false;
-      } else {
-        this.form.iqcElectType = true;
-      }
+      setTimeout(() => {
+        if (this.form.iqcElectType == 'false') {
+          this.form.iqcElectType = false;
+        } else {
+          this.form.iqcElectType = true;
+        }
+      }, 300);
       this.statusStr = Utils.getStatusApproveName(this.form.status)
       // this.selectedEx = this.form.templateCode = data.component.templateCode;
       // this.form.checkDate =  this.form.checkDate ? this.datePipe.transform(Number(this.form.checkDate), 'yyyy-MM-dd') : '';
@@ -318,7 +382,7 @@ export class CheckLkdtComponent implements OnInit {
       this.lstAuditCriteriaLKDT.forEach(element => {
         element.auditQuantity = element.quantity;
       })
-
+      this.sortList()
       this.lstAuditCriteriaParam = data.component.resultParam;
     } else {
 
@@ -328,17 +392,22 @@ export class CheckLkdtComponent implements OnInit {
   }
 
   async refreshExamination() {
-    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType } = this.formSearch;
+    const { name, code, iqcCode, reportCode, invoiceNumber, startDate, endDate, status, itemType, origin } = this.formSearch;
     const dataSearch = {
       name: name,
       code: code,
       iqcCode: iqcCode,
       reportCode: reportCode,
-      startDate: startDate ? startDate + " 00:00:00" : null,
-      endDate: endDate ? endDate + " 23:59:59" : null,
+      startDate: startDate ? startDate : null,
+      endDate: endDate ? endDate : null,
+      // startDate: startDate ? startDate + " 00:00:00" : null,
+      // endDate: endDate ? endDate + " 23:59:59" : null,
       status: status,
       itemType: itemType,
-      invoiceNumber: invoiceNumber
+      invoiceNumber: invoiceNumber,
+      origin: origin,
+      grpoNumber: null,
+      createBy: null
     }
     let data = await this.iqcCheckService.getAll(this.page, this.pageSize, dataSearch, Constant.TYPE_ELECTRIC_COMPONENT_LKDT_BTP, Constant.IQC_TYPE_CREATE)
     // console.log(data);
@@ -365,7 +434,32 @@ export class CheckLkdtComponent implements OnInit {
       }, 100)
     })
   }
-  async onSubmit(buttonType: any) {
+  createReport() {
+    this.form.elecCompCode = '';
+    this.form.electCompName = '';
+    this.form.checkDate = new Date();
+    this.form.importDate = new Date();
+    this.form.reportCode = formatDate(new Date(), 'yyyyMMddhhmmss', 'en_US') + '-RANGDONG-QC';
+    this.form.iqcElectType = false;
+    this.form.itemType = 'Hàng nhập';
+    this.form.suggestion = 'Nhập kho bình thường';
+    this.form.conclusion = 'Đạt nhập kho';
+    this.form.status = 'DRAFF';
+    this.form.type = Constant.TYPE_ELECTRIC_COMPONENT_LKDT_BTP;
+    setTimeout(async () => {
+      let data = await this.iqcCheckService.create(this.form, null, null, null, 'ADD');
+      // setTimeout(() => {
+      console.log('check data :: ', data)
+      this.router.navigate([
+        `/iqc/iqc-lkdt-check/${data.id}/edit`,
+        {},
+      ]).then(() => {
+        window.location.reload();
+      });
+      // }, 200);
+    }, 200);
+  }
+  onSubmit(buttonType: any) {
     if (this.file) {
       const body = { iqcElectCompId: this.actRoute.snapshot.params['id'], data: JSON.stringify(this.rawData), createdAt: new Date }
       this.http.post(`${this.address}/store/download-raw-data`, body).subscribe();
@@ -394,8 +488,6 @@ export class CheckLkdtComponent implements OnInit {
           this.form.checkDate != null
             ? moment(this.form.checkDate).format('DD-MM-YYYY')
             : '';
-        this.form.elecCompCode = this.strSelectElec;
-        this.form.electCompName = this.strSelectElecName;
         this.form.type = 2;
         let message = '';
         if (buttonType == 'save') {
@@ -416,6 +508,7 @@ export class CheckLkdtComponent implements OnInit {
         this.lstAuditCriteriaLKDT.forEach(element => {
           element.quantity = element.auditQuantity;
         })
+        console.log("check list item: ", this.lstAuditCriteriaParam, this.lstAuditCriteriaLKDT)
         let data = await this.iqcCheckService.create(this.form, null, this.lstAuditCriteriaParam, this.lstAuditCriteriaLKDT, action)
         if (data.result.responseCode == '00') {
 
@@ -440,7 +533,7 @@ export class CheckLkdtComponent implements OnInit {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
                   const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                    // console.log('1', res)
+                    console.log('id item: ', res)
                     this.listOfErrorWait.forEach(x => {
                       var result2 = res.find((y: any) => y.itemCode == x.itemCode);
                       if (result2) {
@@ -449,6 +542,14 @@ export class CheckLkdtComponent implements OnInit {
                     })
                     setTimeout(() => {
                       this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                        setTimeout(() => {
+                          this.router.navigate([
+                            `/iqc/iqc-lkdt-check/${data.id}/show`,
+                            {},
+                          ]).then(() => {
+                            window.location.reload();
+                          });
+                        }, 1000);
                       });
                     }, 300);
                   });
@@ -456,14 +557,6 @@ export class CheckLkdtComponent implements OnInit {
                   //   window.location.reload();
                   // }, 100);
                 }, 300);
-                setTimeout(() => {
-                  this.router.navigate([
-                    `/iqc/iqc-lkdt-check/${data.id}/show`,
-                    {},
-                  ]).then(() => {
-                    window.location.reload();
-                  });
-                }, 1500);
               } else {
                 this.iqcElecCompId = data.id;
                 this.listOfItem.forEach((item: any) => item.iqcElecCompId = data.id);
@@ -471,7 +564,7 @@ export class CheckLkdtComponent implements OnInit {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
                   const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                    // console.log('1', res)
+                    console.log('check item 1:', res);
                     this.listOfErrorWait.forEach(x => {
                       var result2 = res.find((y: any) => y.itemCode == x.itemCode);
                       if (result2) {
@@ -480,19 +573,20 @@ export class CheckLkdtComponent implements OnInit {
                     })
                     setTimeout(() => {
                       this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
+                        console.log('update error item 111111:', this.listOfErrorWait);
+                        setTimeout(() => {
+                          this.router.navigate([
+                            `/iqc/iqc-lkdt-check/${data.id}/edit`,
+                            {},
+                          ]).then(() => {
+                            window.location.reload();
+                          });
+                        }, 1000);
                       });
                     }, 300);
                   }
                   );
                 }, 300);
-                setTimeout(() => {
-                  this.router.navigate([
-                    `/iqc/iqc-lkdt-check/${data.id}/edit`,
-                    {},
-                  ]).then(() => {
-                    window.location.reload();
-                  });
-                }, 1500);
                 // window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
               }
             }, 300)
@@ -504,10 +598,10 @@ export class CheckLkdtComponent implements OnInit {
     }, 100);
   }
 
-  open(content: any) {
+  open(content: any, type: any, index: any) {
     var data = { type: 'LKDT' }
     this.http.post<any>(`${this.address}/${this.path}/group/type/get-all`, data).subscribe(res => {
-      // console.log("check list: ", res)
+      console.log("check list: ", res)
       this.listOfCriticalGroup = res;
     })
     this.modalService.open(content, this.modalOptions).result.then(
@@ -518,6 +612,40 @@ export class CheckLkdtComponent implements OnInit {
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       }
     );
+
+
+    if (type == 'edit') {
+      this.formAuditCriteriaLKDT = this.lstAuditCriteriaLKDT[index];
+      this.formAuditParam = this.lstAuditCriteriaParam[index];
+      document.getElementById('btn-update')!.hidden = false;
+      document.getElementById('btn-insert')!.hidden = true;
+      this.lstAuditCriteriaLKDTCheckDup = this.lstAuditCriteriaLKDT.filter(x => (x.positionNumber != this.lstAuditCriteriaLKDT[index].positionNumber) || x.positionNumber != undefined);
+      this.lstAuditCriteriaParamCheckDup = this.lstAuditCriteriaParam.filter(x => (x.positionNumber != this.lstAuditCriteriaParam[index].positionNumber) || x.positionNumber != undefined);
+      console.log("check update: ", this.lstAuditCriteriaLKDTCheckDup)
+    } else {
+      document.getElementById('btn-update')!.hidden = true;
+      document.getElementById('btn-insert')!.hidden = false;
+      this.formAuditCriteriaLKDT = {};
+      var list3 = this.lstAuditCriteriaLKDT
+      this.lstAuditCriteriaLKDTCheckDup = list3;
+      this.formAuditCriteriaLKDT.positionNumber = 0;
+      this.lstAuditCriteriaLKDT.forEach(x => {
+        if (x.positionNumber! >= this.formAuditCriteriaLKDT.positionNumber) {
+          const i = x.positionNumber!
+          this.formAuditCriteriaLKDT.positionNumber = Number(i) + 1;
+        }
+      })
+      this.formAuditParam = {};
+      var list4 = this.lstAuditCriteriaParam
+      this.lstAuditCriteriaParamCheckDup = list4;
+      this.formAuditParam.positionNumber = 0;
+      this.lstAuditCriteriaParam.forEach(x => {
+        if (x.positionNumber! >= this.formAuditParam.positionNumber) {
+          const i = x.positionNumber!
+          this.formAuditParam.positionNumber = Number(i) + 1;
+        }
+      })
+    }
   }
 
   private getDismissReason(reason: any): string {
@@ -534,28 +662,30 @@ export class CheckLkdtComponent implements OnInit {
     // console.log('hello', this.selectExamination);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectExamination.id}`).subscribe(res => {
       this.listOfItem = res;
-    })
-    // this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
-    this.strSelectElec = this.iqcElecCompCode = this.selectExamination.code;
-    this.strSelectElecName = this.iqcElecCompname = this.selectExamination.name;
-    this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
-    this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
-    this.lstAuditCriteriaParam.forEach(element => {
-      element.parameterId = element.id;
-      element.checkResult = 'Đạt';
-      element.ids = Utils.randomString(5);
-    })
+      // this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
+      this.strSelectElec = this.iqcElecCompCode = this.form.elecCompCode = this.selectExamination.code;
+      this.strSelectElecName = this.iqcElecCompname = this.form.electCompName = this.selectExamination.name;
+      this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
+      this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
+      this.lstAuditCriteriaParam.forEach(element => {
+        element.parameterId = element.id;
+        element.checkResult = 'Đạt';
+        element.ids = Utils.randomString(5);
+      })
 
-    this.lstAuditCriteriaLKDT = this.selectExamination.lstAuditCriteriaLkdt;
-    this.lstAuditCriteriaLKDT?.forEach(element => {
-      element.auditCritetiaLkdtId = element.id;
-      element.checkResult = 'Đạt';
-      element.ids = Utils.randomString(5);
+      this.lstAuditCriteriaLKDT = this.selectExamination.lstAuditCriteriaLkdt;
+      this.lstAuditCriteriaLKDT?.forEach(element => {
+        element.auditCritetiaLkdtId = element.id;
+        element.checkResult = 'Đạt';
+        element.ids = Utils.randomString(5);
+        element.auditQuantity = null;
+        element.inaccuracy = '0';
+      })
+
+      // console.log(this.lstAuditCriteriaParam);
+      // console.log(this.lstAuditCriteriaLKDT)
+      this.sortList();
     })
-
-    // console.log(this.lstAuditCriteriaParam);
-    // console.log(this.lstAuditCriteriaLKDT)
-
   }
 
   onSelectedElectronic(index: any, itemCode: any) {
@@ -586,7 +716,7 @@ export class CheckLkdtComponent implements OnInit {
     }, 50);
     // console.log(this.selectedElectronic);
     //this.strSelectElec = this.selectedElectronic.itemCode;
-    this.form.electCompName = this.selectedElectronic.itemName;
+    // this.form.electCompName = this.selectedElectronic.itemName;
   }
 
   onSelectedOrigin() {
@@ -816,28 +946,38 @@ export class CheckLkdtComponent implements OnInit {
   }
 
 
-  addAuditCriterialLKDT() {
-    this.formAuditCriteriaLKDT.ids = Utils.randomString(5);
-    if (this.typeAction == 'add') {
-      this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
+  async addAuditCriterialLKDT(index: any) {
+    if (index != null) {
+      this.sortList();
+    } else {
+      this.formAuditCriteriaLKDT.ids = Utils.randomString(5);
+      if (this.typeAction == 'add') {
+        this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
+      }
+      else if (this.typeAction == 'edit') {
+        this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
+      }
+      this.sortList();
     }
-    else if (this.typeAction == 'edit') {
-      this.lstAuditCriteriaLKDT.push(this.formAuditCriteriaLKDT)
-    }
-
     this.formAuditCriteriaLKDT = {};
     this.modalService.dismissAll()
   }
 
 
-  addAuditCriterialParam() {
-    this.formAuditParam.ids = Utils.randomString(5);
-    if (this.typeAction == 'add') {
-      this.lstAuditCriteriaParam.push(this.formAuditParam)
+  addAuditCriterialParam(index: any) {
+    if (index != null) {
+      this.sortList();
+    } else {
+      this.formAuditParam.ids = Utils.randomString(5);
+      if (this.typeAction == 'add') {
+        this.lstAuditCriteriaParam.push(this.formAuditParam)
+      }
+      else if (this.typeAction == 'edit') {
+        this.lstAuditCriteriaParam.push(this.formAuditParam)
+      }
+      this.sortList();
     }
-    else if (this.typeAction == 'edit') {
 
-    }
 
     this.formAuditCriteriaLKDT = {};
     this.modalService.dismissAll()
@@ -878,7 +1018,9 @@ export class CheckLkdtComponent implements OnInit {
       cancelButtonText: 'Hủy'
     }).then(async (result) => {
       const data = await this.iqcCheckService.copy(id);
-      this.router.navigate([`/iqc/iqc-lkdt-check/${data.id}/edit`, {},]);
+      // this.router.navigate([`/iqc/iqc-lkdt-check/${data.id}/edit`, {},]);
+      window.open(`/iqc/iqc-lkdt-check/${data.id}/edit`, '_blank');
+      window.location.reload();
     })
   }
   async exportExcelDetail() {
@@ -1113,6 +1255,14 @@ export class CheckLkdtComponent implements OnInit {
     }
   }
   submitError(index: any) {
+    if (this.listOfError[index].quantity == 0) {
+      Swal.fire(
+        'Lỗi',
+        'Số lượng lỗi cần lớn hơn 0 !',
+        'warning'
+      )
+      return;
+    }
     if (this.listOfError[index].errorCode === '') {
       Swal.fire({
         title: 'Lỗi',
@@ -1231,6 +1381,7 @@ export class CheckLkdtComponent implements OnInit {
     }, 100);
   }
   openPopupError(content: any, item: any) {
+    console.log('check item: ', item)
     this.errCode = '';
     this.errGroup = '';
     this.errName = '';
@@ -1353,5 +1504,11 @@ export class CheckLkdtComponent implements OnInit {
 
     //   })
     // }
+  }
+  onSelectedOriginS() {
+    this.strSelectOrigin = this.selectedOrigin.name;
+    this.formSearch.origin = this.selectedOrigin.name;
+    console.log(this.formSearch.origin);
+
   }
 }

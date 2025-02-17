@@ -2,3 +2,24 @@
   max-width: 90%;
   width: 90%;
 }
+
+.checkbox-container:has(> input:disabled:checked)::after {
+  width: 27px;
+  height: 27px;
+  font-size: 9px;
+  background: #0d6efd;
+  display: inline-block;
+  border: 1px solid #0d6efd;
+  border-radius: 3px;
+  color: white;
+  position: relative;
+  content: "✔";
+  text-align: center;
+  float: left;
+  font-size: 19px;
+}
+
+/* remove display of default disabled checked checkbox */
+.checkbox-container input:disabled:checked {
+  display: none;
+}
