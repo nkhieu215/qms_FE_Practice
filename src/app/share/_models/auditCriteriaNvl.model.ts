@@ -6,7 +6,7 @@ export class AuditCriteriaNvl {
   unit?: string;
   note?: string;
   ids?: string;
-  id?: number;
+  id?: number | null;
   templateId?: string;
   auditCriteriaId?: string;
   acceptanceLevel?: string;

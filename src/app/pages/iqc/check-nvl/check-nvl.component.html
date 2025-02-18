@@ -565,7 +565,7 @@
                 <button class="btn btn-info" *ngIf=" typeAction == 'edit'||  typeAction == 'add'" title="Chỉnh sửa"
                   (click)="open(mymodal,'edit',i)"><i class="fa fa-edit"></i></button>
                 <button *ngIf=" typeAction == 'edit'||  typeAction == 'add'" class="btn btn-danger"
-                  (click)="deleteAuditRow(audit.ids, audit.id)">
+                  (click)="deleteAuditRow(audit.criteriaName, audit.id)">
                   <i class="fa fa-trash"></i>
                 </button>
               </td>

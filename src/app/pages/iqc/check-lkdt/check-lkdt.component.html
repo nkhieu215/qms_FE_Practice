@@ -548,7 +548,8 @@
                     <button class="btn btn-info" *ngIf=" typeAction == 'edit'||  typeAction == 'add'" title="Chỉnh sửa"
                       (click)="open(tieuchi,'edit',i)"><i class="fa fa-edit"></i></button>
                     <button *ngIf=" typeAction == 'edit' || typeAction =='add' " class="btn btn-danger" type="button"
-                      (click)="removeAuditLKDT(auditLKDT.ids)"><i class="fa fa-trash"></i></button>
+                      (click)="removeAuditLKDT(auditLKDT.auditContent,auditLKDT.id)"><i
+                        class="fa fa-trash"></i></button>
                   </td>
                 </tr>
               </tbody>
@@ -666,7 +667,8 @@
                     <button *ngIf=" typeAction == 'edit' || typeAction =='add' " class="btn btn-info" type="button"
                       (click)="open(thongso,'edit',i)"><i class="fa fa-edit"></i></button>
                     <button *ngIf=" typeAction == 'edit' || typeAction =='add' " class="btn btn-danger" type="button"
-                      (click)="removeAuditParam(auditLKDT.ids)"><i class="fa fa-trash"></i></button>
+                      (click)="removeAuditParam(auditLKDT.parameterName,auditLKDT.id)"><i
+                        class="fa fa-trash"></i></button>
                   </td>
                 </tr>
               </tbody>

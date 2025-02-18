@@ -659,7 +659,6 @@ export class CheckLkdtComponent implements OnInit {
   }
 
   onSelected() {
-    // console.log('hello', this.selectExamination);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectExamination.id}`).subscribe(res => {
       this.listOfItem = res;
       // this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
@@ -668,23 +667,28 @@ export class CheckLkdtComponent implements OnInit {
       this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
       this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
       this.lstAuditCriteriaParam.forEach(element => {
+        const id = null;
         element.parameterId = element.id;
+        element.id = id;
         element.checkResult = 'Đạt';
         element.ids = Utils.randomString(5);
       })
 
       this.lstAuditCriteriaLKDT = this.selectExamination.lstAuditCriteriaLkdt;
       this.lstAuditCriteriaLKDT?.forEach(element => {
+        const id = null;
         element.auditCritetiaLkdtId = element.id;
+        element.id = id;
         element.checkResult = 'Đạt';
         element.ids = Utils.randomString(5);
         element.auditQuantity = null;
         element.inaccuracy = '0';
       })
 
-      // console.log(this.lstAuditCriteriaParam);
-      // console.log(this.lstAuditCriteriaLKDT)
+      // console.log('hello', this.selectExamination);
       this.sortList();
+      console.log('param', this.lstAuditCriteriaParam);
+      console.log('LKDT', this.lstAuditCriteriaLKDT);
     })
   }
 
@@ -984,25 +988,42 @@ export class CheckLkdtComponent implements OnInit {
   }
 
 
-  removeAuditLKDT(ids: any) {
-    if (this.typeAction == 'edit') {
-
+  async removeAuditLKDT(auditContent: any, id: any) {
+    if (this.typeAction == 'edit' && id !== null) {
+      let data = await this.iqcCheckService.deleteItemCheck(id, this.id, 'LKDT');
+      if (data.result.responseCode == '00') {
+        Swal.fire("Thành công", "Bạn đã xóa thông tin kiểm tra thành công", "warning")
+        this.lstAuditCriteriaLKDT.forEach((element, index) => {
+          if (element.auditContent == auditContent) {
+            this.lstAuditCriteriaLKDT.splice(index, 1);
+          }
+        });
+      }
+    } else if (id === null) {
+      this.lstAuditCriteriaLKDT.forEach((element, index) => {
+        if (element.auditContent == auditContent) {
+          this.lstAuditCriteriaLKDT.splice(index, 1);
+        }
+      });
     }
 
-    this.lstAuditCriteriaLKDT.forEach((element, index) => {
-      if (element.ids == ids) {
-        this.lstAuditCriteriaLKDT.splice(index, 1);
-      }
-    });
   }
 
-  removeAuditParam(ids: any) {
+  async removeAuditParam(parameterName: any, id: any) {
     if (this.typeAction == 'edit') {
-
+      let data = await this.iqcCheckService.deleteItemCheck(id, this.id, 'PARAM');
+      if (data.result.responseCode == '00') {
+        Swal.fire("Thành công", "Bạn đã xóa thông tin kiểm tra thành công", "warning")
+        this.lstAuditCriteriaParam.forEach((element, index) => {
+          if (element.parameterName == parameterName) {
+            this.lstAuditCriteriaParam.splice(index, 1);
+          }
+        });
+      }
     }
 
     this.lstAuditCriteriaParam.forEach((element, index) => {
-      if (element.ids == ids) {
+      if (element.parameterName == parameterName) {
         this.lstAuditCriteriaParam.splice(index, 1);
       }
     });

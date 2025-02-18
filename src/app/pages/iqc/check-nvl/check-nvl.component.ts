@@ -160,7 +160,6 @@ export class CheckNvlComponent implements OnInit {
     }
   }
   onSelected() {
-    // console.log('select', this.selectedEx);
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectedEx.id}`).subscribe(res => {
       this.listOfItem = res;
       this.listOfItem.forEach(x => {
@@ -174,7 +173,9 @@ export class CheckNvlComponent implements OnInit {
     this.iqcElecCompname = this.selectedEx.name;
     this.lstAuditCriteriaNvl = this.selectedEx.lstAuditCriteriaNvl;
     this.lstAuditCriteriaNvl.forEach((element) => {
+      const id = null;
       element.auditCriteriaId = element.id + '';
+      element.id = id;
       element.minAudit = element.min;
       element.maxAudit = element.max;
       element.noteAudit = element.note;
@@ -189,6 +190,7 @@ export class CheckNvlComponent implements OnInit {
       element.ids = Utils.randomString(5);
     })
     this.sortList()
+    console.log('select', this.lstAuditCriteriaNvl);
   }
 
   onSelectedElectronic(index: any, itemCode: any) {
@@ -383,20 +385,26 @@ export class CheckNvlComponent implements OnInit {
     this.formAddCheck = {}
   }
 
-  async deleteAuditRow(ids: any, id: any) {
+  async deleteAuditRow(criteriaName: any, id: any) {
 
-    if (this.typeAction == 'edit') {
+    if (this.typeAction == 'edit' && id !== null) {
       let data = await this.iqcCheckService.deleteItemCheck(id, this.id, 'NVL');
       if (data.result.responseCode == '00') {
         Swal.fire("Thành công", "Bạn đã xóa thông tin kiểm tra thành công", "warning")
+        this.lstAuditCriteriaNvl.forEach((element, index) => {
+          if (element.criteriaName === criteriaName) {
+            this.lstAuditCriteriaNvl.splice(index, 1);
+          }
+        });
       }
+    } else if (id === null) {
+      this.lstAuditCriteriaNvl.forEach((element, index) => {
+        if (element.criteriaName === criteriaName) {
+          this.lstAuditCriteriaNvl.splice(index, 1);
+        }
+      });
     }
 
-    this.lstAuditCriteriaNvl.forEach((element, index) => {
-      if (element.ids == ids) {
-        this.lstAuditCriteriaNvl.splice(index, 1);
-      }
-    });
   }
 
   async deleteErrorRow(ids: any, id: any) {
