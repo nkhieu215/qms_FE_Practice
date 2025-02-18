@@ -27,9 +27,9 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class QualityEvaluationComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   listOfCriticalName: any;
   @Input() show_check = '';

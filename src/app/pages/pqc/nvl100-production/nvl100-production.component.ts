@@ -41,9 +41,9 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class Nvl100ProductionComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  //address = 'http://localhost:8449';
   // hệ thống
-  //address = 'http://192.168.68.92/qms';
+  address = 'http://192.168.68.92/qms';
   //Điều kiện triển khai hiện tại
   page?: number;
   page1?: number;
