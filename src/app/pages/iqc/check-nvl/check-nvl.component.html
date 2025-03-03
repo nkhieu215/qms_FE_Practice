@@ -316,13 +316,8 @@
               [(ngModel)]="form.spkphNumber" />
           </div>
           <div class="col-md-3">
-            <label>Đề nghị </label>
-
-            <select class="form-control" name="suggestion" [(ngModel)]="form.suggestion" #type="ngModel">
-              <option value="Trả lại nhà cung cấp">Trả lại nhà cung cấp</option>
-              <option value="Nhập kho bình thường">Nhập kho bình thường</option>
-              <option value="Nhập kho có điều kiện">Nhập kho có điều kiện</option>
-            </select>
+            <label>Đề nghị <i style="color: red;">(*)</i> </label>
+            <input type="text" class="form-control" name="suggestion" [(ngModel)]="form.suggestion">
           </div>
           <div class="col-md-3">
             <label>Kết luận </label>
@@ -367,7 +362,7 @@
                       <th style="width: 10%;">Mã hàng hóa</th>
                       <th style="width: 29%;">Tên hàng hóa</th>
                       <th style="width: 7%;">Số lượng lô hàng</th>
-                      <th style="width: 7%;">Số lô</th>
+                      <th style="width: 7%;">Số lô SAP</th>
                       <th style="width: 7%;">Số hóa đơn</th>
                       <th style="width: 7%;">Số lượng kiểm tra ngoại quan</th>
                       <th style="width: 6%;">Thông tin lỗi</th>
@@ -401,8 +396,8 @@
                         </span>
                       </td>
                       <td style="text-align: left;width: 7%;">
-                        <input [id]="item.id+'-input-po-quantity'" type="text" [(ngModel)]="item.poQuantity"
-                          [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;">
+                        <input [id]="item.id+'-input-po-quantity'" type="number" [(ngModel)]="item.poQuantity"
+                          [ngModelOptions]="{ standalone: true }" [hidden]="true" style="width: 90%;" min="0">
                         <span [id]="item.id+'-span-po-quantity'" [hidden]="false">{{item.poQuantity}}</span>
                       </td>
                       <td style="text-align: left;width: 7%;">
@@ -451,11 +446,11 @@
             <button class="btn  btn-success" *ngIf=" typeAction == 'edit'||  typeAction == 'add'"
               style="margin-right: 10px;" (click)="open(mymodal,'','')"><i class="fa fa-plus"></i> Thêm tiêu chí kiểm
               tra</button>
-
+            <!-- 
             <button class="btn btn-danger" (click)="open(myModalError,'','')" style="margin-right: 10px;height: 40px;"
               [hidden]="true">
               <i class="fa fa-plus"></i> Thông tin lỗi
-            </button>
+            </button> -->
             <button class="btn  btn-danger" *ngIf=" typeAction == 'edit'||  typeAction == 'add'||  typeAction == 'show'"
               style="margin-right: 10px;height: 40px;" (click)="openPopupError(listErrorView,null)"><i
                 class="fa fa-list"></i> Danh sách lỗi</button>
@@ -600,7 +595,7 @@
 
 
 <!-- thong tin kiem tra nvl -->
-<ng-template #myModalError let-modal>
+<!-- <ng-template #myModalError let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Khai báo lỗi</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
@@ -717,7 +712,7 @@
       </tbody>
     </nz-table>
   </div>
-</ng-template>
+</ng-template> -->
 
 <!-- thong tin kiem tra nvl -->
 <ng-template #mymodal let-modal>
@@ -1053,7 +1048,7 @@
       <div id="table-errors" style="width: 99%;margin-bottom: 10px;">
         <table class="tables" style="margin-top: 0px;">
           <tbody>
-            <tr *ngFor="let item of listOfError;let i = index;">
+            <tr *ngFor="let item of listOfErrorWait;let i = index;">
               <td style="width: 5%;"> {{i+1}}</td>
               <td style="text-align: left;width: 9%;">{{item.itemCode}}</td>
               <td style="text-align: left;width: 9%;"><span>{{item.errGroup}}</span></td>

@@ -38,9 +38,9 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 export class CheckLkdtComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   rawData: any;
@@ -466,8 +466,8 @@ export class CheckLkdtComponent implements OnInit {
       // console.log("Them moi thanh cong", JSON.stringify(this.rawData))
     }
     var checkResult = false;
-    if ((this.form.reportCode === '' || this.form.itemType === '') ||
-      (this.form.reportCode === null || this.form.itemType === null)) {
+    if ((this.form.reportCode === '' || this.form.itemType === ''|| this.form.suggestion === '') ||
+      (this.form.reportCode === null || this.form.itemType === null || this.form.suggestion === null)) {
       checkResult = true;
     }
     setTimeout(async () => {
@@ -521,9 +521,11 @@ export class CheckLkdtComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: 'Đồng ý'
           }).then((result) => {
-            this.listOfErrorWait.forEach(x => {
-              x.electCompId = data.id;
-            })
+            if (this.listOfError !== undefined) {
+              this.listOfError.forEach((x: any) => {
+                x.electCompId = data.id;
+              })
+            }
             setTimeout(() => {
               if (buttonType == 'send_approve') {
                 //window.location.href = `/iqc/iqc-lkdt-check/${data.id}/show`;
@@ -533,25 +535,27 @@ export class CheckLkdtComponent implements OnInit {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
                   const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                    console.log('id item: ', res)
-                    this.listOfErrorWait.forEach(x => {
-                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
-                      if (result2) {
-                        x.auditResultItemId = result2.id;
-                      }
-                    })
-                    setTimeout(() => {
-                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
-                        setTimeout(() => {
-                          this.router.navigate([
-                            `/iqc/iqc-lkdt-check/${data.id}/show`,
-                            {},
-                          ]).then(() => {
-                            window.location.reload();
-                          });
-                        }, 1000);
-                      });
-                    }, 300);
+                    console.log('id item: ', res);
+                    if (this.listOfError !== undefined) {
+                      this.listOfError.forEach((x: any) => {
+                        var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                        if (result2) {
+                          x.auditResultItemId = result2.id;
+                        }
+                      })
+                      setTimeout(() => {
+                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe(() => {
+                          setTimeout(() => {
+                            this.router.navigate([
+                              `/iqc/iqc-lkdt-check/${data.id}/show`,
+                              {},
+                            ]).then(() => {
+                              window.location.reload();
+                            });
+                          }, 1000);
+                        });
+                      }, 300);
+                    }
                   });
                   // setTimeout(() => {
                   //   window.location.reload();
@@ -565,28 +569,38 @@ export class CheckLkdtComponent implements OnInit {
                   const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
                     console.log('check item 1:', res);
-                    this.listOfErrorWait.forEach(x => {
-                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
-                      if (result2) {
-                        x.auditResultItemId = result2.id;
-                      }
-                    })
-                    setTimeout(() => {
-                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
-                        console.log('update error item 111111:', this.listOfErrorWait);
-                        setTimeout(() => {
-                          this.router.navigate([
-                            `/iqc/iqc-lkdt-check/${data.id}/edit`,
-                            {},
-                          ]).then(() => {
-                            window.location.reload();
-                          });
-                        }, 1000);
-                      });
-                    }, 300);
+                    if (this.listOfError !== undefined) {
+                      this.listOfError.forEach((x: any) => {
+                        var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                        if (result2) {
+                          x.auditResultItemId = result2.id;
+                        }
+                      })
+                      setTimeout(() => {
+                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe(() => {
+                          console.log('update error item 111111:', this.listOfError);
+                          setTimeout(() => {
+                            this.router.navigate([
+                              `/iqc/iqc-lkdt-check/${data.id}/edit`,
+                              {},
+                            ]).then(() => {
+                              window.location.reload();
+                            });
+                          }, 1000);
+                        });
+                      }, 300);
+                    }
                   }
                   );
                 }, 300);
+                setTimeout(() => {
+                  this.router.navigate([
+                    `/iqc/iqc-lkdt-check/${data.id}/edit`,
+                    {},
+                  ]).then(() => {
+                    window.location.reload();
+                  });
+                }, 1500);
                 // window.location.href = `/iqc/iqc-lkdt-check/${data.id}/edit`
               }
             }, 300)
@@ -694,29 +708,29 @@ export class CheckLkdtComponent implements OnInit {
 
   onSelectedElectronic(index: any, itemCode: any) {
     this.itemResult = itemCode;
-    var check = false;
-    for (let i = 0; i < this.listOfItem.length; i++) {
-      if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
-        check = true;
-        Swal.fire({
-          title: 'Lỗi',
-          text: 'Đã tồn tại mã sản phẩm ! ',
-          icon: 'warning',
-          showCancelButton: false,
-          showConfirmButton: false,
-          timer: 1000
-        })
-      }
-    }
+    // var check = false;
+    // for (let i = 0; i < this.listOfItem.length; i++) {
+    //   if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
+    //     check = true;
+    //     Swal.fire({
+    //       title: 'Lỗi',
+    //       text: 'Đã tồn tại mã sản phẩm ! ',
+    //       icon: 'warning',
+    //       showCancelButton: false,
+    //       showConfirmButton: false,
+    //       timer: 1000
+    //     })
+    //   }
+    // }
     setTimeout(() => {
-      if (check === false) {
+      // if (check === false) {
         this.listOfItem[index].itemCode = this.itemResult.itemCode;
         this.listOfItem[index].itemName = this.itemResult.itemName;
-      } else {
-        this.listOfItem[index].itemCode = '';
-        this.listOfItem[index].itemName = '';
-        this.listOfItems = [];
-      }
+      // } else {
+      //   this.listOfItem[index].itemCode = '';
+      //   this.listOfItem[index].itemName = '';
+      //   this.listOfItems = [];
+      // }
     }, 50);
     // console.log(this.selectedElectronic);
     //this.strSelectElec = this.selectedElectronic.itemCode;
@@ -1051,10 +1065,10 @@ export class CheckLkdtComponent implements OnInit {
   // -------------------------------------------- Danh sách sản phẩm --------------------------------------------------------
   deleteById(index: any) {
     if (this.listOfItem[index].id === null) {
-      this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+      this.listOfItem.splice(index,1);
     } else {
       this.http.delete<any>(`${this.address}/${this.path}/iqc/delete/${this.listOfItem[index].id}`).subscribe(() => {
-        this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+        this.listOfItem.splice(index,1);
         if (this.listOfItem.length > 5) {
           document.getElementById('table-body')!.style.width = '99.9%';
         } else {
@@ -1127,7 +1141,7 @@ export class CheckLkdtComponent implements OnInit {
       itemName: '',
       billNumber: '',
       lotNumber: '',
-      poQuantity: 0,
+      poQuantity: null,
       quantityCheck: 0,
       createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       updateAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
@@ -1219,7 +1233,13 @@ export class CheckLkdtComponent implements OnInit {
         showConfirmButton: false,
         timer: 5000
       })
-    } else {
+    }else if(this.listOfItem[index].poQuantity === null || this.listOfItem[index].poQuantity <= 0){
+          Swal.fire(
+            'Lỗi',
+            'Số lượng lô hàng cần lớn hơn 0 !',
+            'warning'
+          )
+        } else {
       const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
       this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe((res) => {
         this.listOfItem[index].id = res[0].id;
@@ -1408,7 +1428,7 @@ export class CheckLkdtComponent implements OnInit {
     this.errName = '';
     if (item === null) {
       this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
-        this.listOfError = res;
+        this.listOfErrorWait = res;
       })
     } else {
       this.itemCode = item.itemCode;

@@ -35,9 +35,9 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  //address = 'http://localhost:8449';
+  address = 'http://localhost:8449';
   // hệ thống
-  address = 'http://192.168.68.92/qms';
+  //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
   //list item
   listOfItem: any[] = [];
@@ -106,7 +106,7 @@ export class CheckNvlComponent implements OnInit {
   classError?: string;
   form: any = {};
   formAddCheck: any = {};
-  formErrorChild: any = {};
+  // formErrorChild: any = {};
   errorAdd?: string;
   arrErrChild: Array<ErrorElectronicComponent> = [];
   lstErrorRes?: ErrorListResponse;
@@ -195,26 +195,26 @@ export class CheckNvlComponent implements OnInit {
 
   onSelectedElectronic(index: any, itemCode: any) {
     this.itemResult = itemCode;
-    var check = false;
-    for (let i = 0; i < this.listOfItem.length; i++) {
-      if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
-        check = true;
-        Swal.fire(
-          'Lỗi',
-          'Đã tồn tại mã sản phẩm !',
-          'warning'
-        )
-      }
-    }
+    // var check = false;
+    // for (let i = 0; i < this.listOfItem.length; i++) {
+    //   if (this.listOfItem[i].itemCode === this.itemResult.itemCode) {
+    //     check = true;
+    //     Swal.fire(
+    //       'Lỗi',
+    //       'Đã tồn tại mã sản phẩm !',
+    //       'warning'
+    //     )
+    //   }
+    // }
     setTimeout(() => {
-      if (check === false) {
+    //   if (check === false) {
         this.listOfItem[index].itemCode = this.itemResult.itemCode;
         this.listOfItem[index].itemName = this.itemResult.itemName;
-      } else {
-        this.listOfItem[index].itemCode = '';
-        this.listOfItem[index].itemName = '';
-        this.listOfItems = [];
-      }
+    //   } else {
+    //     this.listOfItem[index].itemCode = '';
+    //     this.listOfItem[index].itemName = '';
+    //     this.listOfItems = [];
+    //   }
     }, 50);
     console.log("check lk", this.listOfItem);
     this.strSelectElec = this.selectedElectronic.itemCode;
@@ -254,7 +254,6 @@ export class CheckNvlComponent implements OnInit {
     this.auditnvl = data.lst;
     this.collectionSize = Number(data.total) * this.pageSize;
   }
-
   ngOnInit(): void {
     this.autoLogout.autoLogout(0, 'check nvl');
     this.searchOriginCtrl.valueChanges
@@ -324,24 +323,24 @@ export class CheckNvlComponent implements OnInit {
   /**
   * thêm mới thông tin kiểm tra
   */
-  async onAddErrorChild() {
-    const { errGroup, errName, quantity, ratio, note } = this.formErrorChild;
-    const errorChild = new ErrorElectronicComponent(
-      errName, errGroup, quantity, ratio, note, Utils.randomString(5)
-    );
+  // async onAddErrorChild() {
+  //   const { errGroup, errName, quantity, ratio, note } = this.formErrorChild;
+  //   const errorChild = new ErrorElectronicComponent(
+  //     errName, errGroup, quantity, ratio, note, Utils.randomString(5)
+  //   );
 
-    if (this.typeAction == 'edit') {
-      errorChild.electCompId = this.id;
-      let data = await this.iqcCheckService.addCheckParam({ errParam: errorChild, type: 'ERROR' });
-      if (data.result.responseCode == '00') {
-        errorChild.id = data.id;
-        this.arrErrChild.push(errorChild);
-        Swal.fire("Thành công", "Bạn đã thêm thông tin kiểm tra thành công", "success")
-      }
-    } else {
-      this.arrErrChild.push(errorChild);
-    }
-  }
+  //   if (this.typeAction == 'edit') {
+  //     errorChild.electCompId = this.id;
+  //     let data = await this.iqcCheckService.addCheckParam({ errParam: errorChild, type: 'ERROR' });
+  //     if (data.result.responseCode == '00') {
+  //       errorChild.id = data.id;
+  //       this.arrErrChild.push(errorChild);
+  //       Swal.fire("Thành công", "Bạn đã thêm thông tin kiểm tra thành công", "success")
+  //     }
+  //   } else {
+  //     this.arrErrChild.push(errorChild);
+  //   }
+  // }
 
   async onAddCheck(index: any) {
     if (index != null) {
@@ -480,16 +479,16 @@ export class CheckNvlComponent implements OnInit {
     });
   }
 
-  onChangeQuantityError(errorNumber: any) {
-    if (this.form.checkingQuantity == null || this.form.checkingQuantity == 0) {
-      this.errorAdd = 'Bạn chưa thực hiện nhập số lượng kiểm tra';
-      this.formErrorChild.ratio = 0;
-    } else {
-      this.errorAdd = '';
-      var number = (errorNumber / this.form.checkingQuantity) * 100;
-      this.formErrorChild.ratio = number.toFixed(2) + '%';
-    }
-  }
+  // onChangeQuantityError(errorNumber: any) {
+  //   if (this.form.checkingQuantity == null || this.form.checkingQuantity == 0) {
+  //     this.errorAdd = 'Bạn chưa thực hiện nhập số lượng kiểm tra';
+  //     this.formErrorChild.ratio = 0;
+  //   } else {
+  //     this.errorAdd = '';
+  //     var number = (errorNumber / this.form.checkingQuantity) * 100;
+  //     this.formErrorChild.ratio = number.toFixed(2) + '%';
+  //   }
+  // }
 
   onChangeQuantity() {
     var checkQuantity = this.form.checkingQuantity;
@@ -537,7 +536,7 @@ export class CheckNvlComponent implements OnInit {
           this.form.iqcElectType = true;
         }
       }, 300);
-      // console.log("check data :", data)
+      console.log("check data iqc:", data)
       this.selectedEx = this.form.templateCode = data.component.templateCode;
       this.form.checkDate = new Date(this.form.checkDate);
       this.form.importDate = new Date(this.form.importDate);
@@ -644,8 +643,8 @@ export class CheckNvlComponent implements OnInit {
    */
   async onSubmit(buttonType: any) {
     var checkResult = false;
-    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === '') ||
-      (this.selectedEx === null || this.form.reportCode === null || this.form.itemType === null)) {
+    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === ''|| this.form.suggestion === '') ||
+      (this.selectedEx === null || this.form.reportCode === null || this.form.itemType === null || this.form.suggestion === null)) {
       checkResult = true;
     }
     if (checkResult === true) {
@@ -696,13 +695,15 @@ export class CheckNvlComponent implements OnInit {
             showCancelButton: false,
             confirmButtonText: 'Đồng ý',
           }).then(async (result) => {
-            this.listOfErrorWait.forEach(x => {
-              if (this.actRoute.snapshot.params['type'] == 'edit') {
-                x.electCompId = this.actRoute.snapshot.params['id'];
-              } else {
-                x.electCompId = data.id;
-              }
-            })
+            if (this.listOfError !== undefined) {
+              this.listOfError.forEach((x: any) => {
+                if (this.actRoute.snapshot.params['type'] == 'edit') {
+                  x.electCompId = this.actRoute.snapshot.params['id'];
+                } else {
+                  x.electCompId = data.id;
+                }
+              })
+            }
 
             setTimeout(() => {
               if (buttonType == 'send_approve') {
@@ -714,16 +715,20 @@ export class CheckNvlComponent implements OnInit {
                   // console.log(body)
                   this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
                     console.log('send approve')
-                    this.listOfErrorWait.forEach(x => {
-                      var result2 = res.find((y: any) => y.itemCode == x.itemCode);
-                      if (result2) {
-                        x.auditResultItemId = result2.id;
-                      }
-                    })
-                    setTimeout(() => {
-                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
-                      });
-                    }, 300);
+                    if (this.listOfError !== undefined) {
+                      // this.listOfErrorWait.forEach(x => { // 2025-24-02
+                      this.listOfError.forEach((x: any) => {
+                        var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                        if (result2) {
+                          x.auditResultItemId = result2.id;
+                        }
+                      })
+                      setTimeout(() => {
+                        // this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => { // 2025-24-02
+                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe(() => {
+                        });
+                      }, 300);
+                    }
                   });
                 }, 300);
                 setTimeout(() => {
@@ -737,32 +742,41 @@ export class CheckNvlComponent implements OnInit {
                 setTimeout(() => {
                   var result = this.listOfItem.filter((item: any) => item.itemCode !== '')
                   if (this.actRoute.snapshot.params['type'] == 'edit') {
-                    this.listOfErrorWait.forEach(x => {
-                      var result2 = this.listOfItem.find((y: any) => y.itemCode == x.itemCode);
-                      if (result2) {
-                        x.auditResultItemId = result2.id;
-                      }
-                    })
-                    setTimeout(() => {
-                      // console.log('update: ', this.listOfErrorWait)
-                      this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
-                      });
-                    }, 300);
-                  } else {
-                    const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
-                    this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
-                      console.log('1', res)
-                      this.listOfErrorWait.forEach(x => {
-                        var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                    if (this.listOfError !== undefined) {
+                      // this.listOfErrorWait.forEach(x => {// 2025-24-02
+                      this.listOfError.forEach((x: any) => {
+                        var result2 = this.listOfItem.find((y: any) => y.itemCode == x.itemCode);
                         if (result2) {
                           x.auditResultItemId = result2.id;
                         }
                       })
                       setTimeout(() => {
-                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {
-                          console.log('insert')
+                        console.log('update: ', this.listOfError, this.listOfItem)
+                        // this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => {// 2025-24-02
+                        this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe(() => {
                         });
                       }, 300);
+                    }
+                  } else {
+                    const body = { auditType: this.actRoute.snapshot.params['type'], item: result };
+                    this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe(res => {
+                      console.log('1', res)
+                      if (this.listOfError !== undefined) {
+                        // this.listOfErrorWait.forEach(x => { // 2025-24-02
+                        this.listOfError.forEach((x: any) => {
+                          var result2 = res.find((y: any) => y.itemCode == x.itemCode);
+                          if (result2) {
+                            x.auditResultItemId = result2.id;
+                          }
+                        })
+                        setTimeout(() => {
+                          console.log('update 2: ', this.listOfError)
+                          // this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfErrorWait).subscribe(() => { // 2025-24-02
+                          this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe(() => {
+                            console.log('insert')
+                          });
+                        }, 300);
+                      }
                     });
                   }
                 }, 300);
@@ -806,10 +820,10 @@ export class CheckNvlComponent implements OnInit {
   // -------------------------------------------- Danh sách sản phẩm --------------------------------------------------------
   deleteById(index: any) {
     if (this.listOfItem[index].id === null) {
-      this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+      this.listOfItem.splice(index,1);
     } else {
       this.http.delete<any>(`${this.address}/${this.path}/iqc/delete/${this.listOfItem[index].id}`).subscribe(() => {
-        this.listOfItem = this.listOfItem.filter((item: any) => item.itemCode !== this.listOfItem[index].itemCode);
+      this.listOfItem.splice(index,1);
         if (this.listOfItem.length > 5) {
           document.getElementById('table-body')!.style.width = '99.9%';
         } else {
@@ -879,7 +893,7 @@ export class CheckNvlComponent implements OnInit {
       itemName: '',
       billNumber: '',
       lotNumber: '',
-      poQuantity: 0,
+      poQuantity: null,
       quantityCheck: 0,
       createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       updateAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
@@ -958,6 +972,12 @@ export class CheckNvlComponent implements OnInit {
         'Vui lòng điền mã sản phẩm !',
         'warning'
       )
+    }else if(this.listOfItem[index].poQuantity === null || this.listOfItem[index].poQuantity <= 0){
+      Swal.fire(
+        'Lỗi',
+        'Số lượng lô hàng cần lớn hơn 0 !',
+        'warning'
+      )
     } else {
       const body = { auditType: this.actRoute.snapshot.params['type'], item: [this.listOfItem[index]] };
       this.http.post<any>(`${this.address}/${this.path}/iqc/submit`, body).subscribe((res) => {
@@ -1028,7 +1048,7 @@ export class CheckNvlComponent implements OnInit {
       )
     } else {
       var item = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[index].itemCode);
-      // console.log('submit', item);
+      console.log('submit', this.listOfError);
       this.listOfError[index].electCompId = this.iqcElecCompId;
       setTimeout(() => {
         this.listOfError[index].auditResultItemId = item.id;
@@ -1050,43 +1070,43 @@ export class CheckNvlComponent implements OnInit {
       }, 100);
     }
   }
-  submitErrors() {
-    var item1 = this.listOfError.find((item2: any) => item2.errCode === '');
-    var auditResultItemId = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[0].itemCode);
-    // console.log({ code1: auditResultItemId, code2: this.listOfError[0] })
-    setTimeout(() => {
-      if (item1) {
-        Swal.fire(
-          'Lỗi',
-          'Vui lòng điền lỗi !',
-          'warning'
-        )
-      } else {
-        this.listOfError.forEach((item: any) => {
-          item.electCompId = this.iqcElecCompId,
-            item.auditResultItemId = auditResultItemId.id
-        })
-        setTimeout(() => {
-          this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe((res) => {
-            this.listOfError = res;
-            document.getElementById('btn-save-item')!.hidden = true;
-            setTimeout(() => {
-              this.listOfError.forEach((item: any) => {
-                item.itemCode = this.itemCode,
-                  this.updateError(item.id, '')
-              })
-            }, 50)
-            this.listOfItems = [];
-            Swal.fire(
-              'Cập nhật',
-              'Bạn đã cập nhật thông tin lỗi thành công.',
-              'success'
-            )
-          })
-        }, 100);
-      }
-    }, 10);
-  }
+  // submitErrors() {
+  //   var item1 = this.listOfError.find((item2: any) => item2.errCode === '');
+  //   var auditResultItemId = this.listOfItem.find(item1 => item1.itemCode === this.listOfError[0].itemCode);
+  //   // console.log({ code1: auditResultItemId, code2: this.listOfError[0] })
+  //   setTimeout(() => {
+  //     if (item1) {
+  //       Swal.fire(
+  //         'Lỗi',
+  //         'Vui lòng điền lỗi !',
+  //         'warning'
+  //       )
+  //     } else {
+  //       this.listOfError.forEach((item: any) => {
+  //         item.electCompId = this.iqcElecCompId,
+  //           item.auditResultItemId = auditResultItemId.id
+  //       })
+  //       setTimeout(() => {
+  //         this.http.post<any>(`${this.address}/${this.path}/error/submit`, this.listOfError).subscribe((res) => {
+  //           this.listOfError = res;
+  //           document.getElementById('btn-save-item')!.hidden = true;
+  //           setTimeout(() => {
+  //             this.listOfError.forEach((item: any) => {
+  //               item.itemCode = this.itemCode,
+  //                 this.updateError(item.id, '')
+  //             })
+  //           }, 50)
+  //           this.listOfItems = [];
+  //           Swal.fire(
+  //             'Cập nhật',
+  //             'Bạn đã cập nhật thông tin lỗi thành công.',
+  //             'success'
+  //           )
+  //         })
+  //       }, 100);
+  //     }
+  //   }, 10);
+  // }
   deleteErrorById(index: any) {
     if (this.listOfError[index].id === null) {
       this.listOfError = this.listOfError.filter((item: any) => item.errCode !== this.listOfError[index].errCode);
@@ -1103,7 +1123,7 @@ export class CheckNvlComponent implements OnInit {
   }
   addNewError() {
     var date = new Date
-    if (this.iqcElecCompId == 0) {
+    if (this.iqcElecCompId === 0) {
       this.iqcElecCompId = 1;
     }
     setTimeout(() => {
@@ -1134,8 +1154,8 @@ export class CheckNvlComponent implements OnInit {
     this.errName = '';
     if (item === null) {
       this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
-        this.listOfError = res;
-        // console.log('list errors:1 ', res, this.id);
+        this.listOfErrorWait = res;
+        console.log('list errors:1 ', res, this.id);
 
       })
     } else {
@@ -1143,7 +1163,7 @@ export class CheckNvlComponent implements OnInit {
       this.http.get<any>(`${this.address}/${this.path}/errors/audit-result-item-id/${item.id}`).subscribe(res => {
         this.listOfError = res;
         this.getLstItemCode();
-        // console.log('list errors:2 ', res, this.id);
+        console.log('list errors:2 ', res, this.id);
 
       })
     }
@@ -1220,10 +1240,9 @@ export class CheckNvlComponent implements OnInit {
     if (this.id !== undefined) {
       this.http.get<any>(`${this.address}/${this.path}/errors/get-all`).subscribe(res => {
         this.listErrors = res;
-        this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
-          this.listOfError = res;
-
-        })
+        // this.http.get<any>(`${this.address}/${this.path}/errors/elect-comp-id/${this.id}`).subscribe(res => {
+        //   this.listOfError = res;
+        // })
       })
     }
   }
@@ -1266,5 +1285,15 @@ export class CheckNvlComponent implements OnInit {
     this.formSearch.origin = this.selectedOrigin.name;
     console.log(this.formSearch.origin);
 
+  }
+  changeColorWhenNull(id:string,mss:any){
+    console.log('test',mss)
+    if(mss === null || mss ===''){
+      document.getElementById(id)!.style.backgroundColor = '#f52d2da8';
+      document.getElementById(id)!.style.color = '#fff';
+    }else{
+      document.getElementById(id)!.style.backgroundColor = '#fff';
+      document.getElementById(id)!.style.color = '#000000';
+    }
   }
 }
