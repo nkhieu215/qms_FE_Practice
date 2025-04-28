@@ -329,10 +329,10 @@ export class PQCService {
   }
 
 
-  report(id: any): Observable<Blob> {
+  report(id: any, daqInfo: any[]): Observable<Blob> {
     const formDataForExport: FormData = new FormData();
     formDataForExport.append('export', 'ALL');
-    let data = this.http.post(environment.api_end_point + "/report/pqc-report-by-wo/" + id, {},
+    let data = this.http.post(environment.api_end_point + "/report/pqc-report-by-wo/" + id, daqInfo,
       {
         responseType: 'blob'
       }

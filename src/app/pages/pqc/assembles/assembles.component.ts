@@ -1,6 +1,6 @@
 import { _filter } from './../interchangeability/interchangeability.component';
 import { FormControl } from '@angular/forms';
-import { Observable, startWith, map, firstValueFrom } from 'rxjs';
+import { Observable, startWith, map, firstValueFrom, forkJoin } from 'rxjs';
 import { KeycloakService } from 'keycloak-angular';
 import { formatDate } from '@angular/common';
 import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
@@ -24,6 +24,8 @@ import { AssemblesCheck } from 'src/app/share/_models/assembles_check.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-assembles',
@@ -32,6 +34,10 @@ import { AuthService } from 'src/app/share/_services/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AssemblesComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -50,7 +56,8 @@ export class AssemblesComponent implements OnInit {
     private scadaService: ScadaRequestService,
     private assemblesCheckService: PQCAssemblesCheckService,
     private commonService: CommonService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient,
   ) { }
 
   page = 1;
@@ -92,86 +99,96 @@ export class AssemblesComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
     var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
-      this.commonService.getSettingProcess().subscribe(data => {
-        this.lstProcess = data.lstSettingProcess;
-      })
-
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
-      this.errorService.getAllCategories().subscribe(
-        (data) => {
-          this.lstErrorRes = data;
-          this.lstErrorGr = data.lstError;
-          // console.log(this.lstErrorRes);
+
+      // Gọi API để lấy danh sách lỗi và quy trình
+      forkJoin({
+        errorCategories: this.errorService.getAllCategories(),
+        settingProcess: this.commonService.getSettingProcess(),
+        productionLine: this.scadaService.getLine()
+      }).subscribe(
+        ({ errorCategories, settingProcess, productionLine }) => {
+          this.lstErrorRes = errorCategories;
+          this.lstErrorGr = errorCategories.lstError;
+          this.lstProcess = settingProcess.lstSettingProcess;
+
+          this.lstProductionLine = productionLine.lstLine;
+          this.lstProductionLine?.forEach(({ name, code }) => {
+            this.options.push(`${name} - ${code}`);
+          });
         },
-        (err) => { }
+        (err) => {
+          console.error('Error fetching data:', err);
+        }
       );
-
-
-      let dataLine = await firstValueFrom(this.scadaService.getLine());
-      this.lstProductionLine = dataLine.lstLine;
-      this.lstProductionLine?.forEach(({ name, code }) => {
-        this.options.push(`${name} - ${code}`);
-      })
-      // console.log(this.lstProductionLine);
-
-
-
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       this.show_work_order = false;
     }
 
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
-      type = 'show';
+      type = 'show'
       this.show_work_order = false;
     }
 
+    if (type === 'add' || type === 'show' || type === 'edit') {
+      // Gọi API để lấy danh sách kiểm tra
+      this.http.get<any>(`${this.address}/assembles/${id}`).subscribe(
+        (lstAssembles) => {
+          console.log('check data ASSEMBLESS :: ', lstAssembles);
 
-    if (type == 'add' || type == 'show' || type == 'edit') {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstAssemblesCheckResponse = data.pqcWorkOrder.lstAssembles;
-        this.lstAssemblesCheckResponse.forEach((element) => {
-          var check = new AssemblesCheck();
+          this.lstAssemblesCheckResponse = lstAssembles;
+          this.lstAssemblesCheckResponse.forEach((element) => {
+            const check = new AssemblesCheck();
 
-          check.line = element.line;
-          check.checkPerson = element.checkPerson;
-          check.processName = element.processName;
-          check.quatity = element.quatity;
-          check.quatityPass = element.quatityPass;
-          check.quatityFail = element.quatityFail;
-          check.ratio = element.ratio;
-          check.conclude = element.conclude;
-          check.checkTime = element.checkTime;
-          check.createdAt = element.createdAt;
-          check.updatedAt = element.updatedAt;
-          check.note = element.note;
-          check.operators = element.operators;
-          check.ids = Utils.randomString(5);
-          check.id = element.id;
-          this.lstAssemblesCompCheck?.push(check);
-        });
-        setTimeout(() => {
-          this.lstAssemblesCompCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
-        }, 300);
-      });
+            check.line = element.line;
+            check.checkPerson = element.checkPerson;
+            check.processName = element.processName;
+            check.quatity = element.quatity;
+            check.quatityPass = element.quatityPass;
+            check.quatityFail = element.quatityFail;
+            check.ratio = element.ratio;
+            check.conclude = element.conclude;
+            check.checkTime = element.checkTime;
+            check.createdAt = element.createdAt;
+            check.updatedAt = element.updatedAt;
+            check.note = element.note;
+            check.operators = element.operators;
+            check.ids = Utils.randomString(5);
+            check.id = element.id;
+            this.lstAssemblesCompCheck?.push(check);
+          });
+
+          // Sắp xếp danh sách kiểm tra
+          this.lstAssemblesCompCheck?.sort((a: any, b: any) => {
+            if (a.processName < b.processName) return -1;
+            if (a.processName > b.processName) return 1;
+            return a.checkTime - b.checkTime;
+          });
+        },
+        (err) => {
+          console.error('Error fetching assembles data:', err);
+        }
+      );
     }
   }
   // crud

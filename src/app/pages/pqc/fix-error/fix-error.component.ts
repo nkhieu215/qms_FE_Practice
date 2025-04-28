@@ -20,14 +20,21 @@ import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationR
 import { FixError } from 'src/app/share/_models/fix_error.model';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { FormControl } from '@angular/forms';
-import { Observable, map, startWith } from 'rxjs';
+import { Observable, forkJoin, map, startWith } from 'rxjs';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-fix-error',
   templateUrl: './fix-error.component.html',
   styleUrls: ['./fix-error.component.css'],
 })
 export class FixErrorComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   @Input() woData: any;
   idWorkOrder?: string;
@@ -48,7 +55,8 @@ export class FixErrorComponent implements OnInit {
     private fixErrorService: PQCFixErrService,
     private errorService: ErrorListService,
     private commonservice: CommonService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient,
   ) { }
 
   page = 1;
@@ -78,40 +86,45 @@ export class FixErrorComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
     var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
-      this.commonservice.getSettingProcess().subscribe(data => {
-        this.lstProcess = data.lstSettingProcess;
-      })
-
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
-      this.errorService.getAllCategories().subscribe(
-        (data) => {
-          this.lstErrorRes = data;
-          this.lstErrorGr = data.lstError;
+
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        settingProcess: this.commonservice.getSettingProcess(),
+        errorCategories: this.errorService.getAllCategories()
+      }).subscribe(
+        ({ settingProcess, errorCategories }) => {
+          this.lstProcess = settingProcess.lstSettingProcess;
+          this.lstErrorRes = errorCategories;
+          this.lstErrorGr = errorCategories.lstError;
           console.log(this.lstErrorRes);
         },
-        (err) => { }
+        (err) => {
+          console.error('Error fetching data:', err);
+        }
       );
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       this.show_work_order = false;
     }
 
-    this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -119,29 +132,36 @@ export class FixErrorComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if (type == 'add' || type == 'show' || type == 'edit') {
-      console.log("wo ::" + this.wo)
-      if (this.wo == null) {
-        this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-          this.form = data.pqcWorkOrder;
-          this.lstErrorFix = data.pqcWorkOrder.lstFixErr;
-          this.lstErrorFix.forEach(element => {
-            element.ids = Utils.randomString(5);
-          })
-        });
+    if (type === 'add' || type === 'show' || type === 'edit') {
+      console.log('wo ::', this.wo);
+
+      if (!this.wo) {
+        // Gọi API để lấy danh sách lỗi
+        this.http.get<any>(`${this.address}/fix-error/${id}`).subscribe(
+          (lstFixErr) => {
+            console.log('check data FIX ERROR :: ', lstFixErr);
+            this.lstErrorFix = lstFixErr.sort((a: any, b: any) => a.checkTime - b.checkTime);
+            this.lstErrorFix.forEach((element) => {
+              element.ids = Utils.randomString(5);
+            });
+          },
+          (err) => {
+            console.error('Error fetching fix-error data:', err);
+          }
+        );
       } else {
         this.form = this.wo.pqcWorkOrder;
         this.lstErrorFix = this.wo.pqcWorkOrder.lstFixErr;
-        this.lstErrorFix.forEach(element => {
+        this.lstErrorFix.forEach((element) => {
           element.ids = Utils.randomString(5);
-        })
+        });
       }
 
+      // Xử lý bộ lọc lỗi
       this.filteredError = this.errorNameForm.valueChanges.pipe(
         startWith(''),
-        map(value => this._filterError(value || '')),
+        map((value) => this._filterError(value || ''))
       );
-
     }
   }
 
@@ -369,24 +389,27 @@ export class FixErrorComponent implements OnInit {
 
   totalCheckElement = 0;
   open(content: any, idError: any) {
-    this.formEx = {};
-    console.log(idError);
-    if (idError != '') {
-      this.editCheck(idError);
-    } else {
-      this.formEx.lotNumber = this.wo.lotNumber
-    }
+    this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(data => {
 
-
-    this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
-    this.modalService.open(content, this.modalOptions).result.then(
-      (result) => {
-        this.closeResult = `Closed with: ${result}`;
-      },
-      (reason) => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      this.formEx = {};
+      console.log(idError);
+      if (idError != '') {
+        this.editCheck(idError);
+      } else {
+        this.formEx.lotNumber = data[0][1];
       }
-    );
+
+
+      this.formEx.checkTime = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
+      this.modalService.open(content, this.modalOptions).result.then(
+        (result) => {
+          this.closeResult = `Closed with: ${result}`;
+        },
+        (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        }
+      );
+    })
   }
 
   private getDismissReason(reason: any): string {

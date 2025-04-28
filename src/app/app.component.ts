@@ -23,7 +23,7 @@ export class AppComponent {
   ngOnInit(): void {
 
     if (this.authService.isLoggedIn) {
-      this.userService.getMenu().toPromise().then(
+      this.userService.getMenu().subscribe(
         data => {
           this.menuResponse = JSON.parse(data);
           this.lstMenuRes = this.menuResponse?.lstmenu;

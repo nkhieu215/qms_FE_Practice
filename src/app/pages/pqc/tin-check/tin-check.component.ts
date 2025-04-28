@@ -21,6 +21,9 @@ import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationR
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { TinSerial } from 'src/app/share/_models/tin_serial.model';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tin-check',
@@ -29,7 +32,10 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class TinCheckComponent implements OnInit {
   @Input() show_check = '';
-
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   lstview = true;
   crud = false;
   create = false;
@@ -41,7 +47,8 @@ export class TinCheckComponent implements OnInit {
     private errorService: ErrorListService,
     private tinCheckSerialService: TinCheckSerialService,
     private tokenStorage: KeycloakService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient
   ) { }
 
   page = 1;
@@ -83,37 +90,42 @@ export class TinCheckComponent implements OnInit {
   getInfo() {
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
-    var type = this.actRoute.snapshot.params['type'];
+    let type = this.actRoute.snapshot.params['type'];
 
-    if (id == null && type == null) {
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
+
+      // Gọi API để lấy danh sách lỗi
       this.errorService.getAllCategories().subscribe(
         (data) => {
           this.lstErrorRes = data;
           this.lstErrorGr = data.lstError;
           console.log(this.lstErrorRes);
         },
-        (err) => { }
+        (err) => {
+          console.error('Error fetching error categories:', err);
+        }
       );
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       this.show_work_order = false;
     }
 
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -121,42 +133,51 @@ export class TinCheckComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if (type != null) {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstTinCheckResponse = data.pqcWorkOrder.lstTin;
-        this.lstTinCheckResponse.forEach((element) => {
-          var check = new TinCheck();
-          check.batchId = element.batchId;
-          check.line = element.line;
-          check.checkPerson = element.checkPerson;
-          check.checkTime = element.checkTime;
-          check.createdAt = element.createdAt;
-          check.expiryDate = element.expiryDate;
-          check.quatity = element.quatity;
-          check.errTotal = element.errTotal;
-          check.conclude = element.conclude;
-          check.note = element.note;
-          check.classify = element.classify;
-          check.ids = Utils.randomString(5);
-          check.dttdCheckId = element.dttdCheckId;
-          check.machineCode = element.machineCode;
-          check.gridCode = element.gridCode;
-          check.knifeCode = element.knifeCode;
-          check.id = element.dttdCheckId;
-          check.operators = element.operators;
-          this.lstTinCheck.push(check);
-        });
-        setTimeout(() => {
-          this.lstTinCheck.sort((a: any, b: any) => b.createdAt - a.createdAt);
-        }, 300);
-      });
+    if (type) {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        lstTin: this.http.get<any>(`${this.address}/pqc-tin-check/${id}`),
+        lstTinCheckSerial: this.tinCheckSerialService.getCheckSerialByWorkOrder(id)
+      }).subscribe(
+        ({ lstTin, lstTinCheckSerial }) => {
+          console.log('check data tin check :: ', lstTin);
 
-      this.tinCheckSerialService
-        .getCheckSerialByWorkOrder(id)
-        .subscribe((data) => {
-          this.lstTin = data.lstTinCheckSerial;
-        });
+          // Xử lý dữ liệu lstTin
+          this.lstTinCheckResponse = lstTin.sort((a: any, b: any) => a.checkTime - b.checkTime);
+          this.lstTinCheckResponse.forEach((element) => {
+            const check = new TinCheck();
+            check.batchId = element.batchId;
+            check.line = element.line;
+            check.checkPerson = element.checkPerson;
+            check.checkTime = element.checkTime;
+            check.createdAt = element.createdAt;
+            check.expiryDate = element.expiryDate;
+            check.quatity = element.quatity;
+            check.errTotal = element.errTotal;
+            check.conclude = element.conclude;
+            check.note = element.note;
+            check.classify = element.classify;
+            check.ids = Utils.randomString(5);
+            check.dttdCheckId = element.dttdCheckId;
+            check.machineCode = element.machineCode;
+            check.gridCode = element.gridCode;
+            check.knifeCode = element.knifeCode;
+            check.id = element.dttdCheckId;
+            check.operators = element.operators;
+            check.updatedAt = element.updatedAt;
+            this.lstTinCheck.push(check);
+          });
+
+          // Sắp xếp lại danh sách lstTinCheck
+          this.lstTinCheck.sort((a: any, b: any) => a.checkTime - b.checkTime);
+
+          // Xử lý dữ liệu lstTinCheckSerial
+          this.lstTin = lstTinCheckSerial.lstTinCheckSerial;
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
   }
   // crud
@@ -188,7 +209,7 @@ export class TinCheckComponent implements OnInit {
     check.line = this.formEx.line;
     check.checkPerson = this.formEx.checkPerson;
     check.checkTime = this.formEx.checkTime;
-    check.createdAt = this.formEx.createdAt;
+    check.createdAt = new Date(this.formEx.createdAt);
     check.updatedAt = new Date();
     check.expiryDate = this.formEx.expiryDate;
     check.quatity = this.formEx.quatity;
@@ -240,7 +261,7 @@ export class TinCheckComponent implements OnInit {
         },
         (error) => { }
       );
-    console.log(this.lstTinCheck);
+    console.log('check result :: ', check);
   }
 
   deleteCheck(id: any, type: any) {

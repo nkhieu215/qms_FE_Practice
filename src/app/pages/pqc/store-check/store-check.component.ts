@@ -1,4 +1,4 @@
-import { Observable, startWith, map, firstValueFrom } from 'rxjs';
+import { Observable, startWith, map, firstValueFrom, concat, forkJoin } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { KeycloakService } from 'keycloak-angular';
 import { formatDate } from '@angular/common';
@@ -39,20 +39,41 @@ import { StoreCheck } from 'src/app/share/_models/storeCheck.model';
 import { HttpClient } from '@angular/common/http';
 import { data } from 'jquery';
 import { AuthService } from 'src/app/share/_services/auth.service';
-
+import { environment } from 'src/environments/environment';
 
 
 @Component({
   selector: 'app-store-check',
   templateUrl: './store-check.component.html',
   styleUrls: ['./store-check.component.css'],
+  styles: [`
+    .greenClass{
+      background-color:#0AE40A;width: 75px;
+      border: #0AE40A;
+      width: 115px;}
+    .redClass{
+      background-color:#FF0000;width: 100px;
+      border: #FF0000;
+      width: 115px;}
+    `],
 })
 export class StoreCheckComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
-
+  // các biến check điều kiện step
+  nvl: any;
+  check_nvl: any;
+  tin: any;
+  mount_components: any;
+  solder: any;
+  interchangeability: any;
+  assembles: any;
+  photoelectric: any;
+  photoelectric_product: any;
+  fix_err: any;
+  qc_check: any;
   //Điều kiện triển khai hiện tại
   path = 'store-check';
   packing = '';
@@ -60,6 +81,9 @@ export class StoreCheckComponent implements OnInit {
   serial: string[] = [];
   text = '';
   lstCheckStep?: string[] = []
+  infoDAQ: any;
+  infoDAQDetail: any;
+  listDAQResultType: any[] = [];
   @HostListener('document:keydown', ['$event'])
   clickout(event: any) {
     if (event.code == 'Enter' || event.code == 'Tab') {
@@ -86,7 +110,7 @@ export class StoreCheckComponent implements OnInit {
   replaceAll(str: string, find: string, replace: string) {
     return str.replace(new RegExp(find, 'g'), replace);
   }
-
+  wo: any;
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -128,7 +152,8 @@ export class StoreCheckComponent implements OnInit {
     lot: null,
     sap: null
   };
-
+  checkDAQ: boolean = false;
+  checkDAQResult: boolean = false;
   formEx: any = {
   };
 
@@ -137,6 +162,19 @@ export class StoreCheckComponent implements OnInit {
   formErrorChild: any = {};
   ngOnInit(): void {
     // this.autoLogout.autoLogout(0, 'store check');
+    setTimeout(() => {
+      this.checkDAQ = sessionStorage.getItem('daq') === 'true' ? true : false;
+      if (this.checkDAQ === true) {
+        this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(result => {
+          console.log(`check data wo :::::::::: ${sessionStorage.getItem('sapWo')}-${result[0][1]}`)
+          this.http.get<any>(`${this.address}/api/v1/infodaq/product-tests/lot/${sessionStorage.getItem('sapWo')}-${result[0][1]}`).subscribe(res => {
+            if (res.length > 0) {
+              this.checkDAQResult = true;
+            }
+          });
+        });
+      }
+    }, 1000);
     this.getInfo();
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
@@ -156,83 +194,86 @@ export class StoreCheckComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.id = id;
 
-    this.commonService.statusStep(id).toPromise().then(
-      data => {
-        this.lstCheck = data.lstStep;
-        this.lstCheck.forEach(element => {
-          this.lstCheckStep?.push(element.step);
-          element.checked = true;
-        });
-      },
-      error => { }
-    )
-
-    var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+    if (!id) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    var type = this.actRoute.snapshot.params['type'];
+    this.idWorkOrder = id;
+
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
-      this.errorService.getAllCategories().subscribe(
-        (data) => {
-          this.lstErrorRes = data;
-          this.lstErrorGr = data.lstError;
-          console.log(this.lstErrorRes);
-        },
-        (err) => { }
-      );
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       this.show_work_order = false;
     }
 
-    this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
+      type = 'SHOW';
       this.lstview = false;
-      type = 'show';
       this.show_work_order = false;
     }
+
     console.log(this.lstview);
 
-    this.storeCheckService.getColorSap().subscribe(data => {
-      this.lstColor = data.lstColor;
-    });
-
+    // Sử dụng forkJoin để thực hiện các yêu cầu song song
     if (!this.lstview) {
+      forkJoin({
+        statusStep: this.commonService.statusStep(id),
+        colorSap: this.storeCheckService.getColorSap(),
+        productionLine: this.scadaService.getLine(),
+        storeCheck: this.storeCheckService.loadStoreCheckByWoId(id),
+      }).subscribe(
+        ({ statusStep, colorSap, productionLine, storeCheck }) => {
+          // Xử lý dữ liệu statusStep
+          this.lstCheck = statusStep.lstStep;
+          this.lstCheckStep = this.lstCheck.map((element: any) => {
+            element.checked = true;
+            return element.step;
+          });
+          this.nvl = this.lstCheckStep?.includes('NVL');
+          this.check_nvl = this.lstCheckStep?.includes('CHECK_NVL');
+          this.tin = this.lstCheckStep?.includes('TIN');
+          this.mount_components = this.lstCheckStep?.includes('MOUNT_COMPONENTS');
+          this.solder = this.lstCheckStep?.includes('SOLDER');
+          this.interchangeability = this.lstCheckStep?.includes('INTERCHANGEABILITY');
+          this.assembles = this.lstCheckStep?.includes('ASSEMBLES');
+          this.photoelectric = this.lstCheckStep?.includes('PHOTOELECTRIC');
+          this.photoelectric_product = this.lstCheckStep?.includes('PHOTOELECTRIC_PRODUCT');
+          this.fix_err = this.lstCheckStep?.includes('FIX_ERR');
+          this.qc_check = this.lstCheckStep?.includes('QC_CHECK');
+          // Xử lý dữ liệu colorSap
+          this.lstColor = colorSap.lstColor;
 
-      let dataLine = await firstValueFrom(this.scadaService.getLine());
-      this.lstProductionLine = dataLine.lstLine;
-      this.lstProductionLine?.forEach(({ name, code }) => {
-        this.options.push(`${name} - ${code}`);
-      })
+          // Xử lý dữ liệu productionLine
+          this.lstProductionLine = productionLine.lstLine;
+          this.options = this.lstProductionLine!.map(({ name, code }: any) => `${name} - ${code}`);
 
-      // load check store
-      this.storeCheckService
-        .loadStoreCheckByWoId(this.id)
-        .toPromise()
-        .then(
-          (data) => {
-            this.lstStoreCheck = data.lstCheck;
-            // console.log('load check store', data.lstCheck);
-            this.lstStoreCheck.forEach((element) => {
-              element.ids = Utils.randomString(5);
-              element.statusApproveSapStr = Utils.getStatusName(element.statusApproveSap);
-            });
-          },
-          (error) => { }
-        );
+          // Xử lý dữ liệu storeCheck
+          this.lstStoreCheck = storeCheck.lstCheck;
+          this.lstStoreCheck.forEach((element: any) => {
+            element.ids = Utils.randomString(5);
+            element.statusApproveSapStr = Utils.getStatusName(element.statusApproveSap);
+          });
+
+          console.log('load check store', this.lstStoreCheck);
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
   }
 
@@ -254,34 +295,43 @@ export class StoreCheckComponent implements OnInit {
   error = '';
   findMax(id: any, quantity: any) {
     this.http.get<any>(`${this.address}/store-check/find-max/${id}`).subscribe(res => {
-      var max = 0;
-      if (res.maxELECT > max) {
-        max = res.maxELECT;
-      }
-      if (res.maxEXTER > max) {
-        max = res.maxEXTER;
-      }
-      if (res.maxSIZE > max) {
-        max = res.maxSIZE;
-      }
-      if (res.maxSAFE > max) {
-        max = res.maxSAFE;
-      }
-      if (res.maxCONFUSED > max) {
-        max = res.maxCONFUSED;
-      }
-      if (res.maxSTRUCTURE > max) {
-        max = res.maxSTRUCTURE;
-      }
+      let max = 0;
+      const properties = ['maxELECT', 'maxEXTER', 'maxSIZE', 'maxSAFE', 'maxCONFUSED', 'maxSTRUCTURE'];
+
+      properties.forEach(prop => {
+        if (res[prop] !== null && res[prop] > max) {
+          max = res[prop];
+        }
+      });
       if (quantity > max) {
         max = quantity;
       }
+      // var max = 0;
+      // if (res.maxELECT !== null && res.maxELECT > max) {
+      //   max = res.maxELECT;
+      // } else if (res.maxEXTER !== null && res.maxEXTER > max) {
+      //   max = res.maxEXTER;
+      // } else if (res.maxSIZE !== null && res.maxSIZE > max) {
+      //   max = res.maxSIZE;
+      // } else if (res.maxSAFE !== null && res.maxSAFE > max) {
+      //   max = res.maxSAFE;
+      // } else if (res.maxCONFUSED !== null && res.maxCONFUSED > max) {
+      //   max = res.maxCONFUSED;
+      // } else if (res.maxSTRUCTURE !== null && res.maxSTRUCTURE > max) {
+      //   max = res.maxSTRUCTURE;
+      // } else if (quantity > max) {
+      //   max = quantity;
+      // }
       // this.lstStoreCheck.forEach(e=>{
       //   if
       // })
-      console.log("find max: ", max);
+      console.log("find max: ", res);
       this.updateStoreCheck(id, max);
-    })
+    },
+      error => {
+        console.error("Error fetching max values: ", error);
+        Swal.fire('Lỗi', 'Không thể lấy dữ liệu từ server', 'error');
+      })
   }
   onSubmit(action: any) {
     // console.log(this.formEx);
@@ -752,70 +802,119 @@ export class StoreCheckComponent implements OnInit {
   openId = '';
   idStoreCheck = '';
   open(content: any, title: any, action: any, ids: any, id: any) {
+    this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(res => {
+      const data = { lotNumber: res[0][1] };
+      this.wo = data;
+      console.log('check data wo :::::::::: ', res)
+      console.log('check wwo :::::: ', this.wo)
 
-    this.formEx = {};
+      this.formEx = {};
 
-    if (ids != '') {
-      this.ids = ids;
-      this.lstStoreCheck.forEach((element) => {
-        if (element.ids == ids) {
-          this.storeCheck = element;
-          this.openId = element.id;
-          this.getInfoByAction(action, element.id, element);
-          console.log("id:: ", this.openId);
-        }
-      });
-    } else {
+      if (ids != '') {
+        this.ids = ids;
+        this.lstStoreCheck.forEach((element) => {
+          if (element.ids == ids) {
+            this.storeCheck = element;
+            this.openId = element.id;
+            this.getInfoByAction(action, element.id, element);
+            console.log("id:: ", this.openId);
+          }
+        });
+      } else {
 
-    }
-
-    this.titlemodal = title;
-    this.action = action;
-    this.formEx.checkDate = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
-    // this.formEx.checkDate = new Date();
-    this.formEx.checkPerson = this.tokenStorage.getUsername();
-    this.formEx.lot = this.wo.lotNumber;
-
-    this.modalService.open(content, this.modalOptions).result.then(
-      (result) => {
-        this.closeResult = `Closed with: ${result}`;
-      },
-      (reason) => {
-        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       }
-    );
+      this.titlemodal = title;
+      this.action = action;
+      this.formEx.checkDate = formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US');
+      // this.formEx.checkDate = new Date();
+      this.formEx.checkPerson = this.tokenStorage.getUsername();
+      this.formEx.lot = this.wo.lotNumber;
 
-    if (action == 'PACKING') {
-      this.packing = '';
-      this.tray = '';
-      this.serial = [];
-      this.idStoreCheck = id;
-    }
-
-    if (action == 'EDIT') {
-      this.lstStoreCheck.forEach((element) => {
-        if (element.ids == ids) {
-          this.formEx.checkDate = element.checkDate;
-          this.formEx.quatityStore = element.quatityStore;
-          this.formEx.lot = element.lot;
-          this.formEx.quatity = element.quatity;
-          this.formEx.totalErr = element.totalErr;
-          element.checkPerson = this.tokenStorage.getUsername();
-          this.formEx.ids = element.ids = ids;
-          this.formEx.conclude = element.conclude;
-          this.id = element.workOrderId;
-          this.formEx.note = element.note;
-          this.formEx.id = element.id;
+      this.modalService.open(content, this.modalOptions).result.then(
+        (result) => {
+          this.closeResult = `Closed with: ${result}`;
+        },
+        (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         }
-      });
-    }
+      );
 
-    if (action == 'EXTER') {
-      this.lstAqlCheck = [];
-      this.refreshAqlTemplate();
-    }
+      if (action == 'PACKING') {
+        this.packing = '';
+        this.tray = '';
+        this.serial = [];
+        this.idStoreCheck = id;
+      }
+
+      if (action == 'EDIT') {
+        this.lstStoreCheck.forEach((element) => {
+          if (element.ids == ids) {
+            this.formEx.checkDate = element.checkDate;
+            this.formEx.quatityStore = element.quatityStore;
+            this.formEx.lot = element.lot;
+            this.formEx.quatity = element.quatity;
+            this.formEx.totalErr = element.totalErr;
+            element.checkPerson = this.tokenStorage.getUsername();
+            this.formEx.ids = element.ids = ids;
+            this.formEx.conclude = element.conclude;
+            this.id = element.workOrderId;
+            this.formEx.note = element.note;
+            this.formEx.id = element.id;
+          }
+        });
+      }
+
+      if (action == 'EXTER') {
+        this.lstAqlCheck = [];
+        this.refreshAqlTemplate();
+      }
+    })
   }
+  openInfoDAQ(content: any) {
+    this.listDAQResultType = []
+    this.http.get<any>(`${this.address}/pqc-wo/get-daq-title`).subscribe(daqtitle => {
+      this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(result => {
+        console.log(`check data wo :::::::::: ${sessionStorage.getItem('sapWo')}-${result[0][1]}`)
+        this.http.get<any>(`${this.address}/api/v1/infodaq/product-tests/lot/${sessionStorage.getItem('sapWo')}-${result[0][1]}`).subscribe(res => {
+          console.log('check data infoDAQ :::::::::: ', res)
+          this.infoDAQ = res;
+          res.forEach((element: any) => {
+            element.testData = JSON.parse(element.testData);
+            if (this.listDAQResultType.length == 0) {
+              const check = daqtitle.find((x: any) => x.code == element.typeTest);
+              const data = {
+                type: element.typeTest, settings: element.testData.settings, data: [element],
+                name: check ? `${check.name} (${check.code})` : element.typeTest
+              };
+              this.listDAQResultType.push(data);
+            } else {
+              const check = this.listDAQResultType.find((x: any) => x.type == element.typeTest);
+              if (check == null) {
+                const check1 = daqtitle.find((x: any) => x.code === element.typeTest);
+                const data = {
+                  type: element.typeTest, settings: element.testData.settings, data: [element],
+                  name: check1 ? `${check1.name} (${check1.code})` : element.typeTest
+                };
+                this.listDAQResultType.push(data);
+              } else {
+                check.data.push(element);
+              }
+            }
+          })
+          console.log('check data listDAQResultType :::::::::: ', this.listDAQResultType)
+        })
 
+      })
+      this.modalService.open(content, this.modalOptions).result.then(
+        (result) => {
+          this.closeResult = `Closed with: ${result}`;
+        },
+        (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        }
+      );
+    });
+  }
   getInfoByAction(action: any, id: any, element: any) {
     if (action != '')
       this.storeCheckService
@@ -895,39 +994,41 @@ export class StoreCheckComponent implements OnInit {
       );
   }
 
-  wo: any;
   exportInfo() {
-    let dataForExcel = [
-      this.wo.branchName,
-      this.wo.lotNumber,
-      this.wo.planingWorkOrderCode,
-      this.wo.workOrderId,
-      this.wo.quantityPlan,
-      this.wo.productionCode,
-      this.wo.productionName,
-      this.wo.sapWo,
-      this.wo.bomVersion,
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    ]
-    let reportData = {
-      fileName: 'export_genQrCode_' + this.wo.lotNumber,
-      title: 'Thông tin kiểm tra',
-      data: dataForExcel,
-      headers: [
-        "ProductionLine", "Lot", "PoCode", "PlanningCode", "NumberOfPlanning", "ItemCode", "ProductName", "SapWo", "Version",
-        "TimeRecieved", "ReelID", "PartNumber", "Vendor", "QuantityOfPackage", "MFGDate", "ProductionShilt", "OpName", "Comments"
-      ],
-    };
+    this.http.get<any>(`${this.address}/pqc-wo/info/${this.actRoute.snapshot.params['id']}`).subscribe(wo => {
 
-    this.exportExelService.exportPrint(reportData);
+      let dataForExcel = [
+        wo.branchName,
+        wo.lotNumber,
+        wo.planingWorkOrderCode,
+        wo.workOrderId,
+        wo.quantityPlan,
+        wo.productionCode,
+        wo.productionName,
+        wo.sapWo,
+        wo.bomVersion,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ]
+      let reportData = {
+        fileName: 'export_genQrCode_' + this.wo.lotNumber,
+        title: 'Thông tin kiểm tra',
+        data: dataForExcel,
+        headers: [
+          "ProductionLine", "Lot", "PoCode", "PlanningCode", "NumberOfPlanning", "ItemCode", "ProductName", "SapWo", "Version",
+          "TimeRecieved", "ReelID", "PartNumber", "Vendor", "QuantityOfPackage", "MFGDate", "ProductionShilt", "OpName", "Comments"
+        ],
+      };
+
+      this.exportExelService.exportPrint(reportData);
+    })
 
   }
   changeWo(dataWo: any) {
@@ -1119,5 +1220,40 @@ export class StoreCheckComponent implements OnInit {
         })
       })
     })
+  }
+  objectToArray(obj: any): { key: string, value: any }[] {
+    if (!obj) return [];
+    return Object.keys(obj).map(key => {
+      const value = obj[key];
+      // Kiểm tra nếu value là chuỗi nhưng có thể chuyển đổi thành số
+      if (typeof value === 'string' && !isNaN(Number(value))) {
+        const numericValue = Number(value);
+        // Kiểm tra nếu là số tự nhiên
+        if (Number.isInteger(numericValue)) {
+          return { key, value: numericValue }; // Giữ nguyên nếu là số tự nhiên
+        }
+        // Định dạng 4 chữ số sau dấu phẩy và loại bỏ số 0 thừa
+        return { key, value: parseFloat(numericValue.toFixed(4)) };
+      }
+      // Giữ nguyên nếu là chuỗi không thể chuyển đổi thành số
+      return { key, value };
+    });
+  }
+  changeDAQ() {
+    if (this.checkDAQ === true) {
+      this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(result => {
+        console.log(`check data wo :::::::::: ${sessionStorage.getItem('sapWo')}-${result[0][1]}`)
+        this.http.get<any>(`${this.address}/api/v1/infodaq/product-tests-result/lot/${sessionStorage.getItem('sapWo')}-${result[0][1]}`).subscribe(res => {
+
+          this.checkDAQResult = res === true ? true : false;
+          console.log('res ::::::::::', res);
+        });
+      });
+    }
+  }
+  getDataAfterDash(input: string): string {
+    if (!input) return ''; // Kiểm tra nếu input là null hoặc undefined
+    const parts = input.split('-'); // Tách chuỗi bằng dấu '-'
+    return parts.length > 1 ? parts[1] : ''; // Trả về phần sau dấu '-' nếu tồn tại
   }
 }

@@ -22,6 +22,7 @@ import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { initializer } from './app-init';
 import { AuthInterceptorService } from './_helpers/auth.interceptor';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { ToastrModule } from 'ngx-toastr';
 import { DEFAULT_TIMEOUT, TimeoutInterceptor } from './_helpers/timeout.interceptor';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -48,6 +49,7 @@ import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Scale } from 'chart.js';
 import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
+import { FilterErrorsPipe } from './pages/pqc/show/filter-errors.pipe';
 registerLocaleData(en);
 
 @NgModule({
@@ -55,6 +57,9 @@ registerLocaleData(en);
     AppComponent,
   ],
   imports: [
+    ToastrModule.forRoot(), // ToastrModule added
+    // ToastrModule, // ToastrModule added
+
     MultiSelectModule,
     ButtonModule,
     BrowserAnimationsModule,

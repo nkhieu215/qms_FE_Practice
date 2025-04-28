@@ -131,6 +131,7 @@
             <th>Số lượng nhập SAP</th>
             <th>Trạng thái</th>
             <th>Ngày thực hiện</th>
+            <th *ngIf="item_type ==='STORE_CHECK'">Kết quả DAQ</th>
             <th nzRight>Tùy chọn</th>
           </tr>
         </thead>
@@ -153,7 +154,9 @@
 
             <td>{{work.strStatus}}</td>
             <td>{{work.createdAt| date:'dd/MM/yyyy'}}</td>
-
+            <td *ngIf="item_type ==='STORE_CHECK'" style="    text-align: center;
+            vertical-align: middle;"><input type="checkbox" [checked]="work.checkDaq" disabled class="custom-checkbox">
+            </td>
             <td nzRight>
               <div class="btn-group">
                 <a class="btn btn-sm btn-info" routerLink="/{{strUrl}}/show/{{work.id}}" target="_blank"

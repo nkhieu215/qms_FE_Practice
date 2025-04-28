@@ -22,12 +22,20 @@ import { ExaminationResponse } from 'src/app/share/response/examination/Examinat
 import { AuditCriteriaLKDT2 } from 'src/app/share/_models/auditCriteriaLkdt2.model';
 import { PqcPhotoelectric } from 'src/app/share/_models/pqc_photoelectric.model';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-photoelectric',
   templateUrl: './photoelectric.component.html',
   styleUrls: ['./photoelectric.component.css']
 })
 export class PhotoelectricComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -45,7 +53,8 @@ export class PhotoelectricComponent implements OnInit {
     private exampleService: ExaminationService,
     private photoelectricService: PQCPhotoelectricService,
     private exportExelService: ExportExcelService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient
   ) { }
 
   page = 1;
@@ -108,26 +117,32 @@ export class PhotoelectricComponent implements OnInit {
   getInfo() {
     const id = this.actRoute.snapshot.params['id'];
     var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
+
+      // Gọi API để lấy danh sách lỗi
       this.errorService.getAllCategories().subscribe(
         (data) => {
           this.lstErrorRes = data;
         },
-        (err) => { }
+        (err) => {
+          console.error('Error fetching error categories:', err);
+        }
       );
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -135,7 +150,7 @@ export class PhotoelectricComponent implements OnInit {
     }
 
     this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -143,18 +158,29 @@ export class PhotoelectricComponent implements OnInit {
       this.show_work_order = false;
     }
 
+    if (type === 'add' || type === 'show' || type === 'edit') {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        lstPhotoelectrics: this.http.get<any>(`${this.address}/photoelectric/${id}`),
+        wo: this.http.get<any>(`${this.address}/pqc-wo/${id}`)
+      }).subscribe(
+        ({ lstPhotoelectrics, wo }) => {
+          console.log('check data photoelectric :: ', lstPhotoelectrics);
 
-    if (type == 'add' || type == 'show' || type == 'edit') {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstCheck = data.pqcWorkOrder.lstPhotoelectrics
-        this.lstCheck?.forEach(element => {
-          element.ids = Utils.randomString(5)
-        })
-        setTimeout(() => {
-          this.lstCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
-        }, 300);
-      });
+          // Xử lý dữ liệu từ API
+          this.form.lotNumber = wo[0][1];
+          this.lstCheck = lstPhotoelectrics.sort((a: any, b: any) => a.checkTime - b.checkTime);
+          this.lstCheck?.forEach((element) => {
+            element.ids = Utils.randomString(5);
+          });
+
+          // Không cần setTimeout vì đã sắp xếp ngay sau khi nhận dữ liệu
+          this.lstCheck?.sort((a: any, b: any) => a.checkTime - b.checkTime);
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
   }
 
@@ -163,6 +189,7 @@ export class PhotoelectricComponent implements OnInit {
     this.strSelect = this.selectExamination.name + '(' + this.selectExamination.code + ')';
     this.lstAuditCriteriaParam = this.selectExamination.iqcAuditCriteriaParameters;
     this.lstAuditCriteriaParam.forEach(element => {
+      element.id = null;
       element.parameterId = element.id;
       element.minAudit = element.min;
       element.maxAudit = element.max;
@@ -173,6 +200,7 @@ export class PhotoelectricComponent implements OnInit {
 
     this.lstAuditCriteriaLKDT = this.selectExamination.lstAuditCriteriaLkdt;
     this.lstAuditCriteriaLKDT?.forEach(element => {
+      element.id = null;
       element.auditCritetiaLkdtId = element.id;
       element.id = null;
       element.checkResult = 'Đạt'
@@ -209,20 +237,32 @@ export class PhotoelectricComponent implements OnInit {
     pqc.lstLkdt = this.lstAuditCriteriaLKDT;
     pqc.createdBy = this.tokenStorage.getUsername();
     pqc.lstParam = this.lstAuditCriteriaParam;
-
+    console.log("check data pqc :: ", pqc);
     this.photoelectricService.createUpdate(pqc).toPromise().then(
       data => {
         this.edit = false;
         this.create = false;
-        Swal.fire(
-          'Thêm mới thông tin',
-          'Bạn đã thực hiện thêm mới thông tin kiểm tra thành công.',
-          'success'
-        )
-        pqc.id = data.id
-        pqc.ids = Utils.randomString(5);
-        pqc.createdAt = new Date().toLocaleString()
-        this.lstCheck?.push(pqc)
+        // Swal.fire(
+        //   'Thêm mới thông tin',
+        //   'Bạn đã thực hiện thêm mới thông tin kiểm tra thành công.',
+        //   'success'
+        // )
+        Swal.fire({
+          title: 'Thêm mới thông tin',
+          text: 'Bạn đã thực hiện thêm mới thông tin kiểm tra thành công!',
+          icon: 'success',
+          showCancelButton: false,
+          confirmButtonText: 'Đồng ý',
+          cancelButtonText: 'Hủy'
+        }).then(async (result) => {
+          if (result.value) {
+            window.location.reload();
+          }
+        })
+        // pqc.id = data.id
+        // pqc.ids = Utils.randomString(5);
+        // pqc.createdAt = new Date().toLocaleString()
+        // this.lstCheck?.push(pqc)
       }
     )
   }

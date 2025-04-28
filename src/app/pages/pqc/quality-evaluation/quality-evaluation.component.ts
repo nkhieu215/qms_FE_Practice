@@ -19,6 +19,8 @@ import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationR
 import { PqcQuality } from 'src/app/share/_models/pqc_quality.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-quality-evaluation',
@@ -27,7 +29,7 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class QualityEvaluationComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
@@ -129,20 +131,22 @@ export class QualityEvaluationComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.id = id;
     var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -150,7 +154,7 @@ export class QualityEvaluationComponent implements OnInit {
     }
 
     this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -158,20 +162,26 @@ export class QualityEvaluationComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if (type == 'add' || type == 'show' || type == 'edit') {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstCheck = data.pqcWorkOrder.lstPqcQcCheck;
-        this.lstCheck.forEach(element => {
-          element.ids = Utils.randomString(5);
-          element.createdAtClient = element.createdAt;
-          if (element.checked == 'false') {
-            element.checked = false;
-          } else {
-            element.checked = true;
-          }
-        })
-      });
+    if (type === 'add' || type === 'show' || type === 'edit') {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        lstPqcQcCheck: this.http.get<any>(`${this.address}/qc-check/${id}`),
+      }).subscribe(
+        ({ lstPqcQcCheck }) => {
+          console.log('check data qc check ::: ', lstPqcQcCheck);
+
+          // Xử lý dữ liệu từ API
+          this.lstCheck = lstPqcQcCheck.sort((a: any, b: any) => a.checkTime - b.checkTime);
+          this.lstCheck.forEach((element) => {
+            element.ids = Utils.randomString(5);
+            element.createdAtClient = element.createdAt;
+            element.checked = element.checked === 'false' ? false : true;
+          });
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
   }
 
@@ -343,10 +353,24 @@ export class QualityEvaluationComponent implements OnInit {
   }
 
   deleteCheckItem(data: any) {
-    const index = this.lstAuditCriteriaParam.indexOf(data);
-    console.log(index);
-    if (index > -1) {
-      this.lstAuditCriteriaParam.splice(index, 1);
+    Swal.fire(
+      'Xóa',
+      'Bạn đã thực hiện xóa thông tin tiêu chí thành công.',
+      'success'
+    )
+    if (data.id) {
+      this.http.delete(`${this.address}/qc-check/delete-check/${data.id}`).subscribe()
+      const index = this.lstAuditCriteriaParam.indexOf(data);
+      console.log('check du lieu xoa', data);
+      if (index > -1) {
+        this.lstAuditCriteriaParam.splice(index, 1);
+      }
+    } else {
+
+      const index = this.lstAuditCriteriaParam.indexOf(data);
+      if (index > -1) {
+        this.lstAuditCriteriaParam.splice(index, 1);
+      }
     }
   }
 

@@ -13,7 +13,7 @@ import {
 import { PQCWorkOrder } from 'src/app/share/response/pqcResponse/pqcWorkOrder';
 import { ActivatedRoute } from '@angular/router';
 import Utils from 'src/app/share/_utils/utils';
-import { Observable, startWith, map, firstValueFrom } from 'rxjs';
+import { Observable, startWith, map, firstValueFrom, forkJoin } from 'rxjs';
 import { PQCService } from 'src/app/share/_services/pqc.service';
 import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import { ScadaRequestService } from 'src/app/share/_services/scada-request.service';
@@ -23,12 +23,19 @@ import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorElectronicComponent } from 'src/app/share/_models/errorElectronicComponent.model';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-solder-check',
   templateUrl: './solder-check.component.html',
   styleUrls: ['./solder-check.component.css'],
 })
 export class SolderCheckComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -45,7 +52,8 @@ export class SolderCheckComponent implements OnInit {
     private errorService: ErrorListService,
     private scadaService: ScadaRequestService,
     private solderService: PQCSolderCheckService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient
   ) { }
 
   page = 1;
@@ -106,106 +114,102 @@ export class SolderCheckComponent implements OnInit {
   async getInfo() {
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
-    var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+    const type = this.actRoute.snapshot.params['type'];
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
+
+      // Gọi API để lấy danh sách lỗi
       this.errorService.getAllCategories().subscribe(
         (data) => {
           this.lstErrorRes = data;
           this.lstErrorGr = data.lstError;
           console.log(this.lstErrorRes);
         },
-        (err) => { }
+        (err) => {
+          console.error('Error fetching error categories:', err);
+        }
       );
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
       this.show_work_order = false;
     }
 
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
-      type = 'show';
       this.show_work_order = false;
     }
 
-    if (type == "add") {
-      // this.scadaService.getMachineName().toPromise().then(dataMachine=>{
-      //   this.lstMachine2 = dataMachine.lstMachine2
-      //   this.lstMachine2?.forEach(({ name, code }) => {
-      //     this.optionsMachine.push(`${name} - ${code}`);
-      //   })
-      //   console.log( this.lstMachine2 )
-      // }, error=>{})
+    if (!this.lstview) {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      const requests: { lstSolder: Observable<any>; dataMachine?: Observable<any>; dataLine?: Observable<any> } = {
+        lstSolder: this.http.get<any>(`${this.address}/solder-error/${id}`),
+      };
 
-      let dataMachine = await firstValueFrom(this.scadaService.getMachineName());
-      this.lstMachine2 = dataMachine.lstMachine;
-      this.lstMachine2?.forEach(({ name, code }) => {
-        this.optionsMachine.push(`${name} - ${code}`);
-      })
+      if (type === 'add') {
+        requests['dataMachine'] = this.scadaService.getMachineName();
+        requests['dataLine'] = this.scadaService.getLine();
+      }
 
-      let dataLine = await firstValueFrom(this.scadaService.getLine());
-      this.lstProductionLine = dataLine.lstLine;
-      this.lstProductionLine?.forEach(({ name, code }) => {
-        this.options.push(`${name} - ${code}`);
-      })
+      forkJoin(requests).subscribe(
+        ({ lstSolder, dataMachine, dataLine }: any) => {
+          console.log('check data solder :: ', lstSolder);
 
+          // Xử lý dữ liệu lstSolder
+          this.lstSolderCompCheckResponse = lstSolder.sort((a: any, b: any) => a.checkTime - b.checkTime);
+          this.lstSolderCompCheckResponse.forEach((element) => {
+            const check = new SolderCompCheck();
+            check.batchId = element.batchId;
+            check.line = element.line;
+            check.checkPerson = element.checkPerson;
+            check.checkTime = element.checkTime;
+            check.createdAt = element.createdAt;
+            check.updatedAt = element.updatedAt;
+            check.machineName = element.machineName;
+            check.quatity = element.quatity;
+            check.errTotal = element.errTotal;
+            check.conclude = element.conclude;
+            check.note = element.note;
+            check.operators = element.operators;
+            check.ids = Utils.randomString(5);
+            check.dttdSolderCheckId = element.dttdSolderCheckId;
+            this.lstSolderCompCheck?.push(check);
+          });
 
-      // this.scadaService.getLine().toPromise().then(data => {
-      //   this.lstProductionLine = data.lstLine
-      // }, error => { })
+          // Xử lý dữ liệu máy móc và dây chuyền (chỉ khi type === 'add')
+          if (type === 'add') {
+            this.lstMachine2 = dataMachine?.lstMachine || [];
+            this.lstMachine2.forEach(({ name, code }) => {
+              this.optionsMachine.push(`${name} - ${code}`);
+            });
 
+            this.lstProductionLine = dataLine?.lstLine || [];
+            this.lstProductionLine.forEach(({ name, code }) => {
+              this.options.push(`${name} - ${code}`);
+            });
+          }
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
-
-
-    this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
-      this.edit = false;
-      this.create = false;
-      this.lstview = false;
-      type = 'show';
-      this.show_work_order = false;
-    }
-
-    this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-      this.form = data.pqcWorkOrder;
-      this.lstSolderCompCheckResponse = data.pqcWorkOrder.lstSolder;
-      this.lstSolderCompCheckResponse.forEach((element) => {
-        var check = new SolderCompCheck();
-        check.batchId = element.batchId;
-        check.line = element.line;
-        check.checkPerson = element.checkPerson;
-        check.checkTime = element.checkTime;
-        check.createdAt = element.createdAt;
-        check.updatedAt = element.updatedAt;
-        check.machineName = element.machineName;
-        check.quatity = element.quatity;
-        check.errTotal = element.errTotal;
-        check.conclude = element.conclude;
-        check.note = element.note;
-        check.operators = element.operators;
-        check.ids = Utils.randomString(5);
-        check.dttdSolderCheckId = element.dttdSolderCheckId;
-        this.lstSolderCompCheck?.push(check);
-      });
-      setTimeout(() => {
-        this.lstSolderCompCheck?.sort((a: any, b: any) => b.createdAt - a.createdAt);
-      }, 300);
-    });
   }
 
   // crud
@@ -240,7 +244,7 @@ export class SolderCheckComponent implements OnInit {
     check.line = line,
       check.checkPerson = checkPerson,
       check.checkTime = checkTime,
-      check.createdAt = createdAt,
+      check.createdAt = new Date(),
       check.updatedAt = new Date(),
       check.machineName = machineName,
       check.quatity = quatity;

@@ -77,7 +77,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
         data => {
 
           this.lstCheck = data.lstStep.filter((x: any) => x.step != "PRINT_SERIAL");
-          // console.log("check list step", data.lstStep)
+          console.log("check list step", data.lstStep)
           setTimeout(() => {
             this.lstCheck.forEach(element => {
               this.lstCheckStep?.push(element.step);
@@ -118,6 +118,7 @@ export class AproveQualityEvaluationComponent implements OnInit {
         this.lstWorkOrder = productionLst.lstOrder;
         this.lstWorkOrder?.forEach(element => {
           element.strStatus = Utils.getStatusName(element.status);
+          element.checkDaq = element.checkDaq === 'true' && element.checkDaqStatus === 'true' ? true : false;
         })
 
         this.collectionSize = Number(productionLst?.total) * this.pageSize;
@@ -130,6 +131,33 @@ export class AproveQualityEvaluationComponent implements OnInit {
 
 
   note?: any;
+  checkConditionReject(action: any) {
+    if (action === 'reject') {
+      this.lstCheck.forEach(x => {
+        if (x.step === 'APPROVE_STORE') {
+          x.checked = false;
+        };
+      })
+      console.log('check data APPROVE STATUS :: ', this.lstCheck)
+      const result = this.lstCheck.filter((x: any) =>
+        x.step != 'SAP_STORE'
+        && x.step != 'PRINT_SERIAL' && x.step != 'APPROVE_STORE').filter((y: any) => y.checked === false);
+      console.log("check result :: ", result);
+      if (result.length === 0) {
+        Swal.fire({
+          title: 'Lỗi'
+          , text: 'Yêu cầu bỏ tích các công đoạn từ chối'
+          , icon: 'error'
+          , showCancelButton: true
+          , confirmButtonText: 'Đồng ý'
+        })
+      } else {
+        this.onSubmit(action);
+      }
+    } else {
+      this.onSubmit(action);
+    }
+  }
   onSubmit(action: any) {
     Swal.fire({
       title: 'Xác nhận',
@@ -208,9 +236,10 @@ export class AproveQualityEvaluationComponent implements OnInit {
   report(id?: any) {
     this.pqcService.getDetailPqcWorkOrder(id).subscribe(
       data => {
+        console.log("check data APPROVE ::", data);
         let wo = data.pqcWorkOrder;
         let user = this.tokenStorage.getUsername();
-        this.pqcService.report(id).subscribe(
+        this.pqcService.report(id, []).subscribe(
           blob => saveAs(blob, user + "_" + wo.workOrderId + "_" + wo.sapWo + "_" + formatDate(new Date(), 'dd_MM_yyyy_HH_mm', 'en_US') + ".xlsx")
         )
       },

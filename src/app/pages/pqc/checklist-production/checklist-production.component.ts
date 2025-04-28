@@ -74,6 +74,7 @@ export class ChecklistProductionComponent implements OnInit {
     const type = this.actRoute.snapshot.params['type'];
     this.pqcService.getDetailPqcWorkOrder(id).subscribe(
       data => {
+        console.log("check data CHECKLIST-PRODUCTION :: ", data);
         this.form = data.pqcWorkOrder;
         this.lstbom = data.pqcWorkOrder.lstbom;
         console.log(this.form);

@@ -144,9 +144,11 @@ export class PqcShowListComponent implements OnInit {
           (data) => {
             var productionLst = new PQCPEndingOrderResponse();
             productionLst = data;
+            console.log('result :: ', data);
             this.lstWorkOrder = data.lstOrder;
             this.lstWorkOrder?.forEach((element) => {
               element.strStatus = Utils.getStatusName(element.status);
+              element.checkDaq = element.checkDaq === 'true' && element.checkDaqStatus === 'true' ? true : false;
             });
             this.collectionSize = Number(productionLst?.total) * this.pageSize;
           },

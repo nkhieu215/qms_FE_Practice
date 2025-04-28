@@ -2,6 +2,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, Input, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 import { CommonService } from 'src/app/share/_services/common.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-button-success',
   templateUrl: './button-success.component.html',
@@ -12,17 +15,24 @@ export class ButtonSuccessComponent implements OnInit {
   constructor(
     private actRoute: ActivatedRoute,
     private commonService: CommonService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
   ) { }
-
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() item_type = '';
   @Input() show_work_order = '';
   strNameTitle?: string;
   strUrl?: string;
   showButtonSuccess?: boolean = false;
-
+  @Input() checkDAQ: boolean = false;
   ngOnInit(): void {
     var type = this.actRoute.snapshot.params['type'];
+    setTimeout(() => {
+      this.checkDAQ = sessionStorage.getItem('daq') === 'true' ? true : false;
+    }, 1000);
     if (type == 'add') {
       this.showButtonSuccess = true
     }
@@ -91,41 +101,195 @@ export class ButtonSuccessComponent implements OnInit {
     }
   }
 
-  onSubmit(type: any) {
-    Swal.fire({
-      title: 'Xác nhận',
-      text: 'Bạn có muốn tiếp tục thực hiện hoàn thành quá trình kiểm tra ? ',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Đồng ý',
-      cancelButtonText: 'Hủy'
-    }).then((result) => {
-      if (result.value) {
-        this.commonService.successStep(this.actRoute.snapshot.params['id'], this.item_type, type).toPromise().then(
-          data => {
-            console.log("check data", data);
-            if (data.result.message == 'NULL') {
-              Swal.fire(
-                'Thất bại',
-                'Công đoạn check NVL chưa hoàn thành',
-                'warning'
-              )
-            } else {
-              // console.log('check data: ', data);
-              Swal.fire(
-                'Thành công',
-                'Bạn đã thực hiện thành công.',
-                'success'
-              )
-            }
-            this.router.navigate([this.strUrl])
-          },
-          error => {
-          }
-        )
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
+  onSubmitWithCondition(type: any) {
+    this.http.get<any>(`${this.address}/pqc-wo/${this.actRoute.snapshot.params['id']}`).subscribe(result => {
+      console.log(`check data wo :::::::::: ${sessionStorage.getItem('sapWo')}-${result[0][1]}`)
+      this.http.get<any>(`${this.address}/api/v1/infodaq/product-tests/lot/${sessionStorage.getItem('sapWo')}-${result[0][1]}`).subscribe(res => {
+        console.log('check data infoDAQ :::::::::: ', res)
+        if (res.length === 0) {
+          Swal.fire({
+            title: 'Thông báo',
+            text: 'Chưa có kết quả kiểm tra DAQ ?',
+            icon: 'warning',
+            showCancelButton: true,
+            showConfirmButton: false,
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Đóng',
+          })
+        } else {
+          this.commonService.statusStep(this.actRoute.snapshot.params['id']).toPromise().then(
+            data => {
+              const result = data.lstStep.filter((x: any) => x.step != 'QC_CHECK'
+                && x.step != 'PHOTOELECTRIC_PRODUCT'
+                && x.step != 'PHOTOELECTRIC'
+                && x.step != 'APPROVE_STORE'
+                && x.step != 'STORE_CHECK'
+                && x.step != 'SAP_STORE'
+                && x.step != 'PRINT_SERIAL').filter((y: any) => y.status !== 'SUCCESS');
+              if (result.length > 0) {
+                Swal.fire({
+                  title: 'Thông báo',
+                  text: 'Còn công đoạn chưa hoàn thành ?',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Tiếp tục',
+                })
+              } else {
+                Swal.fire({
+                  title: 'Xác nhận',
+                  text: 'Bạn có muốn tiếp tục thực hiện hoàn thành quá trình kiểm tra ? ',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Đồng ý',
+                  cancelButtonText: 'Hủy'
+                }).then((result) => {
+                  if (result.value) {
+                    // console.log(data.lstStep)
+                    this.commonService.successStep(this.actRoute.snapshot.params['id'], this.item_type, type).toPromise().then(
+                      data => {
+                        console.log("check data", data);
+                        if (data.result.message == 'NULL') {
+                          Swal.fire(
+                            'Thất bại',
+                            'Công đoạn check NVL chưa hoàn thành',
+                            'warning'
+                          )
+                        } else {
+                          // console.log('check data: ', data);
+                          this.http.post<any>(`${this.address}/pqc-wo/update-daq/${this.actRoute.snapshot.params['id']}`, this.checkDAQ).subscribe();
+                          Swal.fire(
+                            'Thành công',
+                            'Bạn đã thực hiện thành công.',
+                            'success'
+                          )
+                        }
+                        this.router.navigate([this.strUrl])
+                      },
+                      error => {
+                      }
+                    )
 
-      }
-    })
+                  } else if (result.dismiss === Swal.DismissReason.cancel) {
+
+                  }
+                })
+
+              }
+            },
+            error => {
+            }
+          );
+        }
+      });
+    });
+  }
+  onSubmit(type: any) {
+    if (this.item_type === 'STORE_CHECK') {
+      this.commonService.statusStep(this.actRoute.snapshot.params['id']).toPromise().then(
+        data => {
+          const result = data.lstStep.filter((x: any) => x.step != 'QC_CHECK'
+            && x.step != 'PHOTOELECTRIC_PRODUCT'
+            && x.step != 'PHOTOELECTRIC'
+            && x.step != 'APPROVE_STORE'
+            && x.step != 'STORE_CHECK'
+            && x.step != 'SAP_STORE'
+            && x.step != 'PRINT_SERIAL').filter((y: any) => y.status !== 'SUCCESS');
+          if (result.length > 0) {
+            Swal.fire({
+              title: 'Thông báo',
+              text: 'Còn công đoạn chưa hoàn thành ?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Tiếp tục',
+            })
+          } else {
+            Swal.fire({
+              title: 'Xác nhận',
+              text: 'Bạn có muốn tiếp tục thực hiện hoàn thành quá trình kiểm tra ? ',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Đồng ý',
+              cancelButtonText: 'Hủy'
+            }).then((result) => {
+              if (result.value) {
+                // console.log(data.lstStep)
+
+                this.commonService.successStep(this.actRoute.snapshot.params['id'], this.item_type, type).toPromise().then(
+                  data => {
+                    console.log("check data", data);
+                    if (data.result.message == 'NULL') {
+                      Swal.fire(
+                        'Thất bại',
+                        'Công đoạn check NVL chưa hoàn thành',
+                        'warning'
+                      )
+                    } else {
+                      this.http.post<any>(`${this.address}/pqc-wo/update-daq/${this.actRoute.snapshot.params['id']}`, this.checkDAQ).subscribe();
+                      // console.log('check data: ', data);
+                      Swal.fire(
+                        'Thành công',
+                        'Bạn đã thực hiện thành công.',
+                        'success'
+                      )
+                    }
+                    this.router.navigate([this.strUrl])
+                  },
+                  error => {
+                  }
+                )
+
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+
+              }
+            })
+
+          }
+        },
+        error => {
+        }
+      );
+    } else {
+      Swal.fire({
+        title: 'Xác nhận',
+        text: 'Bạn có muốn tiếp tục thực hiện hoàn thành quá trình kiểm tra ? ',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Hủy'
+      }).then((result) => {
+        if (result.value) {
+          // console.log(data.lstStep)
+          this.commonService.successStep(this.actRoute.snapshot.params['id'], this.item_type, type).toPromise().then(
+            data => {
+              console.log("check data", data);
+              if (data.result.message == 'NULL') {
+                Swal.fire(
+                  'Thất bại',
+                  'Công đoạn check NVL chưa hoàn thành',
+                  'warning'
+                )
+              } else {
+                // console.log('check data: ', data);
+                Swal.fire(
+                  'Thành công',
+                  'Bạn đã thực hiện thành công.',
+                  'success'
+                )
+              }
+              this.router.navigate([this.strUrl])
+            },
+            error => {
+            }
+          )
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+
+        }
+      })
+    }
   }
 }

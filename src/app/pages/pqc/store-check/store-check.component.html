@@ -15,38 +15,44 @@
               (eventData)="changeWo($event)"></pqc-show-work-order>
 
             <div *ngIf="show_check !='SHOW'">
-              <app-nvl-production show_check="SHOW" *ngIf="lstCheckStep?.includes('NVL')"></app-nvl-production>
+              <app-nvl-production show_check="SHOW" *ngIf="nvl"></app-nvl-production>
               <app-nvl100-production show_check="SHOW"
                 *ngIf="lstCheckStep?.includes('CHECK_NVL')"></app-nvl100-production>
-              <app-tin-check show_check="SHOW" *ngIf="lstCheckStep?.includes('TIN')"></app-tin-check>
-              <app-mount-comp-check show_check="SHOW" *ngIf="lstCheckStep?.includes('MOUNT_COMPONENTS')">
+              <app-tin-check show_check="SHOW" *ngIf="check_nvl"></app-tin-check>
+              <app-mount-comp-check show_check="SHOW" *ngIf="mount_components">
               </app-mount-comp-check>
-              <app-solder-check show_check="SHOW" *ngIf="lstCheckStep?.includes('SOLDER')"></app-solder-check>
-              <app-interchangeability show_check="SHOW"
-                *ngIf="lstCheckStep?.includes('INTERCHANGEABILITY')"></app-interchangeability>
-              <app-assembles show_check="SHOW" *ngIf="lstCheckStep?.includes('ASSEMBLES')"></app-assembles>
-              <app-photoelectric show_check="SHOW" *ngIf="lstCheckStep?.includes('PHOTOELECTRIC')"></app-photoelectric>
-              <app-photoelectric-product show_check="SHOW"
-                *ngIf="lstCheckStep?.includes('PHOTOELECTRIC_PRODUCT')"></app-photoelectric-product>
+              <app-solder-check show_check="SHOW" *ngIf="solder"></app-solder-check>
+              <app-interchangeability show_check="SHOW" *ngIf="interchangeability"></app-interchangeability>
+              <app-assembles show_check="SHOW" *ngIf="assembles"></app-assembles>
+              <app-photoelectric show_check="SHOW" *ngIf="photoelectric"></app-photoelectric>
+              <app-photoelectric-product show_check="SHOW" *ngIf="photoelectric_product"></app-photoelectric-product>
 
-              <app-fix-error show_check="SHOW" *ngIf="lstCheckStep?.includes('FIX_ERR')"
-                (woData)="{wo}"></app-fix-error>
-              <!-- <app-store-check show_check="SHOW"  *ngIf="lstCheckStep?.includes('STORE_CHECK')"></app-store-check> -->
-              <app-quality-evaluation show_check="SHOW"
-                *ngIf="lstCheckStep?.includes('QC_CHECK')"></app-quality-evaluation>
+              <app-fix-error show_check="SHOW" *ngIf="fix_err" (woData)="{wo}"></app-fix-error>
+              <!-- <app-store-check show_check="SHOW" *ngIf="lstCheckStep?.includes('STORE_CHECK')"></app-store-check> -->
+              <app-quality-evaluation show_check="SHOW" *ngIf="qc_check"></app-quality-evaluation>
             </div>
             <div class="form-group row">
               <div class="col-sm-12">
-                <div class="float-right btn-group" style="margin-bottom: 10px" *ngIf="show_work_order">
+                <div class="container">
+                  <label for="daq-checkbox">Thu thập kết quả DAQ : </label>
+                  <input type="checkbox" id="daq-checkbox" [(ngModel)]="checkDAQ" (change)="changeDAQ()"
+                    [ngModelOptions]="{ standalone: true }" style="width: 30px;height: 30px;">
+                </div>
+                <div class="float-right btn-group" style="margin-bottom: 10px">
                   <a class="btn btn-info" target="_blank" routerLink="/pqc/pqc-show-detail/{{idWorkOrder}}"
-                    title="Chi tiết thông tin"><i class="fa fa-eye"></i> Thông tin kiểm tra</a>
+                    title="Chi tiết thông tin" *ngIf="show_work_order"><i class="fa fa-eye"></i> Thông tin kiểm tra</a>
 
-                  <button class="btn btn-success" (click)="open(myModal, '', '', '', '')">
+                  <button class="btn btn-success" (click)="open(myModal, '', '', '', '')" *ngIf="show_work_order">
                     Thêm thông tin kiểm tra
                   </button>
 
-                  <button class="btn btn-primary" (click)="exportInfo()">
+                  <button class="btn btn-primary" (click)="exportInfo()" *ngIf="show_work_order">
                     Thông tin in tem
+                  </button>
+                  <button class="btn btn-primary"
+                    [ngClass]="{greenClass:checkDAQResult === true,redClass:checkDAQResult === false}" *ngIf="checkDAQ"
+                    (click)="openInfoDAQ(infoDAQTemplate)">
+                    Kết quả DAQ
                   </button>
                 </div>
                 <nz-table #borderedTable nzBordered [nzData]="lstStoreCheck" [nzFrontPagination]="false">
@@ -143,7 +149,6 @@
                         <button *ngIf="show_work_order" style="margin-right: 5px;" class="btn bt-sm btn-primary"
                           href="javascript:void(0);" (click)="open(myModal6, '','PACKING', check.ids,check.id)"> Packing
                         </button>
-
                       </td>
 
                     </tr>
@@ -152,7 +157,8 @@
               </div>
             </div>
             <div style="display: flex;">
-              <app-button-success item_type="STORE_CHECK" show_work_order="{{show_work_order}}"></app-button-success>
+              <app-button-success item_type="STORE_CHECK" show_work_order="{{show_work_order}}"
+                [checkDAQ]="checkDAQ"></app-button-success>
               <div> <button (click)="openDetail(myModalEdit,id)" style="    margin-top: 19px;
                 margin-left: 34px;
                 border-radius: 5px;
@@ -1100,5 +1106,73 @@
       font-size: 18px;
       margin-left: 88%;
       width: 90px;">Lưu</button></div>
+  </div>
+</ng-template>
+<ng-template #infoDAQTemplate let-modal>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-basic-title">
+      Kết quả DAQ
+    </h2>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div *ngFor="let element of listDAQResultType">
+      <br>
+      <!-- <nz-table #borderedTable nzBordered nzTitle="Thông tin cài đặt" [nzData]="objectToArray(element.settings)"
+        [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th *ngFor="let item of objectToArray(element.settings)">{{item.key}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td *ngFor="let item of objectToArray(element.settings)">{{item.value}}</td>
+          </tr>
+        </tbody>
+      </nz-table> -->
+      <nz-table #borderedTable nzBordered nzTitle="Loại kiểm tra : {{element.name}}"
+        [nzData]="objectToArray(element.data)" [nzFrontPagination]="false">
+        <thead>
+          <tr>
+            <th scope="col" colspan="10">Thông tin chung</th>
+            <th scope="col" [colspan]="objectToArray(element.settings).length">Thông tin cài đặt</th>
+            <th scope="col" [colspan]="objectToArray(element.data[0].testData.results).length">Kết quả kiểm tra</th>
+          </tr>
+          <tr>
+            <th>Tên thiết bị</th>
+            <th>Lot number</th>
+            <th>Tên profile</th>
+            <th>Vị trí (trái-phải)</th>
+            <th>FixtureNo</th>
+            <th>Thời gian bắt đầu</th>
+            <th>Thời gian kết thúc</th>
+            <th>Tổng thời gian test</th>
+            <th>Kết quả kiểm tra</th>
+            <th>Loại kiểm tra</th>
+            <th *ngFor="let item of objectToArray(element.settings)">{{item.key}}</th>
+            <th *ngFor="let item of objectToArray(element.data[0].testData.results)">{{item.key}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of element.data">
+            <td>{{item.deviceName}}</td>
+            <td>{{ getDataAfterDash(item.lot) }}</td>
+            <td>{{item.profileName}}</td>
+            <td>{{item.side}}</td>
+            <td>{{item.fixtureNo}}</td>
+            <td>{{item.startTime| date : 'dd/MM/yyyy HH:mm:ss'}}</td>
+            <td>{{item.endTime| date : 'dd/MM/yyyy HH:mm:ss'}}</td>
+            <td>{{item.elapsedTime}}</td>
+            <td [ngClass]="{greenClass:item.resultTest === 'PASS',redClass:item.resultTest === 'FAIL'}">
+              {{item.resultTest}}</td>
+            <td>{{element.type}}</td>
+            <td *ngFor="let item of objectToArray(element.settings)">{{item.value}}</td>
+            <td *ngFor="let item of objectToArray(item.testData.results)">{{item.value}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+    </div>
   </div>
 </ng-template>

@@ -17,12 +17,20 @@ import { ExportExcelService } from 'src/app/share/_services/export-excel.service
 import { PQCPhotoelectricService } from 'src/app/share/_services/pqcPhotoelectric.service';
 import { PqcPhotoelectricProduct } from 'src/app/share/_models/pqc_photoelectric_product.model';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-photoelectric-product',
   templateUrl: './photoelectric-product.component.html',
   styleUrls: ['./photoelectric-product.component.css'],
 })
 export class PhotoelectricProductComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -39,7 +47,8 @@ export class PhotoelectricProductComponent implements OnInit {
     private errorService: ErrorListService,
     private exportExelService: ExportExcelService,
     private photoelectricService: PQCPhotoelectricService,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient,
   ) { }
 
   page = 1;
@@ -102,20 +111,22 @@ export class PhotoelectricProductComponent implements OnInit {
   getInfo() {
     const id = this.actRoute.snapshot.params['id'];
     var type = this.actRoute.snapshot.params['type'];
-    if (id == null && type == null) {
+
+    if (!id && !type) {
       this.lstview = true;
       this.crud = false;
+      return;
     }
 
-    if (type == 'add') {
+    if (type === 'add') {
       this.edit = false;
       this.create = true;
       this.lstview = false;
-    } else if (type == 'edit') {
+    } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
       this.lstview = false;
-    } else if (type == 'show') {
+    } else if (type === 'show') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -123,7 +134,7 @@ export class PhotoelectricProductComponent implements OnInit {
     }
 
     this.idWorkOrder = id;
-    if (this.show_check == 'SHOW') {
+    if (this.show_check === 'SHOW') {
       this.edit = false;
       this.create = false;
       this.lstview = false;
@@ -131,11 +142,23 @@ export class PhotoelectricProductComponent implements OnInit {
       this.show_work_order = false;
     }
 
-    if (type == 'add' || type == 'show' || type == 'edit') {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstCheck = data.pqcWorkOrder.lstPhotoelectricsProduct;
-      });
+    if (type === 'add' || type === 'show' || type === 'edit') {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        lstPhotoelectricsProduct: this.http.get<any>(`${this.address}/photoelectric/product/${id}`),
+        wo: this.http.get<any>(`${this.address}/pqc-wo/${id}`)
+      }).subscribe(
+        ({ lstPhotoelectricsProduct, wo }) => {
+          console.log('check data photoelectric product :: ', lstPhotoelectricsProduct);
+
+          // Xử lý dữ liệu từ API
+          this.form.lotNumber = wo[0][1];
+          this.lstCheck = lstPhotoelectricsProduct.sort((a: any, b: any) => a.checkTime - b.checkTime);
+        },
+        (error) => {
+          console.error('Error fetching data:', error);
+        }
+      );
     }
   }
 

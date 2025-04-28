@@ -21,6 +21,8 @@ import { OitmResponse } from 'src/app/share/response/oitm/OitmResponse';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap, tap } from 'rxjs';
 import { StoreCheckService } from 'src/app/share/_services/store_check.service';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-approve-request',
   templateUrl: './approve-request.component.html',
@@ -29,7 +31,7 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 export class ApproveRequestComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';

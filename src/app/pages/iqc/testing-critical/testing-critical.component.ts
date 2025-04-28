@@ -3,6 +3,8 @@ import { Component, Input } from '@angular/core';
 import { ModalDismissReasons, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/share/_services/auth.service';
 import Swal from 'sweetalert2';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-testing-critical',
   templateUrl: './testing-critical.component.html',
@@ -35,7 +37,7 @@ import Swal from 'sweetalert2';
 })
 export class TestingCriticalComponent {
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';

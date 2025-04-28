@@ -31,6 +31,7 @@
                     <th colspan="3">Độ tin cậy</th>
                     <th rowspan="2">Số lô</th>
                     <th rowspan="2">TBN</th>
+                    <th rowspan="2">Kết luận</th>
                     <th rowspan="2">Ghi chú</th>
                     <th rowspan="2">Tùy chọn</th>
                   </tr>
@@ -85,6 +86,7 @@
                     <td>{{ check.temp }}</td>
                     <td>{{ check.lotNumber }}</td>
                     <td>{{ check.tbn }}</td>
+                    <td>{{ check.conclude }}</td>
                     <td>{{ check.note }}</td>
                     <td>
                       <button *ngIf="show_work_order" class="btn btn-sm btn-primary" style="margin-right: 10px ;"
@@ -375,8 +377,7 @@
         <div class="row">
           <div class="form-group">
             <label>Ghi chú</label>
-            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note"
-              placeholder="Ghi chú" />
+            <input [(ngModel)]="formEx.note" type="text" class="form-control" name="note" placeholder="Ghi chú" />
           </div>
         </div>
 

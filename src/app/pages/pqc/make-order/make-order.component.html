@@ -140,6 +140,7 @@
             <th scope="col">Ngày thực hiện</th>
             <th>Tổng nhập kho</th>
             <th>Tổng nhập SAP</th>
+            <th>Kết quả DAQ</th>
             <th scope="col">Tùy chọn</th>
           </tr>
         </thead>
@@ -161,10 +162,12 @@
             <td>{{work.createdAt| date:'dd/MM/yyyy hh:ss'}}</td>
             <td>{{work.total | number}}</td>
             <td>{{work.totalSap | number}}</td>
-
+            <td style="    text-align: center;
+            vertical-align: middle;"><input type="checkbox" [checked]="work.checkDaq" disabled class="custom-checkbox">
+            </td>
             <td class="text-center">
               <div class="btn-group">
-                <a class="btn btn-sm btn-info" routerLink="/pqc/pqc-show-detail/{{work.id}}" target="_blank"
+                <a class="btn btn-sm btn-info" routerLink="/pqc/pqc-show-detail/show/{{work.id}}" target="_blank"
                   title="Chi tiết thông tin"><i class="fa fa-eye"></i></a>
 
                 <button class="btn btn-sm btn-success" (click)="open(myModalEdit,work.id)" title="Chi tiết công đoạn"><i

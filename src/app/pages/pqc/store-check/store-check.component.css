@@ -1,50 +1,62 @@
-.btn-group .dropdown-menu a{
-  color:#fff;
+.btn-group .dropdown-menu a {
+  color: #fff;
 }
 
 .btn-default .dropdown-menu {
-color: #000 !important;
+  color: #000 !important;
 }
-.btn-default .dropdown-menu li > a:hover,
-.btn-default .dropdown-menu li > a:focus {
-background-color: #000 !important;
-color:#fff !important;
+
+.btn-default .dropdown-menu li>a:hover,
+.btn-default .dropdown-menu li>a:focus {
+  background-color: #000 !important;
+  color: #fff !important;
 }
+
 .btn-group-primary .dropdown-menu {
-background-color: #3784c5 !important;
+  background-color: #3784c5 !important;
 }
-.btn-group-primary .dropdown-menu li > a:hover,
-.btn-group-primary .dropdown-menu li > a:focus {
-background-color: #428bca !important;
+
+.btn-group-primary .dropdown-menu li>a:hover,
+.btn-group-primary .dropdown-menu li>a:focus {
+  background-color: #428bca !important;
 }
+
 .btn-group-success .dropdown-menu {
-background-color: #51b351 !important;
+  background-color: #51b351 !important;
 }
-.btn-group-success .dropdown-menu li > a:hover,
-.btn-group-success .dropdown-menu li > a:focus {
-background-color: #5cb85c !important;
+
+.btn-group-success .dropdown-menu li>a:hover,
+.btn-group-success .dropdown-menu li>a:focus {
+  background-color: #5cb85c !important;
 }
+
 .btn-group-info .dropdown-menu {
-background-color: #4ebbdb !important;
+  background-color: #4ebbdb !important;
 }
-.btn-group-info .dropdown-menu li > a:hover,
-.btn-group-info .dropdown-menu li > a:focus {
-background-color: #5bc0de !important;
+
+.btn-group-info .dropdown-menu li>a:hover,
+.btn-group-info .dropdown-menu li>a:focus {
+  background-color: #5bc0de !important;
 }
+
 .btn-group-warning .dropdown-menu {
-background-color: #efa640 !important;
+  background-color: #efa640 !important;
 }
-.btn-group-warning .dropdown-menu li > a:hover,
-.btn-group-warning .dropdown-menu li > a:focus {
-background-color: #f0ad4e !important;
+
+.btn-group-warning .dropdown-menu li>a:hover,
+.btn-group-warning .dropdown-menu li>a:focus {
+  background-color: #f0ad4e !important;
 }
+
 .btn-group-danger .dropdown-menu {
-background-color: #d64742 !important;
+  background-color: #d64742 !important;
 }
-.btn-group-danger .dropdown-menu li > a:hover,
-.btn-group-danger .dropdown-menu li > a:focus {
-background-color: #d9534f !important;
+
+.btn-group-danger .dropdown-menu li>a:hover,
+.btn-group-danger .dropdown-menu li>a:focus {
+  background-color: #d9534f !important;
 }
+
 .dropdown-menu>li>a {
   display: block;
   padding: 3px 20px;
@@ -55,8 +67,8 @@ background-color: #d9534f !important;
   white-space: nowrap;
 }
 
-.dropdown-menu a  {
-   color: #333;
+.dropdown-menu a {
+  color: #333;
 }
 
 ::ng-deep .modal-xxl .modal-dialog {
@@ -68,7 +80,43 @@ background-color: #d9534f !important;
   position: relative;
   max-height: 500px;
   overflow: auto;
-  }
-  .table-wrapper-scroll-y {
+}
+
+.table-wrapper-scroll-y {
   display: block;
-  }
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  /* Đảm bảo các cột có kích thước bằng nhau */
+}
+
+.table th,
+.table td {
+  text-align: center;
+  /* Căn giữa nội dung */
+  vertical-align: middle;
+  /* Căn giữa theo chiều dọc */
+  padding: 10px;
+  /* Khoảng cách giữa nội dung và đường viền */
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+  /* Đường viền bảng */
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+  /* Đường viền giữa các ô */
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: unset;
+  padding: 10px;
+}

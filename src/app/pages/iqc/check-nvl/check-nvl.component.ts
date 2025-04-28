@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { HttpClient } from '@angular/common/http';
 import { StoreCheckService } from 'src/app/share/_services/store_check.service';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-check-nvl',
@@ -35,7 +36,7 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 export class CheckNvlComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';
@@ -163,7 +164,10 @@ export class CheckNvlComponent implements OnInit {
     this.http.get<any>(`${this.address}/${this.path}/examinations/get-all/${this.selectedEx.id}`).subscribe(res => {
       this.listOfItem = res;
       this.listOfItem.forEach(x => {
+        x.id = null;
         x.iqcElecCompId = this.id;
+        x.poQuantity = null;
+        x.quantityCheck = null;
       })
     })
     this.strSelect = this.selectedEx.name + '(' + this.selectedEx.code + ')';
@@ -207,14 +211,14 @@ export class CheckNvlComponent implements OnInit {
     //   }
     // }
     setTimeout(() => {
-    //   if (check === false) {
-        this.listOfItem[index].itemCode = this.itemResult.itemCode;
-        this.listOfItem[index].itemName = this.itemResult.itemName;
-    //   } else {
-    //     this.listOfItem[index].itemCode = '';
-    //     this.listOfItem[index].itemName = '';
-    //     this.listOfItems = [];
-    //   }
+      //   if (check === false) {
+      this.listOfItem[index].itemCode = this.itemResult.itemCode;
+      this.listOfItem[index].itemName = this.itemResult.itemName;
+      //   } else {
+      //     this.listOfItem[index].itemCode = '';
+      //     this.listOfItem[index].itemName = '';
+      //     this.listOfItems = [];
+      //   }
     }, 50);
     console.log("check lk", this.listOfItem);
     this.strSelectElec = this.selectedElectronic.itemCode;
@@ -643,7 +647,7 @@ export class CheckNvlComponent implements OnInit {
    */
   async onSubmit(buttonType: any) {
     var checkResult = false;
-    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === ''|| this.form.suggestion === '') ||
+    if ((this.selectedEx === '' || this.form.reportCode === '' || this.form.itemType === '' || this.form.suggestion === '') ||
       (this.selectedEx === null || this.form.reportCode === null || this.form.itemType === null || this.form.suggestion === null)) {
       checkResult = true;
     }
@@ -820,10 +824,10 @@ export class CheckNvlComponent implements OnInit {
   // -------------------------------------------- Danh sách sản phẩm --------------------------------------------------------
   deleteById(index: any) {
     if (this.listOfItem[index].id === null) {
-      this.listOfItem.splice(index,1);
+      this.listOfItem.splice(index, 1);
     } else {
       this.http.delete<any>(`${this.address}/${this.path}/iqc/delete/${this.listOfItem[index].id}`).subscribe(() => {
-      this.listOfItem.splice(index,1);
+        this.listOfItem.splice(index, 1);
         if (this.listOfItem.length > 5) {
           document.getElementById('table-body')!.style.width = '99.9%';
         } else {
@@ -894,7 +898,7 @@ export class CheckNvlComponent implements OnInit {
       billNumber: '',
       lotNumber: '',
       poQuantity: null,
-      quantityCheck: 0,
+      quantityCheck: null,
       createdAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       updateAt: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`,
       username: 'admin',
@@ -972,7 +976,7 @@ export class CheckNvlComponent implements OnInit {
         'Vui lòng điền mã sản phẩm !',
         'warning'
       )
-    }else if(this.listOfItem[index].poQuantity === null || this.listOfItem[index].poQuantity <= 0){
+    } else if (this.listOfItem[index].poQuantity && this.listOfItem[index].poQuantity <= 0) {
       Swal.fire(
         'Lỗi',
         'Số lượng lô hàng cần lớn hơn 0 !',
@@ -1286,12 +1290,12 @@ export class CheckNvlComponent implements OnInit {
     console.log(this.formSearch.origin);
 
   }
-  changeColorWhenNull(id:string,mss:any){
-    console.log('test',mss)
-    if(mss === null || mss ===''){
+  changeColorWhenNull(id: string, mss: any) {
+    console.log('test', mss)
+    if (mss === null || mss === '') {
       document.getElementById(id)!.style.backgroundColor = '#f52d2da8';
       document.getElementById(id)!.style.color = '#fff';
-    }else{
+    } else {
       document.getElementById(id)!.style.backgroundColor = '#fff';
       document.getElementById(id)!.style.color = '#000000';
     }

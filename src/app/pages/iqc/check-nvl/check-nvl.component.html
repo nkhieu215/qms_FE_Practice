@@ -316,10 +316,6 @@
               [(ngModel)]="form.spkphNumber" />
           </div>
           <div class="col-md-3">
-            <label>Đề nghị <i style="color: red;">(*)</i> </label>
-            <input type="text" class="form-control" name="suggestion" [(ngModel)]="form.suggestion">
-          </div>
-          <div class="col-md-3">
             <label>Kết luận </label>
 
             <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel">
@@ -335,7 +331,12 @@
             <label for="cbx" class="cbx"></label>
           </div>
         </div>
-
+        <div class="row pb-3">
+          <div class="col-sm-12">
+            <label>Đề nghị <i style="color: red;">(*)</i> </label>
+            <input type="text" class="form-control" name="suggestion" [(ngModel)]="form.suggestion" />
+          </div>
+        </div>
         <div class="row pb-3">
           <div class="col-sm-12">
             <label>Ghi chú</label>

@@ -48,7 +48,7 @@
 <div class="form-group row">
   <div class="col-sm-4">
     <label>Mã lệnh SAP</label>
-    <input type="text" class="form-control" placeholder="Mã lệnh" name="workOrderId" readonly [(ngModel)]="form.sapWo">
+    <input type="text" class="form-control" placeholder="Mã lệnh" name="sapWo" readonly [(ngModel)]="form.sapWo">
   </div>
 
 
@@ -83,7 +83,10 @@
       style="margin-right: 10px;">Hồ sơ</a>
     <a href="{{form.udocURL2 != '' ? form.udocURL2 :'#'}}" target="_blank" class="btn btn-primary"
       style="margin-right: 10px;">Chương trình</a>
-    <button class="btn btn-info" (click)="open(myModal)" style="margin-right: 10px;">
+    <!-- <button class="btn btn-info" (click)="open(myModalNew,1)" style="margin-right: 10px;">
+      <i class="fa fa-info"> Thông tin Scada</i>
+    </button> -->
+    <button class="btn btn-info" (click)="open(myModal,2)" style="margin-right: 10px;">
       <i class="fa fa-info"> Thông tin Scada</i>
     </button>
     <button class="btn btn-success" (click)="exportExcelDetail()" type="submit">
@@ -128,9 +131,53 @@
           <th>Số lỗi</th>
         </thead>
         <tbody class="table table-border">
-          <tr *ngFor="let error of recipient.value.errorLst| keyvalue">
+          <tr *ngFor="let error of recipient.value.errorLst| keyvalue | filterErrors">
             <td>{{error.key}}</td>
             <td>{{error.value}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+
+
+
+
+  </div>
+</ng-template>
+<ng-template #myModalNew let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      Thông tin máy sản xuất
+    </h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+
+    <div class="col-md-12" *ngFor="let recipient of scadaMacine ">
+      <button class="btn btn-success" style="margin-right: 10px;" (click)="detailError(machine.ids)">
+        {{recipient.name}}
+      </button>
+
+      <div class="col-md-6">
+        <p>Số lượng đầu ra : <strong>{{recipient.numberOutput}}</strong></p>
+
+      </div>
+      <div class="col-md-6">
+        <p>Số lượng đầu vào : <strong>{{recipient.numberInput}}</strong></p>
+      </div>
+
+
+      <table class="table table-bordered">
+        <thead>
+          <th>Thông tin lỗi</th>
+          <th>Số lỗi</th>
+        </thead>
+        <tbody class="table table-border">
+          <tr *ngFor="let error of recipient.errors">
+            <td>{{error.error}}</td>
+            <td>{{error.values}}</td>
           </tr>
         </tbody>
       </table>

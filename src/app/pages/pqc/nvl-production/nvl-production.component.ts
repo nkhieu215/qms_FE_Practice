@@ -26,6 +26,9 @@ import { ErrorList } from 'src/app/share/_models/errorList.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { ErrorListService } from 'src/app/share/_services/errorlist.service';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
 type AOA = any[][];
 
 @Component({
@@ -38,7 +41,7 @@ type AOA = any[][];
 export class NvlProductionComponent implements OnInit {
   // ------------------------------------------------ list item ----------------------------------------------
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'check-nvl-new';
@@ -151,33 +154,45 @@ export class NvlProductionComponent implements OnInit {
       console.log(this.lstCheck);
 
     } else {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe(
-        (data) => {
+      // Sử dụng forkJoin để thực hiện các yêu cầu song song
+      forkJoin({
+        lstbom: this.http.get<any>(`${this.address}/pqc-nvl/list-bom/${id}`),
+        lstPqcDrawNvl: this.http.get<any>(`${this.address}/pqc-nvl/draw-nvl/${id}`)
+      }).subscribe(
+        ({ lstbom, lstPqcDrawNvl }) => {
+          console.log('check new api lst bom :: ', lstbom);
+          console.log('check new api lst draw nvl :: ', lstPqcDrawNvl);
+
           const check: any[] = [{ id: 0 }];
-          this.form = data.pqcWorkOrder;
-          this.filteredData = this.lstbom = data.pqcWorkOrder.lstbom;
-          this.lstCheck = data.pqcWorkOrder.lstPqcDrawNvl;
+          this.filteredData = this.lstbom = lstbom;
+          this.lstCheck = lstPqcDrawNvl.sort((a: any, b: any) => a.checkTime - b.checkTime);
+
           this.lstCheck.forEach(element => {
             element.ids = Utils.randomString(5);
           });
-          console.log('list lstbom', this.lstError, this.lstbom)
+
+          console.log('list lstbom', this.lstError, this.lstbom);
+
           this.filteredData.forEach(item => {
             item.sumQuantity = 0;
             item.sumError = 0;
+
             this.lstError.forEach((error: any) => {
               if (error.pqcBomWorkOrderId == item.id) {
                 item.sumError += error.quantity;
-                var result = check.find((x: any) => x.id == error.pqcBomQuantityId);
+                const result = check.find((x: any) => x.id == error.pqcBomQuantityId);
                 if (!result) {
                   const data = { id: error.pqcBomQuantityId };
                   check.push(data);
                   item.sumQuantity += error.quantity2;
                 }
               }
-            })
-          })
+            });
+          });
         },
-        (err) => { }
+        error => {
+          console.error('Error occurred while fetching data:', error);
+        }
       );
     }
 

@@ -4,8 +4,8 @@ export class TinCheck {
   public batchId = null;
   public line = null;
   public checkPerson = null;
-  public checkTime = null;
-  public createdAt = null;
+  public checkTime?: string;
+  public createdAt?: Date;
   public updatedAt?: Date;
   public expiryDate = null;
   public quatity?: number;

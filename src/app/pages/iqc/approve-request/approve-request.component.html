@@ -323,11 +323,8 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-4">
-              <label>Đề nghị của bộ phận kiểm tra</label>
-              <input type="text" readonly class="form-control" placeholder="Mã PO" name="suggestion"
-                [(ngModel)]="form.suggestion" />
-            </div>
+            <!-- <div class="col-sm-4">
+            </div> -->
             <div class="col-sm-4">
               <label>Kết luận của bộ phận kiểm tra</label>
               <select class="form-control" name="conclusion" [(ngModel)]="form.conclusion" #type="ngModel"
@@ -338,6 +335,15 @@
               </select>
               <input type="text" class="form-control" name="itemType" [(ngModel)]="form.conclusion" #name="ngModel"
                 *ngIf="actRoute.snapshot.params['type'] == 'show'" readonly />
+            </div>
+          </div>
+          <div class="row">
+            <div class="row pb-3">
+              <div class="col-sm-12">
+                <label>Đề nghị của bộ phận kiểm tra</label>
+                <input type="text" readonly class="form-control" placeholder="Mã PO" name="suggestion"
+                  [(ngModel)]="form.suggestion" />
+              </div>
             </div>
           </div>
           <div class="row">
@@ -608,8 +614,8 @@
                     <td><input type="text" placeholder="Max" class="form-control" name="maxAudit[{{i}}]"
                         [(ngModel)]="auditLKDT.maxAudit" readonly></td>
                     <td>
-                      <select class="form-control" name="checkResult[{{i}}]" [(ngModel)]="auditLKDT.checkResult"
-                        #type="ngModel" disabled>
+                      <select class="form-control" [ngModelOptions]="{ standalone: true }"
+                        [(ngModel)]="auditLKDT.checkResult" #type="ngModel" disabled>
                         <option value="Đạt">Đạt</option>
                         <option value="Không đạt">Không đạt</option>
                         <option value="Nhân nhượng">Nhân nhượng</option>

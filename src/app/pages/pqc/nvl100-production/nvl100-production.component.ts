@@ -16,6 +16,9 @@ import { HttpClient } from '@angular/common/http';
 import { ShowComponent } from '../show/show.component';
 import { async } from 'rxjs/internal/scheduler/async';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { forkJoin } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-nvl100-production',
   templateUrl: './nvl100-production.component.html',
@@ -41,7 +44,7 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class Nvl100ProductionComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   //Điều kiện triển khai hiện tại
@@ -91,8 +94,13 @@ export class Nvl100ProductionComponent implements OnInit {
   classError?: string;
   lstbom: Bom[] = [];
   lstScan: any[] = [];
+  pagedScan: any[] = []; // Dữ liệu hiển thị theo trang
+  // danh sách scan thất bại
   lstScanFail: any[] = [];
-
+  pagedScanFail: any[] = []; // Dữ liệu hiển thị theo trang
+  pageSize: number = 10; // Số lượng bản ghi trên mỗi trang
+  currentPage: number = 1; // Trang hiện tại
+  //==========================================================
   lstbomData: Bom[] = [];
   lstScanView: NVLScan[] = [];
   profile: Profile = new Profile;
@@ -112,75 +120,10 @@ export class Nvl100ProductionComponent implements OnInit {
 
   machineDetail?: MachineDetail;
 
-  // @HostListener('document:keydown', ['$event'])
-  // clickout(event: any) {
-  //   if (event.code == 'Enter') {
-  //     this.text = this.replaceAll(this.text, 'Shift', '');
-  //     this.text = this.replaceAll(this.text, 'Backspace', '');
-  //     this.text = this.replaceAll(this.text,'CapsLock','');
-  //     this.text = this.replaceAll(this.text,'Control','')
-  //     this.text = this.replaceAll(this.text,'Alt','')
-
-  //     console.log(this.text);
-
-  //     if(!this.strMachine){
-  //       this.strMachine = this.text;
-  //       this.form.machineCode = this.strMachine;
-  //       this.text = "";
-  //       // check machine
-  //       return;
-  //     }
-
-  //     let side = this.form.side ?? '';
-  //     // if(!side){
-  //     //   Swal.fire({
-  //     //     title: 'Lỗi',
-  //     //     text: 'Bạn chưa thực hiện chọn thông tin mặt máy. Vui lòng lựa chọn mặt máy và scan lại.',
-  //     //     allowEnterKey: false,
-  //     //     icon: 'warning',
-  //     //   })
-
-  //     //   this.text = "";
-  //     //   return;
-  //     // }
-
-  //     // get machine detail
-  //     this.checkMachine();
-
-  //     if(!this.strFeeder){
-  //       this.strFeeder = this.text;
-  //       this.form.feeder = this.strFeeder;
-  //       this.text = "";
-  //       return;
-  //     }
-
-  //     if(!this.strMaterial ){
-  //       this.strMaterial = this.text;
-  //       this.strQr = this.text;
-  //       let materialArr =  this.strMaterial.split("#");
-  //       this.strMaterial = materialArr[0];
-  //       this.partnumber = materialArr[1];
-  //       this.form.material = this.strMaterial;
-  //       this.text = "";
-  //     }
-
-  //     this.checkFeeder();
-
-  //   }
-  //   if (event.code != 'Shift' && event.code != 'Enter') {
-  //     this.text += event.key;
-  //   }
-  // }
+  trackById(index: number, item: any): string {
+    return item.id; // Hoặc bất kỳ thuộc tính nào là duy nhất
+  }
   checkScan() {
-    // if (event.code == 'Enter') {
-    // this.text = this.replaceAll(this.text, 'Shift', '');
-    // this.text = this.replaceAll(this.text, 'Backspace', '');
-    // this.text = this.replaceAll(this.text, 'CapsLock', '');
-    // this.text = this.replaceAll(this.text, 'Control', '')
-    // this.text = this.replaceAll(this.text, 'Alt', '')
-
-    // console.log(this.text);
-
     if (!this.strMachine) {
       var result = this.lstScanFail.find(x => x.confirm == false || x.confirm == 'false');
       if (result && this.condition == true) {
@@ -200,17 +143,6 @@ export class Nvl100ProductionComponent implements OnInit {
     }
 
     let side = this.form.side ?? '';
-    // if(!side){
-    //   Swal.fire({
-    //     title: 'Lỗi',
-    //     text: 'Bạn chưa thực hiện chọn thông tin mặt máy. Vui lòng lựa chọn mặt máy và scan lại.',
-    //     allowEnterKey: false,
-    //     icon: 'warning',
-    //   })
-
-    //   this.text = "";
-    //   return;
-    // }
 
     // get machine detail
     this.checkMachine();
@@ -252,11 +184,6 @@ export class Nvl100ProductionComponent implements OnInit {
     }
 
     this.checkFeeder();
-
-    // }
-    // if (event.code != 'Shift' && event.code != 'Enter') {
-    //   this.text += event.key;
-    // }
   }
 
   replaceAll(str: string, find: string, replace: string) {
@@ -314,11 +241,17 @@ export class Nvl100ProductionComponent implements OnInit {
     const id = this.actRoute.snapshot.params['id'];
     this.idWorkOrder = id;
     const type = this.actRoute.snapshot.params['type'];
-    this.pqcService.getDetailPqcWorkOrder(id).subscribe(
-      data => {
-        this.form = data.pqcWorkOrder;
-        console.log('hello', data);
-        this.lstScanDto = data.pqcWorkOrder.lstPqcScan100;
+
+    // Sử dụng forkJoin để thực hiện các yêu cầu song song
+    forkJoin({
+      lstPqcScan100: this.http.get<any>(`${this.address}/scan-100/${id}`),
+      wo: this.http.get<any>(`${this.address}/pqc-wo/${id}`)
+    }).subscribe(
+      ({ lstPqcScan100, wo }) => {
+        console.log("check new data scan 100 :: ");
+        this.lstScanDto = lstPqcScan100.sort((a: any, b: any) => a.date - b.date);
+        this.form.workOrderId = wo[0][0];
+
         if (this.lstScanDto && this.lstScanDto.length > 0) {
           this.lstScanDto.forEach(element => {
             let data = {
@@ -340,23 +273,53 @@ export class Nvl100ProductionComponent implements OnInit {
             };
 
             if (element.status == 1) {
-              this.lstScan.push(data);
+              this.lstScan = [data, ...this.lstScan];
             } else {
-              this.lstScanFail = [data, ... this.lstScanFail];
+              this.lstScanFail = [data, ...this.lstScanFail];
             }
           });
+          this.updatePagedData(3);
         }
+
         if (this.form.status == 'CREATE') {
           this.show = false;
         } else {
           this.show = true;
         }
+
         this.getProfileDetail();
       },
-      err => {
-
+      error => {
+        console.error("Error occurred while fetching data:", error);
       }
     );
+  }
+
+  // Hàm xử lý khi chuyển trang
+  onPageChange(page: number, type: any): void {
+    this.currentPage = page;
+    this.updatePagedData(type);
+  }
+  // Hàm xử lý khi thay đổi số lượng bản ghi trên mỗi trang
+  onPageSizeChange(size: number, type: any): void {
+    this.pageSize = size;
+    this.currentPage = 1; // Reset về trang đầu tiên
+    this.updatePagedData(type);
+  }
+  // Cập nhật dữ liệu hiển thị theo trang
+  updatePagedData(type: any): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    if (type === 1) {
+      this.pagedScanFail = this.lstScanFail.slice(startIndex, endIndex);
+    } else if (type === 2) {
+      this.pagedScan = this.lstScan.slice(startIndex, endIndex);
+    } else if (type === 3) {
+      this.pagedScan = this.lstScan.slice(startIndex, endIndex);
+      this.pagedScanFail = this.lstScanFail.slice(startIndex, endIndex);
+    }
+    // console.log("check paged data: ", this.pagedScanFail, this.currentPage, this.pageSize, this.lstScanFail.length);
+    console.log("check paged data: ");
   }
   checkMachine() {
     let machineCode = this.strMachine;
@@ -383,7 +346,8 @@ export class Nvl100ProductionComponent implements OnInit {
                 }
               })
             })
-            console.log("lst partNumber: ", this.lstPartNumber)
+            // console.log("lst partNumber: ", this.lstPartNumber);
+            console.log("lst partNumber: ");
           }, 100);
         }
 
@@ -398,7 +362,6 @@ export class Nvl100ProductionComponent implements OnInit {
       this.lstScanFail = [data, ... this.lstScanFail]
       this.scan100.createUpdate(data).subscribe(
         data => {
-          console.log('hello', data)
           this.lstScanFail[0].id = data.id;
           this.lstScanFail[0].createdAt = data.createdAt;
           this.lstScanFail[0].updatedAt = data.updatedAt;
@@ -447,7 +410,7 @@ export class Nvl100ProductionComponent implements OnInit {
         //   })
         // } else {
         this.http.post<any>(`${this.address}/scan-100/send-message`, { workOrder: sessionStorage.getItem('workOrder'), machine: this.lstScanFail[index].machine, status: true }).subscribe((res: any) => {
-          console.log("check mss: ", res);
+          console.log("check mss updated: ");
         })
         // }
         Swal.fire({
@@ -470,7 +433,7 @@ export class Nvl100ProductionComponent implements OnInit {
   sendMessage(mss: any) {
     if (mss === false) {
       this.http.post<any>(`${this.address}/scan-100/send-message`, { workOrder: sessionStorage.getItem('workOrder'), machine: this.strMachine, status: mss }).subscribe((res: any) => {
-        console.log("check mss: ", res);
+        console.log("check mss send : ");
       })
     } else {
       Swal.fire({
@@ -485,7 +448,7 @@ export class Nvl100ProductionComponent implements OnInit {
           } else {
             this.strMachine = value;
             this.http.post<any>(`${this.address}/scan-100/send-message`, { workOrder: sessionStorage.getItem('workOrder'), machine: this.strMachine, status: mss }).subscribe((res: any) => {
-              console.log("check mss: ", res);
+              console.log("check mss result: ");
             })
             return ""
           }
@@ -500,14 +463,15 @@ export class Nvl100ProductionComponent implements OnInit {
     let resetFocus = false;
     this.lstFeeder.forEach(e => {
       if (this.strFeeder == e.qrFeederCode) {
-        console.log("Check feeder:: ", this.lstFeeder);
+        // console.log("Check feeder scan :: ", this.lstFeeder);
         this.dnlnvl![0].partNumber.forEach((x: any) => {
-          if (x.name == this.partnumber) {
-            console.log("Check PARTNUMBER:: ", this.partnumber, x.name);
-            var result = x.lstFeeder.find((z: any) => z == this.strFeeder);
-            var result2 = x.lstMachine.find((z: any) => z == this.form.machineCode);
-            if (result == undefined) {
-              console.log("Check feeder feeder :: ", result);
+          console.log("1 Check PARTNUMBER cussess :: ", this.partnumber, x.name);
+          if (x.name === this.partnumber) {
+            console.log("1.1 Check PARTNUMBER cussess :: ", this.partnumber, x.name);
+            var result = x.lstFeeder.find((z: any) => z === this.strFeeder);
+            var result2 = x.lstMachine.find((z: any) => z === this.form.machineCode);
+            if (result) {
+              console.log(`2 Check feeder :: ${result} - feeder scan :: ${this.strFeeder}`);
             } else {
               checkFeeder = true;
             }
@@ -515,60 +479,61 @@ export class Nvl100ProductionComponent implements OnInit {
         })
       }
     })
-
-    if (!checkFeeder) {
-      let data = { workOrderId: this.actRoute.snapshot.params['id'], machine: this.strMachine, side: this.form.side, feeder: this.form.feeder, material: this.strMaterial, pathNumber: this.strQr!.split("#")[1], qr: this.strQr, status: false, date: formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US'), reason: 'Lỗi feeder', confirm: false, timeConfirmed: null };
-      // var resultScan = this.lstScanFail.find(x => x.machine === data.machine && x.feeder === data.feeder && x.material === data.material);
-      // if (resultScan === undefined) {
-      this.lstScanFail = [data, ... this.lstScanFail]
-      this.scan100.createUpdate(data).subscribe(
-        data => {
-          this.lstScanFail[0].id = data.id;
-          this.lstScanFail[0].createdAt = data.createdAt;
-          this.lstScanFail[0].updatedAt = data.updatedAt;
-        },
-        error => {
-          Swal.fire({
-            title: 'Lỗi',
-            text: '"Có lỗi xảy ra vui lòng thử lại sau.',
-            allowEnterKey: false,
-            icon: 'warning',
+    setTimeout(() => {
+      if (checkFeeder === true) {
+        let data = { workOrderId: this.actRoute.snapshot.params['id'], machine: this.strMachine, side: this.form.side, feeder: this.form.feeder, material: this.strMaterial, pathNumber: this.strQr!.split("#")[1], qr: this.strQr, status: false, date: formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US'), reason: 'Lỗi feeder', confirm: false, timeConfirmed: null };
+        // var resultScan = this.lstScanFail.find(x => x.machine === data.machine && x.feeder === data.feeder && x.material === data.material);
+        // if (resultScan === undefined) {
+        this.lstScanFail = [data, ... this.lstScanFail]
+        this.scan100.createUpdate(data).subscribe(
+          data => {
+            this.lstScanFail[0].id = data.id;
+            this.lstScanFail[0].createdAt = data.createdAt;
+            this.lstScanFail[0].updatedAt = data.updatedAt;
+          },
+          error => {
+            Swal.fire({
+              title: 'Lỗi',
+              text: '"Có lỗi xảy ra vui lòng thử lại sau.',
+              allowEnterKey: false,
+              icon: 'warning',
+            })
           })
-        })
-      // Swal.fire({
-      //   title: 'Lỗi',
-      //   text: 'Không tìm thấy thông tin feeder.',
-      //   allowEnterKey: false,
-      //   icon: 'warning',
-      // })
-      setTimeout(() => {
-        console.log("feeder:: " + this.strFeeder)
-        this.form.feeder = "";
-        this.strFeeder = undefined;
-        this.strMaterial = undefined;
-        this.form.material = undefined;
-        this.partnumber = "";
-        this.openAlert("Thông tin Feeder không hợp lệ");
-        // if (this.condition == true) { // set cho line 12
-        this.sendMessage(false);
-        // }
+        // Swal.fire({
+        //   title: 'Lỗi',
+        //   text: 'Không tìm thấy thông tin feeder.',
+        //   allowEnterKey: false,
+        //   icon: 'warning',
+        // })
         setTimeout(() => {
-          // if (this.condition == true) {// set cho line 12
-          this.open(this.templateRefs, '');
+          // console.log("feeder:: " + this.strFeeder)
+          this.form.feeder = "";
+          this.strFeeder = undefined;
+          this.strMaterial = undefined;
+          this.form.material = undefined;
+          this.partnumber = "";
+          this.openAlert("Thông tin Feeder không hợp lệ");
+          // if (this.condition == true) { // set cho line 12
+          this.sendMessage(false);
           // }
-          const input = document.getElementById('feeder-code');
-          if (input) {
-            input.focus();
-            // console.log('focus')
-          }
-        }, 3500);
-      }, 100);
-      return;
-    }
+          setTimeout(() => {
+            // if (this.condition == true) {// set cho line 12
+            this.open(this.templateRefs, '');
+            // }
+            const input = document.getElementById('feeder-code');
+            if (input) {
+              input.focus();
+              // console.log('focus')
+            }
+          }, 3500);
+        }, 100);
+        return;
+      }
 
+    }, 200);
     this.dnlnvl![0].partNumber.forEach((p: any) => {
       if (this.partnumber === p.name) {
-        console.log("lst machine: ", p.lstMachine)
+        // console.log("lst machine: ", p.lstMachine)
         this.lstPartNumber = [];
         p.lstMachine.forEach((z: string) => {
           this.dnlnvl![0].machine.forEach(x => {
@@ -582,7 +547,7 @@ export class Nvl100ProductionComponent implements OnInit {
       }
     })
     setTimeout(() => {
-      console.log("lst partNumber 2: ", this.lstPartNumber)
+      // console.log("lst partNumber 2: ", this.lstPartNumber)
       this.lstPartNumber.forEach(e => {
         console.log("name : " + e.name + " | " + this.partnumber)
         if (e.name == this.partnumber) {
@@ -595,15 +560,15 @@ export class Nvl100ProductionComponent implements OnInit {
                 if (k === this.strMachine) {
                   console.log("5 name : ")
                   console.log("check part : " + p.name + " | " + this.partnumber)
-                  var result = p.lstFeeder.find((z: any) => z == this.strFeeder);
+                  var result = p.lstFeeder.find((z: any) => z === this.strFeeder);
                   if (result == undefined) {
                   } else {
-                    console.log("Check feeder :: ", checkFeeder)
+                    console.log("3 Check feeder :: ", checkFeeder)
                     // this.lstMachineOrigin.forEach(z => {
                     // z.partNumber.forEach((itemPartNumber: any) => {
                     //   console.log("6 name : " + itemPartNumber + " | " + this.partnumber + " | " + z.replaceQrFeeder + " | " + this.strFeeder)
                     //   if (itemPartNumber === this.partnumber) {// sai logic
-                    console.log("check : ", checkPartNumber)
+                    console.log("4 check partnumber :: ", checkPartNumber)
                     checkPartNumber = true;
                     this.lstMaterial = [];
                     this.lstMaterial = e.materials;
@@ -622,7 +587,7 @@ export class Nvl100ProductionComponent implements OnInit {
           })
         }
       })
-      console.log("Check parnumber and material:: " + checkMaterial + " | checkPartNumber:: " + checkPartNumber)
+      console.log("5 Check parnumber and material:: " + checkMaterial + " | checkPartNumber:: " + checkPartNumber)
 
       let data: any;
       if (!checkPartNumber || !checkMaterial) {
@@ -663,7 +628,7 @@ export class Nvl100ProductionComponent implements OnInit {
             })
         }
       }
-      console.log('checkPartNumber ::' + checkPartNumber + ' checkMaterial ::' + checkMaterial)
+      console.log('6 checkPartNumber ::' + checkPartNumber + ' checkMaterial ::' + checkMaterial)
       if (!checkPartNumber) {
         this.openAlert("PartNumber không hợp lệ");
         // if (this.condition == true) { //set cho line 12
@@ -738,35 +703,6 @@ export class Nvl100ProductionComponent implements OnInit {
         }
       }, 1500);
     }, 100);
-
-    // this.machineDetail?.feedersPrograming.forEach(feederDetail=>{
-    //   console.log("feeder :: " +  feeder + " | feederDetail.qrFeederCode :: " + feederDetail.qrFeederCode)
-
-    //   if(feeder ==feederDetail.qrFeederCode ){
-    //     checkFeeder = true;
-    //     console.log("feederDetail :: " +feederDetail)
-    //     console.log("feeder :: " + feeder)
-    //     console.log("dnlnvlDetailOfMaterial :: " + feederDetail.dnlnvlDetailOfMaterial);
-
-    //     feederDetail.dnlnvlDetailOfMaterial.forEach(materialDetail=>{
-    //       console.log("materialDetail: " + materialDetail.materialId + "  | material: " + material)
-    //       if(material == materialDetail.materialId){
-    //         checkMaterial = true;
-    //       }
-    //     })
-    //   }
-    // })
-
-
-    // let data;
-    // if(!checkMaterial){
-    //   Swal.fire("Lỗi","Không tìm thấy thông tin material tương ứng với feeder", "error")
-    //    data = {workOrderId:this.actRoute.snapshot.params['id'] ,machine:this.strMachine, side:this.form.side,feeder:this.strFeeder,material:this.strMaterial,qr:this.strQr, status:false,date: formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US')};
-    //   this.lstScanFail = [data,... this.lstScanFail];
-    // }else{
-    //    data ={workOrderId :this.actRoute.snapshot.params['id'],machine:this.strMachine, side:this.form.side,feeder:this.strFeeder,material:this.strMaterial,qr:this.strQr, status:true,date: formatDate(new Date(), 'dd/MM/yyyy HH:mm', 'en_US')};
-    //   this.lstScan.push(data);
-    // }
 
 
   }
@@ -1036,7 +972,7 @@ export class Nvl100ProductionComponent implements OnInit {
         })
       })
       this.lstPartNumberAvailable = this.lstPartNumberAvailableOrigin;
-      console.log(this.lstPartNumberAvailable)
+      // console.log(this.lstPartNumberAvailable)
     }
     if (idBom === 'scan') {
       this.lstMaterialScan = [];
@@ -1061,7 +997,7 @@ export class Nvl100ProductionComponent implements OnInit {
       setTimeout(() => {
         this.lstMaterialScan = this.lstMaterialScanOrigin.sort((a: any, b: any) => a.status.localeCompare(b.status));
       }, 1000);
-      console.log(this.lstMaterialScan)
+      // console.log(this.lstMaterialScan)
     }
   }
   searchByPartNumber() {
@@ -1139,7 +1075,7 @@ export class Nvl100ProductionComponent implements OnInit {
                       x.lstFeeder.forEach((y: any) => {
                         var feeder = itemSubPart.lstFeeder.find((z: any) => z == y);
                         if (!feeder) {
-                          console.log('add feeder: ', y, itemSubPart.name);
+                          // console.log('add feeder: ', y, itemSubPart.name);
                           itemSubPart.lstFeeder = [y, ...itemSubPart.lstFeeder];
                         }
                       })
@@ -1235,8 +1171,8 @@ export class Nvl100ProductionComponent implements OnInit {
           }, 1000);
         })
       }, 200)
-      console.log('check machine', this.lstMachineOrigin)
-      console.log('check subfeeder -2', lstSubFeeder)
+      console.log('check machine')
+      console.log('check subfeeder -2')
     })
   }
   openAlert(mss: any) {

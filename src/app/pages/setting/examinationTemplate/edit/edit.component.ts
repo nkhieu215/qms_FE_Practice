@@ -19,6 +19,8 @@ import Utils from 'src/app/share/_utils/utils';
 import { HttpClient } from '@angular/common/http';
 import { OitmService } from 'src/app/share/_services/oitmservice';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
@@ -26,7 +28,7 @@ import { AuthService } from 'src/app/share/_services/auth.service';
 })
 export class ExaminationEditComponent implements OnInit {
   // bản test
-  address = 'http://localhost:8449';
+  address = environment.api_end_point;
   // hệ thống
   //address = 'http://192.168.68.92/qms';
   path = 'api/testing-critical';

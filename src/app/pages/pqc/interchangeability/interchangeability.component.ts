@@ -20,6 +20,8 @@ import { ScadaRequestService } from 'src/app/share/_services/scada-request.servi
 import { Interchangeability } from 'src/app/share/_models/interchangeability.model';
 import { ErrorListResponse } from 'src/app/share/response/errorList/ExaminationResponse';
 import { AuthService } from 'src/app/share/_services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-interchangeability',
@@ -28,6 +30,10 @@ import { AuthService } from 'src/app/share/_services/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class InterchangeabilityComponent implements OnInit {
+  // bản test
+  address = environment.api_end_point;
+  // hệ thống
+  //address = 'http://192.168.68.92/qms';
   @Input() show_check = '';
   idWorkOrder?: string;
   show_work_order = true;
@@ -45,7 +51,8 @@ export class InterchangeabilityComponent implements OnInit {
     private interchangeabilityService: InterchangeabilityService,
     private scadaService: ScadaRequestService,
     private _formBuilder: FormBuilder,
-    protected autoLogout: AuthService
+    protected autoLogout: AuthService,
+    protected http: HttpClient,
   ) { }
 
   page = 1;
@@ -138,9 +145,11 @@ export class InterchangeabilityComponent implements OnInit {
     }
 
     if (id) {
-      this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
-        this.form = data.pqcWorkOrder;
-        this.lstInterchangeabilityCompCheckResponse = data.pqcWorkOrder.lstInter;
+      this.http.get<any>(`${this.address}/pqc-interchangeability-check/${id}`).subscribe(lstInter => {
+
+        // this.pqcService.getDetailPqcWorkOrder(id).subscribe((data) => {
+        // this.form = data.pqcWorkOrder;
+        this.lstInterchangeabilityCompCheckResponse = lstInter.sort((a: any, b: any) => a.checkTime - b.checkTime);
         if (this.lstInterchangeabilityCompCheckResponse != null)
           this.lstInterchangeabilityCompCheckResponse.forEach((element) => {
             var check = new Interchangeability();
@@ -166,10 +175,11 @@ export class InterchangeabilityComponent implements OnInit {
             this.lstInterchangeabilityompCheck.push(check);
           });
         setTimeout(() => {
-          this.lstInterchangeabilityompCheck.sort((a: any, b: any) => b.createdAt - a.createdAt);
+          this.lstInterchangeabilityompCheck.sort((a: any, b: any) => a.checkTime - b.checkTime);
         }, 300);
-        console.log(this.lstInterchangeabilityCompCheckResponse)
-      });
+        console.log('check data lst inter :: ', this.lstInterchangeabilityCompCheckResponse)
+        // });
+      })
     }
 
 

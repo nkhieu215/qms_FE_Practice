@@ -6,7 +6,7 @@ export class SolderCompCheck {
   public machineName = null;
   public checkPerson = null;
   public checkTime = null;
-  public createdAt = null;
+  public createdAt?: Date;
   public updatedAt?: Date;
 
   public quatity?: number;

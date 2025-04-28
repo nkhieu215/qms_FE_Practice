@@ -60,6 +60,7 @@ export class MakeProductOrderComponent implements OnInit {
         console.log('list', this.lstWorkOrder)
         this.lstWorkOrder?.forEach(element => {
           element.strStatus = Utils.getStatusName(element.status);
+          element.checkDaq = element.checkDaq === 'true' && element.checkDaqStatus === 'true' ? true : false;
         })
 
         this.collectionSize = Number(productionLst?.total) * this.pageSize;

@@ -63,7 +63,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let scan of lstScan let i=index;">
+                <tr *ngFor="let scan of pagedScan ;let i=index;trackBy: trackById">
                   <td>{{scan.machine}}</td>
                   <!-- <td>{{scan.side}}</td> -->
                   <td>{{scan.feeder}}</td>
@@ -76,12 +76,16 @@
             </nz-table>
           </div>
         </div>
-
+        <div class="pagination-container">
+          <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="lstScan.length" [nzPageSize]="pageSize"
+            [nzShowSizeChanger]="true" [nzShowQuickJumper]="true" (nzPageIndexChange)="onPageChange($event,2)"
+            (nzPageSizeChange)="onPageSizeChange($event,2)"></nz-pagination>
+        </div>
 
         <div class="form-group row">
           <div class="col-sm-12 table-responsive">
             <nz-table #borderedTable nzBordered
-              nzTitle="Danh sách nguyên vật liệu không thuộc khuyến nghị theo lệnh sản xuất" [nzData]="['']"
+              nzTitle="Danh sách nguyên vật liệu không thuộc khuyến nghị theo lệnh sản xuất" [nzData]="[pagedScanFail]"
               [nzFrontPagination]="false">
               <thead>
                 <tr>
@@ -95,7 +99,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let scan of lstScanFail">
+                <tr *ngFor="let scan of pagedScanFail">
                   <td>{{scan.machine}}</td>
                   <!-- <td>{{scan.side}}</td> -->
                   <td>{{scan.feeder}}</td>
@@ -108,7 +112,11 @@
             </nz-table>
           </div>
         </div>
-
+        <div class="pagination-container">
+          <nz-pagination [(nzPageIndex)]="currentPage" [nzTotal]="lstScanFail.length" [nzPageSize]="pageSize"
+            [nzShowSizeChanger]="true" [nzShowQuickJumper]="true" (nzPageIndexChange)="onPageChange($event,1)"
+            (nzPageSizeChange)="onPageSizeChange($event,1)"></nz-pagination>
+        </div>
 
         <app-button-success item_type="CHECK_NVL" show_work_order="{{show_work_order}}"
           *ngIf="show_work_order"></app-button-success>

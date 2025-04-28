@@ -133,6 +133,7 @@
               <th>Mã đơn hàng</th>
               <th scope="col">Trạng thái</th>
               <th scope="col">Ngày thực hiện</th>
+              <th scope="col">Kết quả DAQ</th>
               <th scope="col">Tùy chọn</th>
             </tr>
           </thead>
@@ -152,8 +153,12 @@
 
               <td>{{work.strStatus}}</td>
               <td>{{work.createdAt| date:'dd/MM/yyyy'}}</td>
+              <td style="    text-align: center;
+              vertical-align: middle;"><input type="checkbox" [checked]="work.checkDaq" disabled
+                  class="custom-checkbox">
+              </td>
               <td>
-                <a class="btn btn-sm btn-info" target="_blank" routerLink="/pqc/pqc-show-detail/{{work.id}}"
+                <a class="btn btn-sm btn-info" target="_blank" routerLink="/pqc/pqc-show-detail/show/{{work.id}}"
                   style="margin-right: 5px;" title="Chi tiết thông tin"><i class="fa fa-eye"></i></a>
 
                 <a class="btn btn-sm btn-primary" target="_blank" routerLink="/pqc/approve/approve/{{work.id}}"
@@ -250,24 +255,24 @@
         <div class="form-group" style="margin-top: 20px;">
           <button class="btn" routerLink="/pqc/approve"><i class="fa fa-list"></i> Danh sách</button>
 
-          <button *ngIf="approve" class="btn btn-primary" type="submit" (click)="onSubmit('approve')"
+          <button *ngIf="approve" class="btn btn-primary" type="submit" (click)="checkConditionReject('approve')"
             style="margin-left: 30px;">
             <i class="fa fa-save"></i>
             Phê duyệt yêu cầu
           </button>
 
-          <button *ngIf="approve" class="btn btn-warning" type="submit" (click)="onSubmit('concessions')"
+          <button *ngIf="approve" class="btn btn-warning" type="submit" (click)="checkConditionReject('concessions')"
             style="margin-left: 30px;">
             <i class="fa fa-check"></i>
             Nhân nhượng
           </button>
 
-          <button *ngIf="approve" class="btn btn-danger" type="submit" (click)="onSubmit('reject')"
+          <button *ngIf="approve" class="btn btn-danger" type="submit" (click)="checkConditionReject('reject')"
             style="margin-left: 30px;">
             <i class="fa fa-check"></i>
             Từ chối yêu cầu
           </button>
-          <button *ngIf="approve" class="btn btn-danger" type="submit" (click)="onSubmit('not_approve')"
+          <button *ngIf="approve" class="btn btn-danger" type="submit" (click)="checkConditionReject('not_approve')"
             style="margin-left: 30px; background-color:#F86E51 ;border: #F86E51;">
             <i class="fa fa-check"></i>
             Không đạt nhập kho

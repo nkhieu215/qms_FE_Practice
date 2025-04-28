@@ -58,8 +58,12 @@ import { TemInComponent } from './tem-in/tem-in.component';
 import { TemInLstComponent } from './tem-in-lst/tem-in-lst.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { FilterErrorsPipe } from './show/filter-errors.pipe';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 @NgModule({
   declarations: [
+    FilterErrorsPipe,
     PendingProductOrderComponent,
     MakeProductOrderComponent,
     MakeOrderProductCRUDComponent,
@@ -94,7 +98,8 @@ import { NzInputModule } from 'ng-zorro-antd/input';
   ],
   imports: [
     CommonModule,
-
+    ScrollingModule,
+    NzPaginationModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,

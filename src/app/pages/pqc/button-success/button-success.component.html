@@ -1,4 +1,4 @@
-<div class="form-group" style="margin-top: 20px;"  *ngIf="show_work_order == 'true'">
+<div class="form-group" style="margin-top: 20px;" *ngIf="show_work_order == 'true'">
   <button class="btn  btn-secondary" routerLink="{{ strUrl }}"><i class="fa fa-list"></i> Danh sách</button>
 
   <!-- <button class="btn btn-primary" type="submit" *ngIf="show_work_order == 'true'"
@@ -7,10 +7,22 @@
       Lưu thông tin
   </button> -->
 
-  <button class="btn btn-success" type="submit" *ngIf="showButtonSuccess"
+  <button class="btn btn-success" type="submit" *ngIf="showButtonSuccess && item_type!=='STORE_CHECK'"
     (click)="onSubmit('finish')" style="margin-left: 30px;">
     <i class="fa fa-save"></i>
     Hoàn thành
   </button>
-
+  <button class="btn btn-success" type="submit"
+    *ngIf="showButtonSuccess && item_type==='STORE_CHECK' && checkDAQ === false" (click)="onSubmit('finish')"
+    style="margin-left: 30px;">
+    <i class="fa fa-save"></i>
+    Hoàn thành
+  </button>
+  <button class="btn btn-success" type="submit"
+    *ngIf="showButtonSuccess && item_type==='STORE_CHECK' && checkDAQ === true"
+    (click)="onSubmitWithCondition('finish')" style="margin-left: 30px;">
+    <i class="fa fa-save"></i>
+    Hoàn thành
+  </button>
 </div>
+<!--  style="background-color: #185eb5; border-color: #185eb5;margin-left: 30px;" -->
