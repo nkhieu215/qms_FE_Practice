@@ -13,7 +13,7 @@
   position: relative;
   z-index: 10;
   min-height: 100vh;
-  box-shadow: 2px 0 6px rgba(0,21,41,.35);
+  box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
 }
 
 .header-trigger {
@@ -21,7 +21,7 @@
   padding: 20px 24px;
   font-size: 20px;
   cursor: pointer;
-  transition: all .3s,padding 0s;
+  transition: all .3s, padding 0s;
 }
 
 .trigger:hover {
@@ -51,7 +51,7 @@
   color: #fff;
   font-weight: 600;
   font-size: 14px;
-  font-family: Avenir,Helvetica Neue,Arial,Helvetica,sans-serif;
+  font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
   vertical-align: middle;
 }
 
@@ -66,7 +66,7 @@ nz-header {
   height: 64px;
   padding: 0;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
 }
 
 nz-content {
@@ -79,20 +79,22 @@ nz-content {
   /* height: 100%; */
 }
 
-::ng-deep .ant-table.ant-table-default
-{
-      padding: 6px;
+::ng-deep .ant-table.ant-table-default {
+  padding: 6px;
 
 }
+
 .row {
   padding: 5px;
 }
 
-a{
+a {
   text-decoration: none;
 }
 
-.mat-h5, .mat-typography .mat-h5, .mat-typography h5 {
+.mat-h5,
+.mat-typography .mat-h5,
+.mat-typography h5 {
   font: 00 calc(14px * 0.83) / 20px Roboto, "Helvetica Neue", sans-serif;
   margin: 0 0 12px;
 }
@@ -114,11 +116,167 @@ a .btn-info {
   --bs-btn-disabled-border-color: #0dcaf0;
 }
 
-select .form-control{
+select .form-control {
   -webkit-appearance: auto !important;
   appearance: auto !important;
 }
 
-.form-control.is-invalid, .was-validated .form-control:invalid {
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
   border-color: #dc3545;
+}
+
+::ng-deep .mat-tab-link {
+  color: white !important;
+}
+
+.nz-tabset {
+  margin: 16px;
+}
+
+.nz-tab {
+  padding: 8px;
+}
+
+.nz-tab a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.nz-tab a:hover {
+  color: #40a9ff;
+}
+
+.app-layout {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.sidebar-logo {
+  text-align: center;
+  padding: 16px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.inner-content {
+  padding: 16px;
+}
+
+.tab-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close-tab {
+  margin-left: auto;
+  color: #ff4d4f;
+  transition: color 0.3s;
+}
+
+.close-tab:hover {
+  color: #ff7875;
+}
+
+.tab-content {
+  /* display: flex;
+  justify-content: center; */
+  align-items: center;
+  height: 100%;
+  min-height: 200px;
+  position: relative;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #757575;
+  /* Màu chữ */
+}
+
+.loading-container p {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #616161;
+  /* Màu chữ phụ */
+}
+
+.mat-progress-spinner {
+  margin: auto;
+}
+
+.sidenav .mat-icon {
+  color: #ffffff;
+  /* Màu icon trong sidebar */
+}
+
+.sidenav .mat-icon:hover {
+  color: #1890ff;
+  /* Màu icon khi hover */
+}
+
+/* Màu nền cho danh sách con */
+.mat-expansion-panel {
+  background-color: #001529;
+  /* Màu nền của panel */
+  color: #ffffff;
+  /* Màu chữ */
+}
+
+.mat-expansion-panel-header {
+  background-color: #001529;
+  /* Màu nền của tiêu đề panel */
+  color: #ffffff;
+  /* Màu chữ của tiêu đề */
+}
+
+.mat-expansion-panel-content {
+  background-color: #292f35;
+  /* Màu nền của danh sách con */
+  padding: 0;
+  /* Loại bỏ padding mặc định */
+}
+
+.mat-nav-list {
+  padding: 0;
+  /* Loại bỏ padding mặc định */
+}
+
+.mat-list-item {
+  color: #ffffff;
+  /* Màu chữ của danh sách con */
+}
+
+.mat-list-item:hover {
+  background-color: #1890ff;
+  /* Màu nền khi hover */
+  color: #ffffff;
+  /* Màu chữ khi hover */
+}
+
+.mat-icon {
+  color: #ffffff;
+  /* Màu icon */
+}
+
+.mat-icon:hover {
+  color: #1890ff;
+  /* Màu icon khi hover */
 }

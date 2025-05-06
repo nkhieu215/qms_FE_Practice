@@ -24,15 +24,19 @@ const routes: Routes = [
     },
     loadChildren: () => import('./pages/iqc/iqc-routing.module').then(m => m.IqcRoutingModule)
   },
-  { path: 'pqc',
-  data: {
-    breadcrumb: 'PQC',
+  {
+    path: 'pqc',
+    data: {
+      breadcrumb: 'PQC',
+    },
+    loadChildren: () => import('./pages/pqc/pqc-routing.module').then(m => m.PqcRoutingModule)
   },
-  loadChildren: () => import('./pages/pqc/pqc-routing.module').then(m => m.PqcRoutingModule) },
-  { path: 'setting',
-  data: {
-    breadcrumb: 'Cài đặt',
-  }, loadChildren: () => import('./pages/setting/setting-routing.module').then(m => m.SettingRoutingModule) }
+  {
+    path: 'setting',
+    data: {
+      breadcrumb: 'Cài đặt',
+    }, loadChildren: () => import('./pages/setting/setting-routing.module').then(m => m.SettingRoutingModule)
+  }
 ];
 
 @NgModule({

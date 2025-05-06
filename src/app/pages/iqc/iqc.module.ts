@@ -72,7 +72,7 @@ import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGenerato
     MatDialogModule,
     MatFormFieldModule,
     NzLayoutModule,
-    NzFormModule, BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule
+    NzFormModule, BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule, MatDatepickerModule, MatInputModule, MatNativeDateModule, MatSelectModule, NgxMatSelectSearchModule, MatCheckboxModule, NgbCollapseModule, NgbAlertModule, NgbPaginationModule,
   ]
 })
 

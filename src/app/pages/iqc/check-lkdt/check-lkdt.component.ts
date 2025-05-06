@@ -324,8 +324,10 @@ export class CheckLkdtComponent implements OnInit {
         this.listOfItem = res;
       })
       let data = await this.iqcCheckService.detail(this.id);
-      this.form = data.component;
+      this.form = data.component || {};
       setTimeout(() => {
+        this.form.importDate = this.form.importDate ? new Date(this.form.importDate) : new Date();
+        this.form.checkDate = this.form.checkDate ? new Date(this.form.checkDate) : new Date();
         if (this.form.iqcElectType == 'false') {
           this.form.iqcElectType = false;
         } else {
@@ -338,7 +340,8 @@ export class CheckLkdtComponent implements OnInit {
       // console.log("checkdate ::" +  this.form.checkDate);
 
 
-      this.form.importDate = new Date(this.form.importDate);
+      // this.form.importDate = new Date();
+      // this.form.checkDate = new Date();
       this.strSelectElec = data.component.elecCompCode;
       this.strSelectElecName = data.component.elecCompName;
       this.strSelectOrigin = data.component.origin;

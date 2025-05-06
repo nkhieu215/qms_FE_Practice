@@ -1,12 +1,12 @@
-<nz-layout class="app-layout">
-  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null"  nzBreakpoint="lg">
+<!-- <nz-layout class="app-layout">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null" nzBreakpoint="lg">
     <div class="sidebar-logo">
       <a routerLink="/">
         <img src="{{isCollapsed ? '../assets/img/logo_hide.png' :'../assets/img/logo.png'}}" alt="logo">
         <h1>QMS</h1>
       </a>
     </div>
-    <ul nz-menu nzTheme="dark" nzMode="inline"  [nzInlineCollapsed]="isCollapsed">
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
 
       <li nz-menu-item nz-tooltip nzTooltipPlacement="right" style="padding-left: 10px;">
         <span nz-icon nzType="dashboard"></span>
@@ -16,14 +16,14 @@
         <span nz-icon nzType="dashboard"></span>
         <span routerLink="/dashboard-qms">Dashboard QMS</span>
       </li>
-      <li nz-submenu nzTitle="{{menu.name}}" nzIcon="{{menu.classIcon}}" *ngFor="let menu of lstMenuRes" nzOpen="{{ isCollapsed ? 'false': 'true' }}"
-        [nzPaddingLeft]="10">
+      <li nz-submenu nzTitle="{{menu.name}}" nzIcon="{{menu.classIcon}}" *ngFor="let menu of lstMenuRes"
+        nzOpen="{{ isCollapsed ? 'false': 'true' }}" [nzPaddingLeft]="10">
         <a *ngIf="menu.lstChild == null" routerLink="{{menu.url}}" class="nav-link">
           {{menu.name}}
         </a>
         <ul *ngIf="menu.lstChild != null">
           <li nz-menu-item nzMatchRouter *ngFor="let menuChild of menu.lstChild" style="padding-left: 15px;">
-            <a routerLink="{{menuChild.url}}" enableForKeycloakAuthorization="resource#create" >
+            <a routerLink="{{menuChild.url}}" enableForKeycloakAuthorization="resource#create">
               <span nz-icon nzType="{{menuChild.classIcon}}" nzTheme="outline"></span>
               {{menuChild.name}}
             </a>
@@ -49,13 +49,118 @@
     </nz-header>
     <nz-content>
       <div class="inner-content">
-        <!-- <div class="breadcrumb">
-          <nz-breadcrumb [nzAutoGenerate]="true"></nz-breadcrumb>
-        </div> -->
         <router-outlet></router-outlet>
       </div>
     </nz-content>
   </nz-layout>
 </nz-layout>
 
-<ng-http-loader></ng-http-loader>
+<ng-http-loader></ng-http-loader> -->
+<mat-sidenav-container class="app-layout">
+  <!-- Sidebar -->
+  <mat-sidenav mode="side" [(opened)]="isCollapsed" class="sidenav">
+    <div class="sidebar-logo">
+      <a routerLink="/">
+        <img src="{{isCollapsed ? '../assets/img/logo_hide.png' :'../assets/img/logo.png'}}" alt="logo">
+        <h1 *ngIf="!isCollapsed">QMS</h1>
+      </a>
+    </div>
+    <mat-nav-list style="background-color: #001529;">
+      <!-- Home -->
+      <a mat-list-item (click)="openTab('Home', '/')" matTooltip="Trang chủ">
+        <mat-icon>home</mat-icon>
+        <span style="color: white;">Home</span>
+      </a>
+      <!-- Dashboard -->
+      <a mat-list-item (click)="openTab('Dashboard', '/dashboard')" matTooltip="Dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span style="color: white;">Dashboard</span>
+      </a>
+
+      <!-- Dashboard QMS -->
+      <a mat-list-item (click)="openTab('Dashboard QMS', '/dashboard-qms')" matTooltip="Dashboard QMS">
+        <mat-icon>analytics</mat-icon>
+        <span style="color: white;">Dashboard QMS</span>
+      </a>
+
+      <!-- Dynamic Menu -->
+      <mat-expansion-panel *ngFor="let menu of lstMenuRes" [expanded]="true">
+        <mat-expansion-panel-header matTooltip="{{menu.name}}">
+          <mat-panel-title>
+            <mat-icon style="color: white;">
+              <ng-container [ngSwitch]="menu.classIcon">
+                <ng-container *ngSwitchCase="'dashboard'">dashboard</ng-container>
+                <ng-container *ngSwitchCase="'analytics'">analytics</ng-container>
+                <ng-container *ngSwitchCase="'settings'">settings</ng-container>
+                <ng-container *ngSwitchCase="'group'">group</ng-container>
+                <ng-container *ngSwitchCase="'notifications'">notifications</ng-container>
+                <ng-container *ngSwitchDefault>label</ng-container>
+              </ng-container>
+            </mat-icon>
+            <span style="color: white;">{{menu.name}}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-nav-list *ngIf="menu.lstChild">
+          <a mat-list-item *ngFor="let menuChild of menu.lstChild" (click)="openTab(menuChild.name!, menuChild.url!)"
+            matTooltip="{{menuChild.name}}">
+            <mat-icon style="color: white;">
+              <ng-container [ngSwitch]="menuChild.classIcon">
+                <ng-container *ngSwitchCase="'dashboard'">dashboard</ng-container>
+                <ng-container *ngSwitchCase="'analytics'">analytics</ng-container>
+                <ng-container *ngSwitchCase="'settings'">settings</ng-container>
+                <ng-container *ngSwitchCase="'group'">group</ng-container>
+                <ng-container *ngSwitchCase="'notifications'">notifications</ng-container>
+                <ng-container *ngSwitchDefault>folder</ng-container>
+              </ng-container>
+            </mat-icon>
+            <span style="color: white;">{{menuChild.name}}</span>
+          </a>
+        </mat-nav-list>
+      </mat-expansion-panel>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main Layout -->
+  <mat-sidenav-content>
+    <!-- Header -->
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="isCollapsed = !isCollapsed">
+        <mat-icon>{{ isCollapsed ? 'menu' : 'menu_open' }}</mat-icon>
+      </button>
+      <span class="spacer"></span>
+      <span>{{strName}}</span>
+      <button mat-icon-button (click)="signOut()" matTooltip="Thoát">
+        <mat-icon>power_settings_new</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Tabs -->
+    <div class="inner-content">
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+        <mat-tab *ngFor="let tab of tabs; let i = index">
+          <ng-template mat-tab-label>
+            <div class="tab-label" matTooltip="{{tab.title}}">
+              <span class="tab-title">{{ tab.title }}</span>
+              <button mat-icon-button *ngIf="i !== 0" (click)="closeTab(i)" class="close-tab">
+                <mat-icon style="color: red;">close</mat-icon>
+              </button>
+            </div>
+          </ng-template>
+          <div class="tab-content">
+            <!-- Loading Spinner -->
+            <div class="loading-container" *ngIf="loadingTabs[i]">
+              <mat-progress-spinner mode="indeterminate" diameter="60" strokeWidth="5" color="accent">
+              </mat-progress-spinner>
+              <p>Đang tải nội dung...</p>
+            </div>
+
+            <!-- Tab Content -->
+            <div *ngIf="!loadingTabs[i] && selectedTabIndex === i">
+              <router-outlet></router-outlet>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -533,6 +533,8 @@ export class CheckNvlComponent implements OnInit {
       var id = this.id;
       let data = await this.iqcCheckService.detail(id);
       this.form = data.component;
+      console.log('form :: :: NVL ::', this.form);
+
       setTimeout(() => {
         if (this.form.iqcElectType == 'false') {
           this.form.iqcElectType = false;

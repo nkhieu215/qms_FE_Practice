@@ -35,6 +35,12 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { IqcModule } from './pages/iqc/iqc.module';
@@ -47,10 +53,10 @@ import { HomePageModule } from './pages/home-page/home-page.module';
 import { NgChartsModule } from 'ng2-charts';
 import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { Scale } from 'chart.js';
-import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
-import { FilterErrorsPipe } from './pages/pqc/show/filter-errors.pipe';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+// import { BarcodeGeneratorAllModule, QRCodeGeneratorAllModule, DataMatrixGeneratorAllModule } from '@syncfusion/ej2-angular-barcode-generator'
 registerLocaleData(en);
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -98,7 +104,35 @@ registerLocaleData(en);
     PqcModule,
     NzBreadCrumbModule,
     NgChartsModule,
+    MatTabsModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatListModule,
+    MatTooltipModule,
+    MatExpansionModule,
+    RouterModule.forRoot([]),
+    MatProgressSpinnerModule,
   ],
+  // providers: [
+  //   { provide: NZ_I18N, useValue: en_US },
+  //   {
+  //     provide: APP_INITIALIZER,
+  //     useFactory: initializer,
+  //     deps: [KeycloakService],
+  //     multi: true,
+  //   },
+  //   {
+  //     provide: HTTP_INTERCEPTORS,
+  //     useClass: AuthInterceptorService,
+  //     multi: true,
+
+  //   },
+  //   { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+  //   [{ provide: HTTP_INTERCEPTORS, useClass: TimeoutInterceptor, multi: true }],
+  //   [{ provide: DEFAULT_TIMEOUT, useValue: 30000 }],
+
+
+  // ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
     {
@@ -111,13 +145,14 @@ registerLocaleData(en);
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptorService,
       multi: true,
-
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TimeoutInterceptor,
+      multi: true,
     },
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
-    [{ provide: HTTP_INTERCEPTORS, useClass: TimeoutInterceptor, multi: true }],
-    [{ provide: DEFAULT_TIMEOUT, useValue: 30000 }],
-
-
+    { provide: DEFAULT_TIMEOUT, useValue: 30000 },
   ],
   bootstrap: [AppComponent]
 })

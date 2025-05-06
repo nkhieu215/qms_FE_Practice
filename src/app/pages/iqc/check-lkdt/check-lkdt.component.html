@@ -270,16 +270,23 @@
               </div>
 
               <div class="col-md-3" style="width: 12.5%;">
-                <mat-label>Ngày nhận hàng <i style="color: red;">(*)</i></mat-label>
-                <input class="form-control" type="date" name="importDate"
-                  [ngModel]="form.importDate | date:'yyyy-MM-dd'" (ngModelChange)="form.importDate = $event" />
+                <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%;">
+                  <mat-label>Ngày nhận hàng <i style="color: red;">(*)</i></mat-label>
+                  <input matInput [matDatepicker]="importDate" class="form-control" name="importDate"
+                    [(ngModel)]="form.importDate" />
+                  <mat-datepicker-toggle matSuffix [for]="importDate"></mat-datepicker-toggle>
+                  <mat-datepicker #importDate></mat-datepicker>
+                </mat-form-field>
               </div>
 
               <div class="col-md-3" style="width: 12.5%;">
-                <mat-label>Ngày kiểm <i style="color: red;">(*)</i></mat-label>
-                <!-- #docregion toggle -->
-                <input class="form-control" type="date" name="checkDate" [ngModel]="form.checkDate | date:'yyyy-MM-dd'"
-                  (ngModelChange)="form.checkDate = $event" />
+                <mat-form-field appearance="outline" style="margin-top: 10px; width: 100%;">
+                  <mat-label>Ngày kiểm <i style="color: red;">(*)</i></mat-label>
+                  <input matInput [matDatepicker]="checkDate" class="form-control" name="checkDate"
+                    [(ngModel)]="form.checkDate" />
+                  <mat-datepicker-toggle matSuffix [for]="checkDate"></mat-datepicker-toggle>
+                  <mat-datepicker #checkDate></mat-datepicker>
+                </mat-form-field>
               </div>
               <div class="col-md-3">
                 <label>Nhà cung cấp</label>

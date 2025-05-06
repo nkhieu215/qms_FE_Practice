@@ -207,6 +207,14 @@ export class StoreCheckComponent implements OnInit {
       this.edit = false;
       this.create = true;
       this.lstview = false;
+      this.errorService.getAllCategories().subscribe(
+        (data) => {
+          this.lstErrorRes = data;
+          this.lstErrorGr = data.lstError;
+          console.log(this.lstErrorRes);
+        },
+        (err) => { }
+      );
     } else if (type === 'edit') {
       this.edit = true;
       this.create = false;
